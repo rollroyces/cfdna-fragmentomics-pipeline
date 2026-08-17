@@ -34,14 +34,20 @@ S3 = "https://s3.us-east-2.amazonaws.com/finaledb.epifluidlab.cchmc.org"
 
 def query_seqruns(disease: str | None = None, healthy: bool = False,
                   limit: int = 12, offset: int = 0) -> list[dict]:
-    """Query the FinaleDB seqrun API; filter by disease / healthy status."""
+    """Query the FinaleDB seqrun API; filter by disease / healthy status.
+
+    The API paginates via offset/total (no `next` link), so we loop pages
+    of 50 until we have `limit` matching runs or reach the end.
+    """
     runs: list[dict] = []
-    params = f"?page_size=50&offset={offset}"
-    while True:
-        url = API + params
-        with urllib.request.urlopen(url, timeout=30) as u:
+    page_offset = offset
+    while len(runs) < limit:
+        params = f"page_size=50&offset={page_offset}"
+        with urllib.request.urlopen(API + "?" + params, timeout=30) as u:
             d = json.load(u)
-        for r in d.get("results", []):
+        results = d.get("results", [])
+        total = d.get("total", 0)
+        for r in results:
             sample = r.get("sample") or {}
             dis = (sample.get("disease") or "?")
             if healthy and dis != "Healthy":
@@ -51,9 +57,9 @@ def query_seqruns(disease: str | None = None, healthy: bool = False,
             runs.append(r)
             if len(runs) >= limit:
                 return runs
-        if not d.get("next") or len(runs) >= limit:
+        if not results or page_offset + 50 >= total:
             break
-        params = d["next"].split("?", 1)[-1]
+        page_offset += 50
     return runs
 
 
