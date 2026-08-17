@@ -20,6 +20,7 @@ import argparse
 import gzip
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -27,6 +28,17 @@ import urllib.request
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "scripts"))
 from fetch_finaledb import query_seqruns, download_frag  # noqa: E402
+
+# Cell-line / technical-control names (not patient plasma) — exclude.
+# e.g. GM1100 (B-lymphocyte line) is labeled "Liver cancer" in FinaleDB
+# but is a reference sample; its fragmentation differs from in-vivo cfDNA.
+CELL_LINE_PATTERN = re.compile(
+    r'^(GM\d+|HeLa|HepG2|K562|HL60|Jurkat|Raji|MCF7|U937|THP1|HEK293|'
+    r'HCT116|SW480|A549|GM12878)', re.I)
+
+
+def is_cell_line(sample: str) -> bool:
+    return bool(CELL_LINE_PATTERN.match(sample))
 
 PY = sys.executable
 SCRIPTS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "scripts")
@@ -103,11 +115,17 @@ def main():
     work = []  # (sample, seqrun_id, label)
     for r in cancer_runs:
         s = (r.get("sample") or {}).get("name", f"run{r['id']}")
+        if is_cell_line(s):
+            print(f"  [exclude] {s} (cell-line control, not patient plasma)")
+            continue
         if _done(s):
             processed.append(s); labels[s] = "cancer"; continue
         work.append((s, r["id"], "cancer"))
     for r in healthy_runs:
         s = (r.get("sample") or {}).get("name", f"run{r['id']}")
+        if is_cell_line(s):
+            print(f"  [exclude] {s} (cell-line control, not patient plasma)")
+            continue
         if _done(s):
             processed.append(s); labels[s] = "healthy"; continue
         work.append((s, r["id"], "healthy"))

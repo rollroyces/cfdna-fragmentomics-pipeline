@@ -56,27 +56,22 @@ snakemake -s main.smk --configfile config.yaml --cores 4
 
 Place deduplicated BAMs in `data/raw/<sample>.mdups.bam` and set `mode: "bam"` in `config.yaml`. Extractors use pysam with the strict contract: **properly-paired reads, MAPQ ≥ 30**. 4-mer motifs require a reference FASTA (`reference_fasta` in config).
 
-## Real-data result (60 samples)
+## Real-data result (121 samples, single study)
 
-**AUC 0.967, Sens@95% 0.867, Sens@99% 0.867** — 30 liver cancer vs 30 healthy cfDNA WGS samples (Sun et al. 2019 via FinaleDB), Logistic Regression on the full 5Mb fragment-ratio + coverage profile, PCA-reduced to 30 components inside each CV fold (5-fold, pooled out-of-fold predictions, no leakage).
+**AUC 0.956, Sens@95% 0.831, Sens@99% 0.640** — 89 liver cancer vs 32 healthy cfDNA WGS samples, all from **Jiang et al. 2015 (PNAS, PMID 25646427)** — the low-pass cfDNA HCC cohort, fetched via FinaleDB with a study filter (`--publication 6`) and a deep-WGS file-size guard (`--max-mb 500`). Logistic Regression on the full 5Mb fragment-ratio + coverage profile, PCA-reduced to 30 components inside each CV fold (5-fold, pooled out-of-fold predictions, no leakage).
+
+**Data-quality controls applied:**
+- **Single study only** — mixing FinaleDB studies pulls in deep-WGS samples (2.6–3.7 GB files vs ~200–270 MB low-pass) whose coverage differences create a batch effect. `--publication 6` restricts to Jiang 2015.
+- **File-size guard** — `frag_file_size()` HEAD-checks each sample and rejects files > 500 MB (deep-WGS regime).
+- **Cell-line exclusion** — GM1100 (B-lymphocyte line, mislabeled "Liver cancer" in FinaleDB) and similar technical controls are filtered out; their fragmentation differs from in-vivo plasma cfDNA.
 
 | Model | AUC | Sens@95% | Sens@99% |
 |---|---|---|---|
-| **Logistic Regression** | **0.967** | **0.867** | **0.867** |
-| Random Forest | 0.948 | 0.833 | 0.600 |
-| Gradient Boosting | 0.861 | 0.433 | 0.333 |
+| **Logistic Regression** | **0.956** | **0.831** | **0.640** |
+| Random Forest | 0.954 | 0.640 | 0.573 |
+| Gradient Boosting | 0.874 | 0.596 | 0.258 |
 
-**Why LR wins at high specificity:** RF's `predict_proba` is a quantized vote-fraction (ties at the 0-false-positive threshold), while LR emits continuous, well-calibrated scores — critical for the 99%-spec operating point where a single healthy outlier caps the threshold.
-
-| Iteration | Approach | AUC |
-|---|---|---|
-| baseline | 24 samples, 16 summary features | 0.764 |
-| + FSD profile | + 5bp fragment-length histogram (100-220bp) | 0.806 |
-| + full profile + PCA | full 5Mb ratio+coverage profile → PCA → RF, 60 samples | 0.944 |
-| + PCA n=30 | optimal component count | 0.948 |
-| **+ Logistic Regression** | continuous calibrated scores | **0.967** |
-
-Reproduce: `python run_real_cohort.py --cancer "Liver cancer" --healthy --n-cancer 30 --n-healthy 30 --parallel 6 --pca`
+Reproduce: `python run_real_cohort.py --cancer "Liver cancer" --healthy --n-cancer 90 --n-healthy 32 --parallel 8 --publication 6 --max-mb 500 --pca`
 
 ## Honest validation
 
