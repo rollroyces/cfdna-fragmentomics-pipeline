@@ -80,6 +80,42 @@ def load_features(features_dir: str, labels: dict[str, int],
             w = w[np.isfinite(w)]
             feats += [float(np.mean(w)), float(np.std(w)), float(np.median(w))]
             fnames += ["wps_mean", "wps_std", "wps_median"]
+        # FSD full profile (5bp bins 100-220bp — the fragment-length shape
+        # is the primary tumor signal: tumor cfDNA is shorter)
+        size_bins = d.get("size_bins", {})
+        for b in sorted(size_bins):
+            # keep the informative 100-220bp window (24 bins)
+            try:
+                lo = int(b.split("-")[0])
+            except ValueError:
+                continue
+            if 100 <= lo < 220:
+                feats.append(float(size_bins[b]))
+                fnames.append(f"fsd_bin_{b}")
+        # 5Mb DELFI ratio vector (CNA-scale chromatin signal)
+        r5 = os.path.join(features_dir, f"{sample}.delfi_5mb_ratio.npy")
+        if os.path.exists(r5):
+            v5 = np.load(r5)
+            v5 = v5[np.isfinite(v5) & (v5 > 0)]
+            feats += [float(np.mean(v5)), float(np.median(v5)),
+                      float(np.percentile(v5, 10)), float(np.percentile(v5, 90)),
+                      float(np.std(v5)),
+                      float((v5 > np.percentile(v5, 90)).mean())]
+            fnames += ["delfi5_mean", "delfi5_median", "delfi5_p10",
+                       "delfi5_p90", "delfi5_std", "delfi5_extreme_frac"]
+        # CNV coverage profile (5Mb, median-normalized → copy number aberrations)
+        cov5 = os.path.join(features_dir, f"{sample}.delfi_5mb_coverage.npy")
+        if os.path.exists(cov5):
+            c5 = np.load(cov5)
+            c5 = c5[np.isfinite(c5) & (c5 > 0)]
+            feats += [float(np.std(c5)),
+                      float((c5 < 0.8).mean()),      # deletions
+                      float((c5 > 1.2).mean()),      # amplifications
+                      float((c5 > 1.5).mean()),      # high-level amps
+                      float(np.percentile(c5, 5)),
+                      float(np.percentile(c5, 95))]
+            fnames += ["cnv_std", "cnv_del_frac", "cnv_amp_frac",
+                       "cnv_high_amp_frac", "cnv_p5", "cnv_p95"]
         # Motifs (optional)
         if with_motifs:
             mf = os.path.join(features_dir, f"{sample}.motifs.json")

@@ -172,6 +172,19 @@ def extract(path: str, out_dir: str, sample: str) -> dict:
     np.save(os.path.join(out_dir, f"{sample}.delfi_100kb_ratio.npy"), ratios)
     np.save(os.path.join(out_dir, f"{sample}.wps_100kb.npy"), wps_vals)
 
+    # 5Mb ratio vector + CNV coverage profile (median-normalized)
+    ratio_5mb = np.array([float(b["ratio"]) for c in CHROM_SIZES
+                          for b in [bins_5mb[f"{c}:{s}-{e}"]
+                                    for (s, e) in windows_5mb[c]]])
+    cover_5mb = np.array([int(short_5[c][i]) + int(long_5[c][i])
+                          for c in CHROM_SIZES
+                          for i in range(len(windows_5mb[c]))])
+    # median-normalize coverage to 1.0 → depth-independent CNV signal
+    med = float(np.median(cover_5mb[cover_5mb > 0]))
+    cover_norm = cover_5mb.astype(float) / max(med, 1.0)
+    np.save(os.path.join(out_dir, f"{sample}.delfi_5mb_ratio.npy"), ratio_5mb)
+    np.save(os.path.join(out_dir, f"{sample}.delfi_5mb_coverage.npy"), cover_norm)
+
     out = os.path.join(out_dir, f"{sample}.delfi.json")
     with open(out, "w") as f:
         json.dump(result, f)

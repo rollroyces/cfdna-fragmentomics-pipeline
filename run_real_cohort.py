@@ -83,18 +83,21 @@ def main():
     labels = {}
     print(f"Cohort: {len(cancer_runs)} cancer + {len(healthy_runs)} healthy")
 
-    # 2. Stream: fetch → extract → delete (skip samples with features already)
+    # 2. Stream: fetch → extract → delete (skip samples fully processed)
     processed = []
+    def _done(s):
+        return os.path.exists(os.path.join(FEAT, f"{s}.fsd.json")) and \
+               os.path.exists(os.path.join(FEAT, f"{s}.delfi_5mb_ratio.npy"))
     for r in cancer_runs:
         s = (r.get("sample") or {}).get("name", f"run{r['id']}")
-        if os.path.exists(os.path.join(FEAT, f"{s}.fsd.json")):
+        if _done(s):
             processed.append(s); labels[s] = "cancer"; continue
         if process_sample(s, r["id"], args.keep_raw):
             labels[s] = "cancer"
             processed.append(s)
     for r in healthy_runs:
         s = (r.get("sample") or {}).get("name", f"run{r['id']}")
-        if os.path.exists(os.path.join(FEAT, f"{s}.fsd.json")):
+        if _done(s):
             processed.append(s); labels[s] = "healthy"; continue
         if process_sample(s, r["id"], args.keep_raw):
             labels[s] = "healthy"
