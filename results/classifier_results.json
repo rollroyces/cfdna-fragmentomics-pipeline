@@ -19,11 +19,11 @@
     "wps_std",
     "wps_median"
   ],
-  "n_samples": 7,
-  "n_folds": 7,
-  "auc_mean": 0.25,
+  "n_samples": 24,
+  "n_folds": 24,
+  "auc_mean": 0.763888888888889,
   "auc_std": 0.0,
   "sens95_mean": 0.0,
   "sens99_mean": 0.0,
-  "n_out_of_fold": 7
+  "n_out_of_fold": 24
 }
