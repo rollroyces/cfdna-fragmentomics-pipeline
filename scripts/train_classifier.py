@@ -32,6 +32,7 @@ import numpy as np
 
 try:
     from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+    from sklearn.decomposition import PCA
     from sklearn.metrics import roc_auc_score, roc_curve
     from sklearn.model_selection import StratifiedKFold, LeaveOneOut
     from sklearn.preprocessing import StandardScaler
@@ -140,7 +141,7 @@ def load_features(features_dir: str, labels: dict[str, int],
     return X, y, names
 
 
-def evaluate_cv(X, y, model, cv) -> dict:
+def evaluate_cv(X, y, model, cv, use_pca: bool = False, pca_n: int = 20) -> dict:
     """K-fold CV with POOLED out-of-fold predictions.
 
     Per-fold AUC is undefined for small test folds (e.g. LOOCV single
@@ -159,6 +160,12 @@ def evaluate_cv(X, y, model, cv) -> dict:
         scaler = StandardScaler().fit(X[tr])
         Xtr = scaler.transform(X[tr])
         Xte = scaler.transform(X[te])
+        # PCA on the full profile inside the fold (DELFI: profile → PCA → RF)
+        if use_pca and pca_n > 0 and Xtr.shape[1] > pca_n:
+            n_comp = min(pca_n, Xtr.shape[1], Xtr.shape[0])
+            pca = PCA(n_components=n_comp, random_state=42).fit(Xtr)
+            Xtr = pca.transform(Xtr)
+            Xte = pca.transform(Xte)
         m = model.fit(Xtr, y[tr])
         p = m.predict_proba(Xte)[:, 1]
         y_true_all.extend(y[te].tolist())
@@ -183,6 +190,31 @@ def evaluate_cv(X, y, model, cv) -> dict:
     }
 
 
+def load_full_profile(features_dir: str, labels: dict[str, int]) -> tuple[np.ndarray, np.ndarray]:
+    """Load the FULL 5Mb ratio + coverage vectors (DELFI profile).
+
+    Returns (X, y) where X has one row per sample and one column per
+    5Mb genomic bin (ratio) + per 5Mb bin (coverage) — ~1040 columns.
+    PCA is applied inside CV folds to reduce this to a discriminative
+    subspace (Cristiano et al. 2019 profile → PCA → RF).
+    """
+    rows = []
+    y = []
+    for sample in sorted(labels):
+        r5 = os.path.join(features_dir, f"{sample}.delfi_5mb_ratio.npy")
+        c5 = os.path.join(features_dir, f"{sample}.delfi_5mb_coverage.npy")
+        if not (os.path.exists(r5) and os.path.exists(c5)):
+            continue
+        v = np.concatenate([np.load(r5), np.load(c5)])
+        rows.append(v)
+        y.append(labels[sample])
+    X = np.asarray(rows, dtype=float)
+    y = np.asarray(y, dtype=int)
+    # NaN/Inf → 0 (bins with no coverage)
+    X = np.nan_to_num(X, nan=0.0, posinf=0.0, neginf=0.0)
+    return X, y
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -190,6 +222,10 @@ def main():
     ap.add_argument("--labels", required=True)
     ap.add_argument("--out", default="results")
     ap.add_argument("--model", choices=["rf", "gb"], default="rf")
+    ap.add_argument("--pca", action="store_true",
+                    help="PCA-reduce the full profile inside each CV fold (DELFI-style)")
+    ap.add_argument("--pca-n", type=int, default=20,
+                    help="number of PCA components (default 20)")
     ap.add_argument("--cv", type=int, default=5, help="folds (0 = LOOCV)")
     ap.add_argument("--with-motifs", action="store_true")
     ap.add_argument("--n-estimators", type=int, default=300)
@@ -212,8 +248,15 @@ def main():
     print(f"Labels: {len(labels)} samples "
           f"({sum(labels.values())} cancer, {len(labels) - sum(labels.values())} healthy)")
 
-    X, y, fnames = load_features(args.features, labels, args.with_motifs)
-    print(f"Feature matrix: {X.shape[0]} samples x {X.shape[1]} features")
+    if args.pca:
+        # DELFI-style: full 5Mb profile → PCA (inside CV) → RF
+        X, y = load_full_profile(args.features, labels)
+        feature_desc = "full-5mb-profile-pca"
+        print(f"Full 5Mb profile matrix: {X.shape[0]} samples x {X.shape[1]} bins")
+    else:
+        X, y, fnames = load_features(args.features, labels, args.with_motifs)
+        feature_desc = fnames
+        print(f"Feature matrix: {X.shape[0]} samples x {X.shape[1]} features")
 
     if args.model == "rf":
         model = RandomForestClassifier(n_estimators=args.n_estimators,
@@ -224,11 +267,11 @@ def main():
     cv = LeaveOneOut() if args.cv == 0 or X.shape[0] < 25 else \
         StratifiedKFold(n_splits=args.cv, shuffle=True, random_state=42)
 
-    res = evaluate_cv(X, y, model, cv)
+    res = evaluate_cv(X, y, model, cv, use_pca=args.pca, pca_n=args.pca_n)
     os.makedirs(args.out, exist_ok=True)
     out_path = os.path.join(args.out, "classifier_results.json")
     with open(out_path, "w") as f:
-        json.dump({"model": args.model, "cv": str(cv), "features": fnames,
+        json.dump({"model": args.model, "cv": str(cv), "features": feature_desc,
                    "n_samples": int(X.shape[0]), **res}, f, indent=2)
     print(f"\n=== RESULTS ({args.model}, {res['n_folds']}-fold CV) ===")
     print(f"AUC:         {res['auc_mean']:.3f} ± {res['auc_std']:.3f}")
