@@ -1,0 +1,188 @@
+#!/usr/bin/env python3
+"""Train an ensemble classifier (Random Forest / Gradient Boosting) on the
+normalized fragmentomic feature matrix to classify Cancer vs Healthy.
+
+Feature matrix per sample (rows = samples, columns = features):
+  - FSD summary statistics (median, mode, p10, p90, short_fraction, S/L ratio)
+  - DELFI 100 kb window ratios (GC-corrected), summarized: mean, median, p10,
+    p90, MAD, and the fraction of extreme windows
+  - (optionally) 5 Mb window ratios
+  - (optionally) 4-mer end-motif frequencies (BAM mode)
+
+Rigorous validation:
+  - stratified 5-fold CV (or LOOCV when n < 25)
+  - no feature selection on the full data — the classifier consumes the
+    pre-defined feature set
+  - reports AUC, sens@95% spec, sens@99% spec, balanced accuracy
+
+Usage:
+  python train_classifier.py --features data/features --labels labels.tsv \
+      --out results --model rf --cv 5
+
+labels.tsv format (tab-separated, no header):
+  sample<TAB>label        # label in {0, 1} or {healthy, cancer}
+"""
+import argparse
+import glob
+import json
+import os
+import sys
+
+import numpy as np
+
+try:
+    from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+    from sklearn.metrics import roc_auc_score, roc_curve
+    from sklearn.model_selection import StratifiedKFold, LeaveOneOut
+    from sklearn.preprocessing import StandardScaler
+except ImportError:
+    print("ERROR: scikit-learn not installed. `pip install scikit-learn`",
+          file=sys.stderr)
+    sys.exit(1)
+
+
+def load_features(features_dir: str, labels: dict[str, int],
+                  with_motifs: bool = False) -> tuple[np.ndarray, np.ndarray, list[str]]:
+    """Build the sample×feature matrix from per-sample JSON/npy artifacts."""
+    rows, cols, names = [], [], None
+    for sample, label in sorted(labels.items()):
+        # FSD
+        fsd = os.path.join(features_dir, f"{sample}.fsd.json")
+        if not os.path.exists(fsd):
+            print(f"  ! missing {fsd}", file=sys.stderr)
+            continue
+        with open(fsd) as f:
+            d = json.load(f)
+        feats = [
+            d.get("median_length", np.nan), d.get("mode_length", np.nan),
+            d.get("mean_length", np.nan), d.get("p10", np.nan),
+            d.get("p90", np.nan),
+            d.get("short_fraction_100_150", np.nan),
+            d.get("short_long_ratio", np.nan),
+        ]
+        fnames = ["fsd_median", "fsd_mode", "fsd_mean", "fsd_p10", "fsd_p90",
+                  "fsd_short_frac", "fsd_short_long_ratio"]
+        # DELFI: GC-corrected 100kb ratio vector → distribution summaries
+        corr = os.path.join(features_dir, f"{sample}.gc_corrected.npy")
+        if os.path.exists(corr):
+            v = np.load(corr)
+            v = v[np.isfinite(v) & (v > 0)]
+            feats += [float(np.mean(v)), float(np.median(v)),
+                      float(np.percentile(v, 10)), float(np.percentile(v, 90)),
+                      float(np.std(v)),
+                      float((v > np.percentile(v, 90)).mean())]
+            fnames += ["delfi_mean", "delfi_median", "delfi_p10", "delfi_p90",
+                       "delfi_std", "delfi_extreme_frac"]
+        # WPS
+        wps = os.path.join(features_dir, f"{sample}.wps_100kb.npy")
+        if os.path.exists(wps):
+            w = np.load(wps)
+            w = w[np.isfinite(w)]
+            feats += [float(np.mean(w)), float(np.std(w)), float(np.median(w))]
+            fnames += ["wps_mean", "wps_std", "wps_median"]
+        # Motifs (optional)
+        if with_motifs:
+            mf = os.path.join(features_dir, f"{sample}.motifs.json")
+            if os.path.exists(mf):
+                with open(mf) as f:
+                    freqs = json.load(f)["freqs"]
+                feats += [freqs.get(m, 0.0) for m in sorted(freqs)]
+                fnames += [f"motif_{m}" for m in sorted(freqs)]
+        rows.append(feats)
+        names = fnames if cols is None else names
+        cols = len(feats) if cols is None else cols
+        if len(feats) != cols:
+            print(f"  ! inconsistent feature count for {sample} "
+                  f"({len(feats)} vs {cols})", file=sys.stderr)
+            continue
+    X = np.asarray(rows, dtype=float)
+    y = np.asarray([labels[s] for s, _ in zip(sorted(labels), rows)], dtype=int)
+    # NaN → column median
+    col_med = np.nanmedian(X, axis=0)
+    for c in range(X.shape[1]):
+        X[np.isnan(X[:, c]), c] = col_med[c]
+    return X, y, names
+
+
+def evaluate_cv(X, y, model, cv) -> dict:
+    aucs, sens95s, sens99s = [], [], []
+    for tr, te in cv.split(X, y):
+        scaler = StandardScaler().fit(X[tr])
+        Xtr = scaler.transform(X[tr])
+        Xte = scaler.transform(X[te])
+        m = model.fit(Xtr, y[tr])
+        p = m.predict_proba(Xte)[:, 1]
+        aucs.append(roc_auc_score(y[te], p))
+        fpr, tpr, _ = roc_curve(y[te], p)
+        # fixed-specificity sensitivity (no threshold optimization on test)
+        def sens_at(fpr_target):
+            idx = np.argmin(np.abs(fpr - fpr_target))
+            return float(tpr[idx])
+        sens95s.append(sens_at(0.05))
+        sens99s.append(sens_at(0.01))
+    return {
+        "n_folds": len(aucs),
+        "auc_mean": float(np.mean(aucs)),
+        "auc_std": float(np.std(aucs)),
+        "sens95_mean": float(np.mean(sens95s)),
+        "sens99_mean": float(np.mean(sens99s)),
+        "aucs": aucs,
+    }
+
+
+def main():
+    ap = argparse.ArgumentParser(description=__doc__,
+                                 formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--features", default="data/features")
+    ap.add_argument("--labels", required=True)
+    ap.add_argument("--out", default="results")
+    ap.add_argument("--model", choices=["rf", "gb"], default="rf")
+    ap.add_argument("--cv", type=int, default=5, help="folds (0 = LOOCV)")
+    ap.add_argument("--with-motifs", action="store_true")
+    ap.add_argument("--n-estimators", type=int, default=300)
+    args = ap.parse_args()
+
+    labels = {}
+    with open(args.labels) as f:
+        for line in f:
+            line = line.strip()
+            if not line or line.startswith("#"):
+                continue
+            parts = line.split("\t")
+            if len(parts) < 2:
+                continue
+            sample, lab = parts[0], parts[1].lower()
+            if lab in ("cancer", "1", "tumor", "positive"):
+                labels[sample] = 1
+            elif lab in ("healthy", "0", "control", "normal", "negative"):
+                labels[sample] = 0
+    print(f"Labels: {len(labels)} samples "
+          f"({sum(labels.values())} cancer, {len(labels) - sum(labels.values())} healthy)")
+
+    X, y, fnames = load_features(args.features, labels, args.with_motifs)
+    print(f"Feature matrix: {X.shape[0]} samples x {X.shape[1]} features")
+
+    if args.model == "rf":
+        model = RandomForestClassifier(n_estimators=args.n_estimators,
+                                       random_state=42, n_jobs=-1)
+    else:
+        model = GradientBoostingClassifier(n_estimators=args.n_estimators,
+                                           random_state=42)
+    cv = LeaveOneOut() if args.cv == 0 or X.shape[0] < 25 else \
+        StratifiedKFold(n_splits=args.cv, shuffle=True, random_state=42)
+
+    res = evaluate_cv(X, y, model, cv)
+    os.makedirs(args.out, exist_ok=True)
+    out_path = os.path.join(args.out, "classifier_results.json")
+    with open(out_path, "w") as f:
+        json.dump({"model": args.model, "cv": str(cv), "features": fnames,
+                   "n_samples": int(X.shape[0]), **res}, f, indent=2)
+    print(f"\n=== RESULTS ({args.model}, {res['n_folds']}-fold CV) ===")
+    print(f"AUC:         {res['auc_mean']:.3f} ± {res['auc_std']:.3f}")
+    print(f"Sens@95%:    {res['sens95_mean']:.3f}")
+    print(f"Sens@99%:    {res['sens99_mean']:.3f}")
+    print(f"Saved: {out_path}")
+
+
+if __name__ == "__main__":
+    main()

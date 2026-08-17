@@ -1,0 +1,16 @@
+name: cfdna-fragmentomics
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python=3.11
+  - numpy
+  - scipy
+  - scikit-learn
+  - pandas
+  - pysam            # BAM-mode feature extraction
+  - snakemake-minimal  # workflow orchestration
+  - pybigwig         # optional: bigWig parsing
+  - pip
+  - pip:
+      - tabix         # bgzf/bgzip reading (FinaleDB .bgz files)

@@ -1,0 +1,23 @@
+# ── Raw data (never committed) ─────────────────────────────────────────
+data/raw/*
+data/features/*
+data/references/*.bgz
+data/references/*.bw
+results/*.pkl
+results/*.pdf
+results/*.png
+
+# ── Python ─────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# ── Snakemake ──────────────────────────────────────────────────────────
+.snakemake/
+slurm_logs/
+logs/
+
+# ── OS ─────────────────────────────────────────────────────────────────
+.DS_Store

@@ -1,0 +1,29 @@
+# cfdna-fragmentomics-pipeline configuration
+# Two modes:
+#   mode: "finaledb"  → fetch real pre-processed cfDNA fragment records from
+#                       FinaleDB (CCHMC) — no local BAM processing needed
+#   mode: "bam"       → local BAMs: bwa-mem → Picard dedup → pysam features
+
+mode: "finaledb"
+
+# FinaleDB fetch parameters (mode=finaledb)
+disease: "Liver cancer"     # disease label; "" = any
+healthy: false              # fetch "Healthy" controls instead of disease
+n_samples: 12               # max samples to fetch
+
+# BAM mode parameters (mode=bam)
+reference_fasta: "/path/to/hg38.fa"
+bam_dir: "data/raw"         # place <sample>.mdups.bam here
+
+# Samples & labels (FinaleDB mode: names match manifest; auto-populated)
+samples: []
+labels: {}
+
+# GC reference (per 100kb bin GC fraction, hg38)
+gc_reference: "data/references/hg38_100kb_gc.npy"
+
+# Classification
+model: "rf"                 # rf | gb
+cv: 5                       # folds (0 = LOOCV)
+with_motifs: false          # true only in bam mode
+out_dir: "results"
