@@ -177,7 +177,19 @@ def evaluate_cv(X, y, model, cv, use_pca: bool = False, pca_n: int = 20) -> dict
     fpr, tpr, _ = roc_curve(y_true, y_score)
 
     def sens_at(fpr_target):
-        idx = np.argmin(np.abs(fpr - fpr_target))
+        """Sensitivity at the operating point with FPR ≤ target.
+
+        With n controls, FPR is quantized in steps of 1/n; the correct
+        fixed-specificity sensitivity is the TPR at the LARGEST FPR that
+        does not exceed the target (e.g. 99% spec with 30 controls → 0
+        false positives → the threshold just above the top healthy score).
+        The old argmin(|fpr-target|) snapped to fpr=0.0 (ROC origin) and
+        wrongly reported 0.0 sensitivity.
+        """
+        ok = fpr <= fpr_target + 1e-9
+        if not ok.any():
+            return 0.0
+        idx = int(np.where(ok)[0][-1])  # last (highest) valid operating point
         return float(tpr[idx])
 
     return {

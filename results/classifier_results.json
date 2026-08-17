@@ -6,7 +6,7 @@
   "n_folds": 5,
   "auc_mean": 0.9477777777777778,
   "auc_std": 0.0,
-  "sens95_mean": 0.6666666666666666,
-  "sens99_mean": 0.0,
+  "sens95_mean": 0.8333333333333334,
+  "sens99_mean": 0.6,
   "n_out_of_fold": 60
 }
