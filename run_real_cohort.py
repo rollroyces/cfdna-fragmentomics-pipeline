@@ -42,11 +42,12 @@ def run(*args):
     return r.stdout.strip()
 
 
-def process_sample(sample: str, seqrun_id: int, keep_raw: bool = False):
+def process_sample(sample: str, seqrun_id: int, keep_raw: bool = False,
+                   max_mb: float = 500):
     raw = os.path.join(RAW, f"{sample}.frag.tsv.bgz")
     if not os.path.exists(raw):
         print(f"  [fetch] {sample} (seqrun {seqrun_id}) ...", flush=True)
-        if not download_frag(seqrun_id, raw):
+        if not download_frag(seqrun_id, raw, max_mb=max_mb):
             return False
     print(f"  [extract] {sample} ...", flush=True)
     run(PY, os.path.join(SCRIPTS, "extract_fsd.py"),
@@ -72,6 +73,10 @@ def main():
     ap.add_argument("--cv", type=int, default=5)
     ap.add_argument("--parallel", type=int, default=1,
                     help="concurrent sample downloads (I/O-bound; default 1)")
+    ap.add_argument("--publication", type=int, default=None,
+                    help="restrict to one FinaleDB study (6 = Jiang 2015 low-pass)")
+    ap.add_argument("--max-mb", type=float, default=500,
+                    help="reject frag files larger than this (deep-WGS guard)")
     ap.add_argument("--pca", action="store_true", help="DELFI-style full-profile PCA")
     args = ap.parse_args()
 
@@ -80,11 +85,14 @@ def main():
     os.makedirs(args.out, exist_ok=True)
 
     # 1. Discover samples
-    cancer_runs = query_seqruns(args.cancer, healthy=False, limit=args.n_cancer)
-    healthy_runs = query_seqruns(None, healthy=args.healthy, limit=args.n_healthy) \
+    cancer_runs = query_seqruns(args.cancer, healthy=False, limit=args.n_cancer,
+                                publication=args.publication)
+    healthy_runs = query_seqruns(None, healthy=args.healthy, limit=args.n_healthy,
+                                 publication=args.publication) \
         if args.healthy else []
     labels = {}
-    print(f"Cohort: {len(cancer_runs)} cancer + {len(healthy_runs)} healthy")
+    print(f"Cohort: {len(cancer_runs)} cancer + {len(healthy_runs)} healthy "
+          f"(publication={args.publication}, max {args.max_mb:.0f}MB)")
 
     # 2. Stream: fetch → extract → delete (skip samples fully processed)
     processed = []
@@ -109,7 +117,7 @@ def main():
         print(f"Fetching {len(work)} samples with {args.parallel} workers ...")
         def _proc(item):
             s, sid, lab = item
-            ok = process_sample(s, sid, args.keep_raw)
+            ok = process_sample(s, sid, args.keep_raw, max_mb=args.max_mb)
             return s, lab, ok
         with ThreadPoolExecutor(max_workers=args.parallel) as ex:
             futs = {ex.submit(_proc, w): w for w in work}
@@ -124,7 +132,7 @@ def main():
                     print(f"  [{done}/{len(work)}] done", flush=True)
     else:
         for s, sid, lab in work:
-            if process_sample(s, sid, args.keep_raw):
+            if process_sample(s, sid, args.keep_raw, max_mb=args.max_mb):
                 labels[s] = lab
                 processed.append(s)
     if len(processed) < 4:

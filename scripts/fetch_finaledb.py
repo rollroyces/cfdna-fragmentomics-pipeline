@@ -33,11 +33,16 @@ S3 = "https://s3.us-east-2.amazonaws.com/finaledb.epifluidlab.cchmc.org"
 
 
 def query_seqruns(disease: str | None = None, healthy: bool = False,
-                  limit: int = 12, offset: int = 0) -> list[dict]:
-    """Query the FinaleDB seqrun API; filter by disease / healthy status.
+                  limit: int = 12, offset: int = 0,
+                  publication: int | None = None) -> list[dict]:
+    """Query the FinaleDB seqrun API; filter by disease / healthy / publication.
 
     The API paginates via offset/total (no `next` link), so we loop pages
     of 50 until we have `limit` matching runs or reach the end.
+
+    `publication` filters to a single study (e.g. 6 = Jiang et al. 2015,
+    the low-pass cfDNA HCC cohort) so coverage depth stays uniform —
+    mixing studies (some are deep WGS) creates a coverage batch effect.
     """
     runs: list[dict] = []
     page_offset = offset
@@ -50,6 +55,10 @@ def query_seqruns(disease: str | None = None, healthy: bool = False,
         for r in results:
             sample = r.get("sample") or {}
             dis = (sample.get("disease") or "?")
+            pub = r.get("publication")
+            pid = pub.get("id") if isinstance(pub, dict) else pub
+            if publication is not None and pid != publication:
+                continue
             if healthy and dis != "Healthy":
                 continue
             if disease and dis != disease:
@@ -63,10 +72,32 @@ def query_seqruns(disease: str | None = None, healthy: bool = False,
     return runs
 
 
-def download_frag(seqrun_id: int, out_path: str) -> bool:
-    """Stream the frag.tsv.bgz for a seqrun to out_path."""
+def frag_file_size(seqrun_id: int, max_mb: float = 500) -> int:
+    """HEAD the frag.tsv.bgz and return its size in bytes (0 if error)."""
     key = f"entries/EE{seqrun_id}/hg38/EE{seqrun_id}.hg38.frag.tsv.bgz"
     url = f"{S3}/{key}"
+    req = urllib.request.Request(url, method="HEAD")
+    try:
+        with urllib.request.urlopen(req, timeout=30) as u:
+            return int(u.headers.get("Content-Length", 0))
+    except (urllib.error.HTTPError, urllib.error.URLError):
+        return 0
+
+
+def download_frag(seqrun_id: int, out_path: str,
+                  max_mb: float = 500) -> bool:
+    """Stream the frag.tsv.bgz for a seqrun to out_path.
+
+    Rejects files > max_mb MB (deep-WGS samples have multi-GB fragment
+    files; low-pass cfDNA is ~170 MB). Returns False (skip) on oversize.
+    """
+    key = f"entries/EE{seqrun_id}/hg38/EE{seqrun_id}.hg38.frag.tsv.bgz"
+    url = f"{S3}/{key}"
+    size = frag_file_size(seqrun_id)
+    if 0 < size > max_mb * 1024 * 1024:
+        print(f"  ! skip {seqrun_id}: {size/1e6:.0f}MB (deep WGS, > {max_mb:.0f}MB)",
+              file=sys.stderr)
+        return False
     tmp = out_path + ".part"
     try:
         with urllib.request.urlopen(url, timeout=600) as u, open(tmp, "wb") as f:
