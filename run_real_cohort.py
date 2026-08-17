@@ -70,6 +70,9 @@ def main():
     ap.add_argument("--keep-raw", action="store_true")
     ap.add_argument("--model", default="rf")
     ap.add_argument("--cv", type=int, default=5)
+    ap.add_argument("--parallel", type=int, default=1,
+                    help="concurrent sample downloads (I/O-bound; default 1)")
+    ap.add_argument("--pca", action="store_true", help="DELFI-style full-profile PCA")
     args = ap.parse_args()
 
     os.makedirs(RAW, exist_ok=True)
@@ -88,20 +91,42 @@ def main():
     def _done(s):
         return os.path.exists(os.path.join(FEAT, f"{s}.fsd.json")) and \
                os.path.exists(os.path.join(FEAT, f"{s}.delfi_5mb_ratio.npy"))
+
+    work = []  # (sample, seqrun_id, label)
     for r in cancer_runs:
         s = (r.get("sample") or {}).get("name", f"run{r['id']}")
         if _done(s):
             processed.append(s); labels[s] = "cancer"; continue
-        if process_sample(s, r["id"], args.keep_raw):
-            labels[s] = "cancer"
-            processed.append(s)
+        work.append((s, r["id"], "cancer"))
     for r in healthy_runs:
         s = (r.get("sample") or {}).get("name", f"run{r['id']}")
         if _done(s):
             processed.append(s); labels[s] = "healthy"; continue
-        if process_sample(s, r["id"], args.keep_raw):
-            labels[s] = "healthy"
-            processed.append(s)
+        work.append((s, r["id"], "healthy"))
+
+    if args.parallel > 1 and work:
+        from concurrent.futures import ThreadPoolExecutor, as_completed
+        print(f"Fetching {len(work)} samples with {args.parallel} workers ...")
+        def _proc(item):
+            s, sid, lab = item
+            ok = process_sample(s, sid, args.keep_raw)
+            return s, lab, ok
+        with ThreadPoolExecutor(max_workers=args.parallel) as ex:
+            futs = {ex.submit(_proc, w): w for w in work}
+            done = 0
+            for fut in as_completed(futs):
+                s, lab, ok = fut.result()
+                done += 1
+                if ok:
+                    labels[s] = lab
+                    processed.append(s)
+                if done % 5 == 0:
+                    print(f"  [{done}/{len(work)}] done", flush=True)
+    else:
+        for s, sid, lab in work:
+            if process_sample(s, sid, args.keep_raw):
+                labels[s] = lab
+                processed.append(s)
     if len(processed) < 4:
         print("ERROR: too few samples processed", file=sys.stderr)
         sys.exit(1)
@@ -123,9 +148,12 @@ def main():
         for s, lab in sorted(labels.items()):
             f.write(f"{s}\t{lab}\n")
     print(f"\nLabels written: {labels_path} ({len(labels)} samples)")
-    run(PY, os.path.join(SCRIPTS, "train_classifier.py"),
-        "--features", FEAT, "--labels", labels_path, "--out", args.out,
-        "--model", args.model, "--cv", str(args.cv))
+    cmd = [PY, os.path.join(SCRIPTS, "train_classifier.py"),
+           "--features", FEAT, "--labels", labels_path, "--out", args.out,
+           "--model", args.model, "--cv", str(args.cv)]
+    if args.pca:
+        cmd.append("--pca")
+    run(*cmd)
     res = json.load(open(os.path.join(args.out, "classifier_results.json")))
     print("\n=== REAL-DATA FRAGMENTOMICS CLASSIFICATION ===")
     print(f"  n={res['n_samples']}  AUC={res['auc_mean']:.3f}±{res['auc_std']:.3f}  "
