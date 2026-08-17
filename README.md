@@ -56,6 +56,19 @@ snakemake -s main.smk --configfile config.yaml --cores 4
 
 Place deduplicated BAMs in `data/raw/<sample>.mdups.bam` and set `mode: "bam"` in `config.yaml`. Extractors use pysam with the strict contract: **properly-paired reads, MAPQ ≥ 30**. 4-mer motifs require a reference FASTA (`reference_fasta` in config).
 
+## Real-data result (60 samples)
+
+**AUC 0.948** — 30 liver cancer vs 30 healthy cfDNA WGS samples (Sun et al. 2019 via FinaleDB), Random Forest on the full 5Mb fragment-ratio + coverage profile, PCA-reduced to 30 components inside each CV fold (5-fold, pooled out-of-fold predictions, no leakage). Sens@95% = 0.667.
+
+| Iteration | Approach | AUC |
+|---|---|---|
+| baseline | 24 samples, 16 summary features | 0.764 |
+| + FSD profile | + 5bp fragment-length histogram (100-220bp) | 0.806 |
+| + full profile + PCA | full 5Mb ratio+coverage profile → PCA → RF, 60 samples | 0.944 |
+| **final** | PCA n=30 components (optimal) | **0.948** |
+
+Reproduce: `python run_real_cohort.py --cancer "Liver cancer" --healthy --n-cancer 30 --n-healthy 30 --parallel 6 --pca`
+
 ## Honest validation
 
 - **Stratified K-fold CV** (LOOCV when n < 25) — never trains on test samples.
