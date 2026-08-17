@@ -1,0 +1,29 @@
+{
+  "model": "rf",
+  "cv": "LeaveOneOut()",
+  "features": [
+    "fsd_median",
+    "fsd_mode",
+    "fsd_mean",
+    "fsd_p10",
+    "fsd_p90",
+    "fsd_short_frac",
+    "fsd_short_long_ratio",
+    "delfi_mean",
+    "delfi_median",
+    "delfi_p10",
+    "delfi_p90",
+    "delfi_std",
+    "delfi_extreme_frac",
+    "wps_mean",
+    "wps_std",
+    "wps_median"
+  ],
+  "n_samples": 7,
+  "n_folds": 7,
+  "auc_mean": 0.25,
+  "auc_std": 0.0,
+  "sens95_mean": 0.0,
+  "sens99_mean": 0.0,
+  "n_out_of_fold": 7
+}

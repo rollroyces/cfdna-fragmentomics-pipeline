@@ -44,7 +44,7 @@ except ImportError:
 def load_features(features_dir: str, labels: dict[str, int],
                   with_motifs: bool = False) -> tuple[np.ndarray, np.ndarray, list[str]]:
     """Build the sample×feature matrix from per-sample JSON/npy artifacts."""
-    rows, cols, names = [], [], None
+    rows, cols, names = [], None, None
     for sample, label in sorted(labels.items()):
         # FSD
         fsd = os.path.join(features_dir, f"{sample}.fsd.json")
@@ -105,28 +105,45 @@ def load_features(features_dir: str, labels: dict[str, int],
 
 
 def evaluate_cv(X, y, model, cv) -> dict:
-    aucs, sens95s, sens99s = [], [], []
+    """K-fold CV with POOLED out-of-fold predictions.
+
+    Per-fold AUC is undefined for small test folds (e.g. LOOCV single
+    samples), so we collect all out-of-fold predictions and compute a
+    single ROC/AUC/fixed-specificity sensitivity on the pooled set —
+    the standard honest protocol for small cohorts.
+    """
+    y_true_all: list[int] = []
+    y_score_all: list[float] = []
+    # Drop constant columns (std=0) — StandardScaler would produce NaN
+    keep = np.nanstd(X, axis=0) > 1e-12
+    X = X[:, keep]
+    if X.shape[1] == 0:
+        raise ValueError("all features are constant — nothing to learn")
     for tr, te in cv.split(X, y):
         scaler = StandardScaler().fit(X[tr])
         Xtr = scaler.transform(X[tr])
         Xte = scaler.transform(X[te])
         m = model.fit(Xtr, y[tr])
         p = m.predict_proba(Xte)[:, 1]
-        aucs.append(roc_auc_score(y[te], p))
-        fpr, tpr, _ = roc_curve(y[te], p)
-        # fixed-specificity sensitivity (no threshold optimization on test)
-        def sens_at(fpr_target):
-            idx = np.argmin(np.abs(fpr - fpr_target))
-            return float(tpr[idx])
-        sens95s.append(sens_at(0.05))
-        sens99s.append(sens_at(0.01))
+        y_true_all.extend(y[te].tolist())
+        y_score_all.extend(p.tolist())
+
+    y_true = np.asarray(y_true_all)
+    y_score = np.asarray(y_score_all)
+    auc = float(roc_auc_score(y_true, y_score))
+    fpr, tpr, _ = roc_curve(y_true, y_score)
+
+    def sens_at(fpr_target):
+        idx = np.argmin(np.abs(fpr - fpr_target))
+        return float(tpr[idx])
+
     return {
-        "n_folds": len(aucs),
-        "auc_mean": float(np.mean(aucs)),
-        "auc_std": float(np.std(aucs)),
-        "sens95_mean": float(np.mean(sens95s)),
-        "sens99_mean": float(np.mean(sens99s)),
-        "aucs": aucs,
+        "n_folds": len(list(cv.split(X, y))),
+        "auc_mean": auc,
+        "auc_std": 0.0,  # pooled OOF — single estimate (honest for small n)
+        "sens95_mean": sens_at(0.05),
+        "sens99_mean": sens_at(0.01),
+        "n_out_of_fold": len(y_true),
     }
 
 

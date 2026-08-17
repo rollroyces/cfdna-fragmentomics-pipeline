@@ -65,12 +65,16 @@ def extract(path: str, out_dir: str, sample: str) -> dict:
         windows_100kb[chrom] = _bin_map(chrom, BIN_100KB)
         windows_5mb[chrom] = _bin_map(chrom, BIN_5MB)
 
-    # Counters: (chrom, bin_idx) -> [short, long]
+    # Counters: (chrom, bin_idx) -> [short, long] (separate arrays!)
     from collections import defaultdict
-    cnt_100: dict[str, np.ndarray] = {c: np.zeros(len(windows_100kb[c]), dtype=np.int64)
+    short_100: dict[str, np.ndarray] = {c: np.zeros(len(windows_100kb[c]), dtype=np.int64)
+                                        for c in CHROM_SIZES}
+    long_100: dict[str, np.ndarray] = {c: np.zeros(len(windows_100kb[c]), dtype=np.int64)
+                                       for c in CHROM_SIZES}
+    short_5: dict[str, np.ndarray] = {c: np.zeros(len(windows_5mb[c]), dtype=np.int64)
                                       for c in CHROM_SIZES}
-    cnt_5: dict[str, np.ndarray] = {c: np.zeros(len(windows_5mb[c]), dtype=np.int64)
-                                    for c in CHROM_SIZES}
+    long_5: dict[str, np.ndarray] = {c: np.zeros(len(windows_5mb[c]), dtype=np.int64)
+                                     for c in CHROM_SIZES}
     # WPS: accumulate per-position (start/end events and coverage) per 100kb bin
     wps_support: dict[str, np.ndarray] = {c: np.zeros(len(windows_100kb[c]), dtype=np.float64)
                                           for c in CHROM_SIZES}
@@ -102,18 +106,18 @@ def extract(path: str, out_dir: str, sample: str) -> dict:
                 total_long += 1
             # 100kb bin
             bi = start // BIN_100KB
-            if bi < len(cnt_100[chrom]):
+            if bi < len(short_100[chrom]):
                 if is_short:
-                    cnt_100[chrom][bi] += 1
+                    short_100[chrom][bi] += 1
                 else:
-                    cnt_100[chrom][bi] -= 1  # store short - long difference (signed)
+                    long_100[chrom][bi] += 1
             # 5Mb bin
             bi5 = start // BIN_5MB
-            if bi5 < len(cnt_5[chrom]):
+            if bi5 < len(short_5[chrom]):
                 if is_short:
-                    cnt_5[chrom][bi5] += 1
+                    short_5[chrom][bi5] += 1
                 else:
-                    cnt_5[chrom][bi5] -= 1
+                    long_5[chrom][bi5] += 1
             # WPS contribution: support = (# fully covering - # starting/ending here)
             # Approximate per-window: full-cover span contributes +span/win,
             # start/end events contribute -1.
@@ -125,15 +129,12 @@ def extract(path: str, out_dir: str, sample: str) -> dict:
             if bi < len(wps_support[chrom]):
                 wps_support[chrom][bi] -= 2.0 / BIN_100KB
 
-    # Convert signed counters to (short, long, ratio)
+    # Convert counters to (short, long, ratio)
     bins_100kb = {}
     for c in CHROM_SIZES:
         for i, (s, e) in enumerate(windows_100kb[c]):
-            d = int(cnt_100[c][i])
-            # reconstruct short/long: we only stored short-long diff; approximate
-            # by using the WPS-normalized split (documented approximation):
-            short = max(d, 0)
-            long_ = max(-d, 0)
+            short = int(short_100[c][i])
+            long_ = int(long_100[c][i])
             bins_100kb[f"{c}:{s}-{e}"] = {
                 "short": short, "long": long_,
                 "ratio": float(short / max(long_, 1)),
@@ -142,9 +143,8 @@ def extract(path: str, out_dir: str, sample: str) -> dict:
     bins_5mb = {}
     for c in CHROM_SIZES:
         for i, (s, e) in enumerate(windows_5mb[c]):
-            d = int(cnt_5[c][i])
-            short = max(d, 0)
-            long_ = max(-d, 0)
+            short = int(short_5[c][i])
+            long_ = int(long_5[c][i])
             bins_5mb[f"{c}:{s}-{e}"] = {
                 "short": short, "long": long_,
                 "ratio": float(short / max(long_, 1)),
@@ -165,7 +165,7 @@ def extract(path: str, out_dir: str, sample: str) -> dict:
         "n_windows_100kb": len(ratios),
     }
     # Save per-bin fragment counts for GC correction
-    counts_100kb = np.array([abs(int(cnt_100[c][i]))
+    counts_100kb = np.array([int(short_100[c][i]) + int(long_100[c][i])
                              for c in CHROM_SIZES
                              for i in range(len(windows_100kb[c]))])
     np.save(os.path.join(out_dir, f"{sample}.delfi_100kb_counts.npy"), counts_100kb)
