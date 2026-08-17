@@ -58,14 +58,23 @@ Place deduplicated BAMs in `data/raw/<sample>.mdups.bam` and set `mode: "bam"` i
 
 ## Real-data result (60 samples)
 
-**AUC 0.948** — 30 liver cancer vs 30 healthy cfDNA WGS samples (Sun et al. 2019 via FinaleDB), Random Forest on the full 5Mb fragment-ratio + coverage profile, PCA-reduced to 30 components inside each CV fold (5-fold, pooled out-of-fold predictions, no leakage). Sens@95% = 0.667.
+**AUC 0.967, Sens@95% 0.867, Sens@99% 0.867** — 30 liver cancer vs 30 healthy cfDNA WGS samples (Sun et al. 2019 via FinaleDB), Logistic Regression on the full 5Mb fragment-ratio + coverage profile, PCA-reduced to 30 components inside each CV fold (5-fold, pooled out-of-fold predictions, no leakage).
+
+| Model | AUC | Sens@95% | Sens@99% |
+|---|---|---|---|
+| **Logistic Regression** | **0.967** | **0.867** | **0.867** |
+| Random Forest | 0.948 | 0.833 | 0.600 |
+| Gradient Boosting | 0.861 | 0.433 | 0.333 |
+
+**Why LR wins at high specificity:** RF's `predict_proba` is a quantized vote-fraction (ties at the 0-false-positive threshold), while LR emits continuous, well-calibrated scores — critical for the 99%-spec operating point where a single healthy outlier caps the threshold.
 
 | Iteration | Approach | AUC |
 |---|---|---|
 | baseline | 24 samples, 16 summary features | 0.764 |
 | + FSD profile | + 5bp fragment-length histogram (100-220bp) | 0.806 |
 | + full profile + PCA | full 5Mb ratio+coverage profile → PCA → RF, 60 samples | 0.944 |
-| **final** | PCA n=30 components (optimal) | **0.948** |
+| + PCA n=30 | optimal component count | 0.948 |
+| **+ Logistic Regression** | continuous calibrated scores | **0.967** |
 
 Reproduce: `python run_real_cohort.py --cancer "Liver cancer" --healthy --n-cancer 30 --n-healthy 30 --parallel 6 --pca`
 

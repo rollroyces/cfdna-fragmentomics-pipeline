@@ -233,7 +233,7 @@ def main():
     ap.add_argument("--features", default="data/features")
     ap.add_argument("--labels", required=True)
     ap.add_argument("--out", default="results")
-    ap.add_argument("--model", choices=["rf", "gb"], default="rf")
+    ap.add_argument("--model", choices=["rf", "gb", "lr"], default="lr")
     ap.add_argument("--pca", action="store_true",
                     help="PCA-reduce the full profile inside each CV fold (DELFI-style)")
     ap.add_argument("--pca-n", type=int, default=30,
@@ -273,6 +273,9 @@ def main():
     if args.model == "rf":
         model = RandomForestClassifier(n_estimators=args.n_estimators,
                                        random_state=42, n_jobs=-1)
+    elif args.model == "lr":
+        from sklearn.linear_model import LogisticRegression
+        model = LogisticRegression(max_iter=2000, C=1.0)
     else:
         model = GradientBoostingClassifier(n_estimators=args.n_estimators,
                                            random_state=42)
