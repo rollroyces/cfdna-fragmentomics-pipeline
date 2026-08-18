@@ -75,6 +75,11 @@ def extract(path: str, out_dir: str, sample: str) -> dict:
                                       for c in CHROM_SIZES}
     long_5: dict[str, np.ndarray] = {c: np.zeros(len(windows_5mb[c]), dtype=np.int64)
                                      for c in CHROM_SIZES}
+    # Per-bin mean fragment length (Jiang 2015 "shortening" signal, spatial)
+    sumlen_100: dict[str, np.ndarray] = {c: np.zeros(len(windows_100kb[c]), dtype=np.float64)
+                                         for c in CHROM_SIZES}
+    sumlen_5: dict[str, np.ndarray] = {c: np.zeros(len(windows_5mb[c]), dtype=np.float64)
+                                       for c in CHROM_SIZES}
     # WPS: accumulate per-position (start/end events and coverage) per 100kb bin
     wps_support: dict[str, np.ndarray] = {c: np.zeros(len(windows_100kb[c]), dtype=np.float64)
                                           for c in CHROM_SIZES}
@@ -118,6 +123,11 @@ def extract(path: str, out_dir: str, sample: str) -> dict:
                     short_5[chrom][bi5] += 1
                 else:
                     long_5[chrom][bi5] += 1
+            # per-bin mean length (100kb + 5Mb)
+            if bi < len(sumlen_100[chrom]):
+                sumlen_100[chrom][bi] += flen
+            if bi5 < len(sumlen_5[chrom]):
+                sumlen_5[chrom][bi5] += flen
             # WPS contribution: support = (# fully covering - # starting/ending here)
             # Approximate per-window: full-cover span contributes +span/win,
             # start/end events contribute -1.
@@ -171,6 +181,22 @@ def extract(path: str, out_dir: str, sample: str) -> dict:
     np.save(os.path.join(out_dir, f"{sample}.delfi_100kb_counts.npy"), counts_100kb)
     np.save(os.path.join(out_dir, f"{sample}.delfi_100kb_ratio.npy"), ratios)
     np.save(os.path.join(out_dir, f"{sample}.wps_100kb.npy"), wps_vals)
+
+    # Per-bin mean fragment length (spatial shortening signal)
+    cnt_100 = np.array([int(short_100[c][i]) + int(long_100[c][i])
+                        for c in CHROM_SIZES for i in range(len(windows_100kb[c]))])
+    meanlen_100 = np.divide(
+        np.array([sumlen_100[c][i] for c in CHROM_SIZES
+                  for i in range(len(windows_100kb[c]))]),
+        cnt_100, out=np.zeros_like(cnt_100, dtype=float), where=cnt_100 > 0)
+    cnt_5 = np.array([int(short_5[c][i]) + int(long_5[c][i])
+                      for c in CHROM_SIZES for i in range(len(windows_5mb[c]))])
+    meanlen_5 = np.divide(
+        np.array([sumlen_5[c][i] for c in CHROM_SIZES
+                  for i in range(len(windows_5mb[c]))]),
+        cnt_5, out=np.zeros_like(cnt_5, dtype=float), where=cnt_5 > 0)
+    np.save(os.path.join(out_dir, f"{sample}.delfi_100kb_meanlen.npy"), meanlen_100)
+    np.save(os.path.join(out_dir, f"{sample}.delfi_5mb_meanlen.npy"), meanlen_5)
 
     # 5Mb ratio vector + CNV coverage profile (median-normalized)
     ratio_5mb = np.array([float(b["ratio"]) for c in CHROM_SIZES

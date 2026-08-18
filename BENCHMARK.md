@@ -82,6 +82,24 @@ shared.
    excluded; its cell-line fragmentation would have inflated the
    cancer-vs-healthy separation.
 
+## Feature ablation (documented, not hidden)
+
+All three "Big Three" signals were implemented and ablated on a 98-sample
+subset (3-seed pooled OOF, per-study harmonized):
+
+| Feature set | AUC (3-seed) |
+|---|---|
+| 5-channel (ratio + coverage + 100kb + FSD histogram) | 0.875 ± 0.011 |
+| + 4-mer end motifs | 0.880 ± 0.012 (+0.005) |
+| + per-bin mean length | 0.869 ± 0.011 (−0.006) |
+
+**Conclusion:** fragment-size features dominate the signal. 4-mer end motifs
+(a genuinely independent nuclease-preference signal, verified — CCCA is the
+top motif at 0.0153, matching Jiang 2015's DNASE1L3 signature) add a small
+consistent +0.005 but below the noise floor at n=98; per-bin mean length is
+redundant with the short/long ratio. The 5-channel profile is near-optimal
+for this data, so the full 627-sample motif re-extraction was not justified.
+
 ## Sources
 
 - Cristiano et al., *Nature* 570:385 (2019) — DELFI pan-cancer.

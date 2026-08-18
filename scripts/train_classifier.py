@@ -216,6 +216,9 @@ def load_full_profile(features_dir: str, labels: dict[str, int]) -> tuple[np.nda
       3. 100kb short/long ratio    (30,894 bins — finer DELFI ratio)
       4. 100kb coverage (median-norm) (30,894 bins — finer CNA)
       5. FSD size histogram        (196 bins — full fragment-length shape)
+      6. 100kb mean length         (30,894 bins — spatial shortening)
+      7. 5Mb mean length           (631 bins — coarse spatial shortening)
+      8. 4-mer end motifs          (256 bins — nuclease preferences)
 
     The 100kb channels add ~50x spatial resolution; per-sample median
     normalization of coverage removes sequencing-depth batch effects. The
@@ -250,6 +253,15 @@ def load_full_profile(features_dir: str, labels: dict[str, int]) -> tuple[np.nda
                 sb = json.load(f).get("size_bins", {})
             keys = sorted(sb, key=lambda k: int(k.split("-")[0]))
             v.append(np.asarray([sb[k] for k in keys], dtype=float))
+        # Per-bin mean fragment length (spatial shortening)
+        for suf in ("delfi_100kb_meanlen.npy", "delfi_5mb_meanlen.npy"):
+            p = os.path.join(features_dir, f"{sample}.{suf}")
+            if os.path.exists(p):
+                v.append(np.load(p).astype(float))
+        # 4-mer end-motif frequencies (nuclease preferences)
+        mf = os.path.join(features_dir, f"{sample}.motifs.npy")
+        if os.path.exists(mf):
+            v.append(np.load(mf).astype(float))
         rows.append(np.concatenate(v))
         y.append(labels[sample])
         order.append(sample)

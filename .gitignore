@@ -21,3 +21,8 @@ logs/
 
 # ── OS ─────────────────────────────────────────────────────────────────
 .DS_Store
+
+# large references (downloaded on demand, not committed)
+data/references/*.2bit
+data/references/*.fa
+data/references/*.fa.gz
