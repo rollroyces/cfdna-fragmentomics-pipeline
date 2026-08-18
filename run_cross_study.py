@@ -62,7 +62,11 @@ def discover():
 
 def fetch(items, max_mb, parallel):
     work = []
+    seen = set()
     for study, s, sid in items:
+        if s in seen:
+            continue
+        seen.add(s)
         if not (os.path.exists(os.path.join(FEAT, f"{s}.fsd.json")) and
                 os.path.exists(os.path.join(FEAT, f"{s}.delfi_5mb_ratio.npy"))):
             work.append((study, s, sid))
@@ -98,12 +102,19 @@ def main():
     print(f"Cross-study cohort: {len(cancer)} cancer + {len(healthy)} healthy")
     fetch(cancer + healthy, args.max_mb, args.parallel)
 
-    # Write labels with study column (sample \t label \t study)
+    # Write labels with study column (sample \t label \t study), deduped
     labels_path = os.path.join(FEAT, "labels_cross_study.tsv")
+    written = set()
     with open(labels_path, "w") as f:
         for study, s, sid in cancer:
+            if s in written:
+                continue
+            written.add(s)
             f.write(f"{s}\tcancer\t{study}\n")
         for study, s, sid in healthy:
+            if s in written:
+                continue
+            written.add(s)
             f.write(f"{s}\thealthy\t{study}\n")
     print(f"Labels: {labels_path} ({len(cancer) + len(healthy)} samples)")
 

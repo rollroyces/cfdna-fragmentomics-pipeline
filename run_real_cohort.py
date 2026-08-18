@@ -67,7 +67,10 @@ def process_sample(sample: str, seqrun_id: int, keep_raw: bool = False,
     run(PY, os.path.join(SCRIPTS, "extract_delfi.py"),
         "--input", raw, "--sample", sample, "--out-dir", FEAT)
     if not keep_raw and raw.endswith(".frag.tsv.bgz"):
-        os.remove(raw)
+        try:
+            os.remove(raw)
+        except FileNotFoundError:
+            pass  # another worker already removed it (race on duplicate names)
         print(f"  [clean] removed {os.path.basename(raw)}")
     return True
 
