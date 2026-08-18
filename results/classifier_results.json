@@ -4,9 +4,9 @@
   "features": "full-5mb-profile-pca",
   "n_samples": 121,
   "n_folds": 5,
-  "auc_mean": 0.980688202247191,
+  "auc_mean": 0.9803370786516854,
   "auc_std": 0.0,
   "sens95_mean": 0.898876404494382,
-  "sens99_mean": 0.8314606741573034,
+  "sens99_mean": 0.8202247191011236,
   "n_out_of_fold": 121
 }

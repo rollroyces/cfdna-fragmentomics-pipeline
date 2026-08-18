@@ -215,9 +215,13 @@ def load_full_profile(features_dir: str, labels: dict[str, int]) -> tuple[np.nda
       2. 5Mb coverage (median-norm)(631 bins — CNA at 5Mb)
       3. 100kb short/long ratio    (30,894 bins — finer DELFI ratio)
       4. 100kb coverage (median-norm) (30,894 bins — finer CNA)
+      5. FSD size histogram        (196 bins — full fragment-length shape)
 
     The 100kb channels add ~50x spatial resolution; per-sample median
-    normalization of coverage removes sequencing-depth batch effects.
+    normalization of coverage removes sequencing-depth batch effects. The
+    FSD histogram captures the full fragment-length distribution shape
+    (sub-nucleosomal, mononucleosome, dinucleosome peaks) — richer than
+    the single 150bp short/long split.
     Returns (X, y, order); PCA is applied inside CV folds.
     """
     rows = []
@@ -239,6 +243,13 @@ def load_full_profile(features_dir: str, labels: dict[str, int]) -> tuple[np.nda
             if med > 0:
                 c = c / med  # per-sample median-normalize (removes depth)
             v.append(c)
+        # FSD size histogram (5bp bins 20-1000bp) from the FSD JSON
+        fsd_json = os.path.join(features_dir, f"{sample}.fsd.json")
+        if os.path.exists(fsd_json):
+            with open(fsd_json) as f:
+                sb = json.load(f).get("size_bins", {})
+            keys = sorted(sb, key=lambda k: int(k.split("-")[0]))
+            v.append(np.asarray([sb[k] for k in keys], dtype=float))
         rows.append(np.concatenate(v))
         y.append(labels[sample])
         order.append(sample)
