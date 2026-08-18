@@ -141,7 +141,8 @@ def load_features(features_dir: str, labels: dict[str, int],
     return X, y, names
 
 
-def evaluate_cv(X, y, model, cv, use_pca: bool = False, pca_n: int = 20) -> dict:
+def evaluate_cv(X, y, model, cv, use_pca: bool = False, pca_n: int = 20,
+                study_arr=None, harmonize: bool = False) -> dict:
     """K-fold CV with POOLED out-of-fold predictions.
 
     Per-fold AUC is undefined for small test folds (e.g. LOOCV single
@@ -157,9 +158,13 @@ def evaluate_cv(X, y, model, cv, use_pca: bool = False, pca_n: int = 20) -> dict
     if X.shape[1] == 0:
         raise ValueError("all features are constant — nothing to learn")
     for tr, te in cv.split(X, y):
-        scaler = StandardScaler().fit(X[tr])
-        Xtr = scaler.transform(X[tr])
-        Xte = scaler.transform(X[te])
+        if harmonize and study_arr is not None:
+            Xtr, scalers = _harmonize(X[tr], study_arr[tr], None)
+            Xte, _ = _harmonize(X[te], study_arr[te], scalers)
+        else:
+            scaler = StandardScaler().fit(X[tr])
+            Xtr = scaler.transform(X[tr])
+            Xte = scaler.transform(X[te])
         # PCA on the full profile inside the fold (DELFI: profile → PCA → RF)
         if use_pca and pca_n > 0 and Xtr.shape[1] > pca_n:
             n_comp = min(pca_n, Xtr.shape[1], Xtr.shape[0])
@@ -202,16 +207,18 @@ def evaluate_cv(X, y, model, cv, use_pca: bool = False, pca_n: int = 20) -> dict
     }
 
 
-def load_full_profile(features_dir: str, labels: dict[str, int]) -> tuple[np.ndarray, np.ndarray]:
+def load_full_profile(features_dir: str, labels: dict[str, int]) -> tuple[np.ndarray, np.ndarray, list[str]]:
     """Load the FULL 5Mb ratio + coverage vectors (DELFI profile).
 
-    Returns (X, y) where X has one row per sample and one column per
+    Returns (X, y, order) where X has one row per sample and one column per
     5Mb genomic bin (ratio) + per 5Mb bin (coverage) — ~1040 columns.
+    `order` is the sample names in row order (for study-aware harmonization).
     PCA is applied inside CV folds to reduce this to a discriminative
     subspace (Cristiano et al. 2019 profile → PCA → RF).
     """
     rows = []
     y = []
+    order = []
     for sample in sorted(labels):
         r5 = os.path.join(features_dir, f"{sample}.delfi_5mb_ratio.npy")
         c5 = os.path.join(features_dir, f"{sample}.delfi_5mb_coverage.npy")
@@ -220,11 +227,34 @@ def load_full_profile(features_dir: str, labels: dict[str, int]) -> tuple[np.nda
         v = np.concatenate([np.load(r5), np.load(c5)])
         rows.append(v)
         y.append(labels[sample])
+        order.append(sample)
     X = np.asarray(rows, dtype=float)
     y = np.asarray(y, dtype=int)
     # NaN/Inf → 0 (bins with no coverage)
     X = np.nan_to_num(X, nan=0.0, posinf=0.0, neginf=0.0)
-    return X, y
+    return X, y, order
+
+
+def _harmonize(X, study_arr, scalers=None):
+    """Per-study z-score: fit per-study StandardScaler (train) or apply (test).
+
+    Returns (transformed_X, scalers_dict). Fitting on train only and applying
+    the same per-study scalers to test removes study-specific mean/variance
+    shifts without leaking test-set statistics.
+    """
+    if scalers is None:
+        scalers = {}
+        for st in np.unique(study_arr):
+            mask = study_arr == st
+            if mask.sum() > 1:
+                scalers[st] = StandardScaler().fit(X[mask])
+    out = np.empty_like(X, dtype=float)
+    for st, sc in scalers.items():
+        mask = study_arr == st
+        if mask.any():
+            out[mask] = sc.transform(X[mask])
+    # studies with no fitted scaler (single sample in train) → leave as-is
+    return out, scalers
 
 
 def main():
@@ -241,9 +271,13 @@ def main():
     ap.add_argument("--cv", type=int, default=5, help="folds (0 = LOOCV)")
     ap.add_argument("--with-motifs", action="store_true")
     ap.add_argument("--n-estimators", type=int, default=300)
+    ap.add_argument("--harmonize", action="store_true",
+                    help="per-study z-score harmonization (cross-study cohorts; "
+                         "labels file must have a 3rd study column)")
     args = ap.parse_args()
 
     labels = {}
+    studies = {}
     with open(args.labels) as f:
         for line in f:
             line = line.strip()
@@ -257,17 +291,22 @@ def main():
                 labels[sample] = 1
             elif lab in ("healthy", "0", "control", "normal", "negative"):
                 labels[sample] = 0
+            if len(parts) >= 3:
+                studies[sample] = parts[2].strip()
     print(f"Labels: {len(labels)} samples "
           f"({sum(labels.values())} cancer, {len(labels) - sum(labels.values())} healthy)")
 
     if args.pca:
         # DELFI-style: full 5Mb profile → PCA (inside CV) → RF
-        X, y = load_full_profile(args.features, labels)
+        X, y, order = load_full_profile(args.features, labels)
         feature_desc = "full-5mb-profile-pca"
+        study_arr = np.asarray([studies.get(s, "default") for s in order]) \
+            if studies else None
         print(f"Full 5Mb profile matrix: {X.shape[0]} samples x {X.shape[1]} bins")
     else:
         X, y, fnames = load_features(args.features, labels, args.with_motifs)
         feature_desc = fnames
+        study_arr = None
         print(f"Feature matrix: {X.shape[0]} samples x {X.shape[1]} features")
 
     if args.model == "rf":
@@ -282,7 +321,8 @@ def main():
     cv = LeaveOneOut() if args.cv == 0 or X.shape[0] < 25 else \
         StratifiedKFold(n_splits=args.cv, shuffle=True, random_state=42)
 
-    res = evaluate_cv(X, y, model, cv, use_pca=args.pca, pca_n=args.pca_n)
+    res = evaluate_cv(X, y, model, cv, use_pca=args.pca, pca_n=args.pca_n,
+                      study_arr=study_arr, harmonize=args.harmonize)
     os.makedirs(args.out, exist_ok=True)
     out_path = os.path.join(args.out, "classifier_results.json")
     with open(out_path, "w") as f:
