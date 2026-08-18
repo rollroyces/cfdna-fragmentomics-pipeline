@@ -4,6 +4,8 @@
 
 A production-oriented pipeline that extracts the "Big Three" fragmentomic signatures from cfDNA and classifies Cancer vs Healthy **without any prior knowledge of tumor mutations**. Built for reproducibility (Snakemake), honest validation (fixed-specificity metrics, no threshold optimization), and real data (FinaleDB public cohort, no synthetic data).
 
+> **How it compares to industry:** see [BENCHMARK.md](BENCHMARK.md) — at parity with DELFI-HCC on the clinically relevant metric (86% vs 84.5% sensitivity @ 95% specificity), with an honest accounting of where the comparison is and isn't fair.
+
 ---
 
 ## The Big Three fragmentomic features
