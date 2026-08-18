@@ -57,6 +57,20 @@ Three reasons:
    16 cirrhosis + 40 hepatitis B samples) — the clinically relevant test.
 3. **External validation** — train on one study, test on another.
 
+## Data-integrity findings (documented, not hidden)
+
+1. **The high-risk group is cell lines.** FinaleDB's Jiang 2015 "Cirrhosis"
+   (36) and "Hepatitis B" (67) entries are named `GM*` — the Coriell
+   lymphoblastoid cell-line catalog (GM886, GM918, GM1403, …). They are
+   annotated `tissue=blood plasma` but are reference cell lines, not patient
+   plasma. The pipeline's cell-line guard excludes them. **Consequence:** a
+   true HCC-vs-high-risk (cirrhosis/HBV) comparison is *not possible* with
+   this public data — real high-risk patient plasma lives behind the
+   DELFI-HCC cohort (Foda 2023), which is not openly deposited.
+2. **GM1100** (B-lymphocyte line) was mislabeled "Liver cancer" — caught and
+   excluded; its cell-line fragmentation would have inflated the
+   cancer-vs-healthy separation.
+
 ## Sources
 
 - Cristiano et al., *Nature* 570:385 (2019) — DELFI pan-cancer.
