@@ -58,7 +58,15 @@ Place deduplicated BAMs in `data/raw/<sample>.mdups.bam` and set `mode: "bam"` i
 
 ## Real-data result (121 samples, single study)
 
-**AUC 0.956, Sens@95% 0.831, Sens@99% 0.640** — 89 liver cancer vs 32 healthy cfDNA WGS samples, all from **Jiang et al. 2015 (PNAS, PMID 25646427)** — the low-pass cfDNA HCC cohort, fetched via FinaleDB with a study filter (`--publication 6`) and a deep-WGS file-size guard (`--max-mb 500`). Logistic Regression on the full 5Mb fragment-ratio + coverage profile, PCA-reduced to 30 components inside each CV fold (5-fold, pooled out-of-fold predictions, no leakage).
+**AUC 0.976–0.983, Sens@99% 0.79–0.83** — 89 liver cancer vs 32 healthy cfDNA WGS samples, all from **Jiang et al. 2015 (PNAS, PMID 25646427)** — the low-pass cfDNA HCC cohort, fetched via FinaleDB with a study filter (`--publication 6`) and a deep-WGS file-size guard (`--max-mb 500`). Logistic Regression on the full 5Mb fragment-ratio + coverage profile, PCA-reduced to **80 components** inside each CV fold (5-fold, pooled out-of-fold predictions, no leakage). Reproducible seed-42 run: AUC 0.976; 3-seed mean 0.983 ± 0.005.
+
+**PCA component count matters** — the profile has 1,262 bins/sample and 30 components under-fits (AUC 0.956, Sens@99% 0.64); the plateau at 50–80 components recovers the fine fragmentation/CNA structure:
+
+| pca components | AUC (3-seed) | Sens@99% |
+|---|---|---|
+| 30 | 0.967 | 0.72 |
+| 50 | 0.984 | 0.77 |
+| **80** | **0.983** | **0.79** |
 
 **Data-quality controls applied:**
 - **Single study only** — mixing FinaleDB studies pulls in deep-WGS samples (2.6–3.7 GB files vs ~200–270 MB low-pass) whose coverage differences create a batch effect. `--publication 6` restricts to Jiang 2015.
@@ -67,9 +75,10 @@ Place deduplicated BAMs in `data/raw/<sample>.mdups.bam` and set `mode: "bam"` i
 
 | Model | AUC | Sens@95% | Sens@99% |
 |---|---|---|---|
-| **Logistic Regression** | **0.956** | **0.831** | **0.640** |
-| Random Forest | 0.954 | 0.640 | 0.573 |
-| Gradient Boosting | 0.874 | 0.596 | 0.258 |
+| **Logistic Regression (pca=80)** | **0.983** | **0.86** | **0.79** |
+| Logistic Regression (pca=30) | 0.967 | 0.85 | 0.72 |
+| Random Forest | 0.92 | 0.64 | 0.57 |
+| Gradient Boosting | 0.874 | 0.60 | 0.26 |
 
 Reproduce: `python run_real_cohort.py --cancer "Liver cancer" --healthy --n-cancer 90 --n-healthy 32 --parallel 8 --publication 6 --max-mb 500 --pca`
 

@@ -1,12 +1,12 @@
 {
-  "model": "gb",
+  "model": "lr",
   "cv": "StratifiedKFold(n_splits=5, random_state=42, shuffle=True)",
   "features": "full-5mb-profile-pca",
   "n_samples": 121,
   "n_folds": 5,
-  "auc_mean": 0.8742977528089888,
+  "auc_mean": 0.976123595505618,
   "auc_std": 0.0,
-  "sens95_mean": 0.5955056179775281,
-  "sens99_mean": 0.25842696629213485,
+  "sens95_mean": 0.8314606741573034,
+  "sens99_mean": 0.8314606741573034,
   "n_out_of_fold": 121
 }

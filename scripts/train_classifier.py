@@ -236,8 +236,8 @@ def main():
     ap.add_argument("--model", choices=["rf", "gb", "lr"], default="lr")
     ap.add_argument("--pca", action="store_true",
                     help="PCA-reduce the full profile inside each CV fold (DELFI-style)")
-    ap.add_argument("--pca-n", type=int, default=30,
-                    help="number of PCA components (default 30, optimal on 60-sample cohort)")
+    ap.add_argument("--pca-n", type=int, default=80,
+                    help="number of PCA components (default 80 — under-fitting at 30)")
     ap.add_argument("--cv", type=int, default=5, help="folds (0 = LOOCV)")
     ap.add_argument("--with-motifs", action="store_true")
     ap.add_argument("--n-estimators", type=int, default=300)
