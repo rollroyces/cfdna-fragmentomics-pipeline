@@ -77,6 +77,9 @@ def main():
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--cancer", default="Liver cancer")
     ap.add_argument("--healthy", action="store_true", help="also fetch healthy controls")
+    ap.add_argument("--negative-diseases", default=None,
+                    help="comma-separated diseases for the negative class, e.g. "
+                         "'Cirrhosis,Hepatitis B' (high-risk comparison group)")
     ap.add_argument("--n-cancer", type=int, default=6)
     ap.add_argument("--n-healthy", type=int, default=6)
     ap.add_argument("--out", default="results")
@@ -96,14 +99,23 @@ def main():
     os.makedirs(FEAT, exist_ok=True)
     os.makedirs(args.out, exist_ok=True)
 
-    # 1. Discover samples
+    # 1. Discover samples — positive (cancer) + negative (healthy or high-risk)
     cancer_runs = query_seqruns(args.cancer, healthy=False, limit=args.n_cancer,
                                 publication=args.publication)
-    healthy_runs = query_seqruns(None, healthy=args.healthy, limit=args.n_healthy,
-                                 publication=args.publication) \
-        if args.healthy else []
+    neg_runs: list[tuple[str, dict]] = []
+    if args.negative_diseases:
+        for dis in args.negative_diseases.split(","):
+            dis = dis.strip()
+            for r in query_seqruns(dis, healthy=False, limit=500,
+                                   publication=args.publication):
+                neg_runs.append((dis, r))
+    elif args.healthy:
+        for r in query_seqruns(None, healthy=True, limit=args.n_healthy,
+                               publication=args.publication):
+            neg_runs.append(("Healthy", r))
+    neg_label = "negative" if args.negative_diseases else "healthy"
     labels = {}
-    print(f"Cohort: {len(cancer_runs)} cancer + {len(healthy_runs)} healthy "
+    print(f"Cohort: {len(cancer_runs)} cancer + {len(neg_runs)} {neg_label} "
           f"(publication={args.publication}, max {args.max_mb:.0f}MB)")
 
     # 2. Stream: fetch → extract → delete (skip samples fully processed)
@@ -121,14 +133,14 @@ def main():
         if _done(s):
             processed.append(s); labels[s] = "cancer"; continue
         work.append((s, r["id"], "cancer"))
-    for r in healthy_runs:
+    for _, r in neg_runs:
         s = (r.get("sample") or {}).get("name", f"run{r['id']}")
         if is_cell_line(s):
             print(f"  [exclude] {s} (cell-line control, not patient plasma)")
             continue
         if _done(s):
-            processed.append(s); labels[s] = "healthy"; continue
-        work.append((s, r["id"], "healthy"))
+            processed.append(s); labels[s] = neg_label; continue
+        work.append((s, r["id"], neg_label))
 
     if args.parallel > 1 and work:
         from concurrent.futures import ThreadPoolExecutor, as_completed
