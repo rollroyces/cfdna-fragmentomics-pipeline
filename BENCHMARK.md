@@ -100,6 +100,19 @@ consistent +0.005 but below the noise floor at n=98; per-bin mean length is
 redundant with the short/long ratio. The 5-channel profile is near-optimal
 for this data, so the full 627-sample motif re-extraction was not justified.
 
+## Batch-effect demonstration (why the cross-study setup is the only valid one)
+
+A naive "HCC vs all healthy" cross-study pooling (89 Jiang HCC vs 32 Jiang +
+262 Cristiano healthy) **collapses to AUC 0.505 — random**. This is the
+study-confound: the cancer class is 100% Jiang, the healthy class 89%
+Cristiano, so the classifier learns "which study" instead of "cancer vs
+healthy". Per-study z-scoring cannot remove it.
+
+The pan-cancer cross-study result (AUC 0.978) is valid *because both classes
+span both studies* — the study effect partially cancels. This is why the
+cross-study number is pan-cancer (harder task) rather than HCC-only (easier
+task), and why it is the honest, comparable result.
+
 ## Sources
 
 - Cristiano et al., *Nature* 570:385 (2019) — DELFI pan-cancer.
