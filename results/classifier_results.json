@@ -2,11 +2,11 @@
   "model": "lr",
   "cv": "StratifiedKFold(n_splits=5, random_state=42, shuffle=True)",
   "features": "full-5mb-profile-pca",
-  "n_samples": 627,
+  "n_samples": 121,
   "n_folds": 5,
-  "auc_mean": 0.9466775189915686,
+  "auc_mean": 0.980688202247191,
   "auc_std": 0.0,
-  "sens95_mean": 0.7658402203856749,
-  "sens99_mean": 0.6170798898071626,
-  "n_out_of_fold": 627
+  "sens95_mean": 0.898876404494382,
+  "sens99_mean": 0.8314606741573034,
+  "n_out_of_fold": 121
 }

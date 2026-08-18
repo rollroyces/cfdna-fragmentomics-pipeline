@@ -208,13 +208,17 @@ def evaluate_cv(X, y, model, cv, use_pca: bool = False, pca_n: int = 20,
 
 
 def load_full_profile(features_dir: str, labels: dict[str, int]) -> tuple[np.ndarray, np.ndarray, list[str]]:
-    """Load the FULL 5Mb ratio + coverage vectors (DELFI profile).
+    """Load the FULL fragmentomic profile (DELFI-style).
 
-    Returns (X, y, order) where X has one row per sample and one column per
-    5Mb genomic bin (ratio) + per 5Mb bin (coverage) — ~1040 columns.
-    `order` is the sample names in row order (for study-aware harmonization).
-    PCA is applied inside CV folds to reduce this to a discriminative
-    subspace (Cristiano et al. 2019 profile → PCA → RF).
+    Four channels concatenated per sample:
+      1. 5Mb short/long ratio      (631 bins — DELFI ratio profile)
+      2. 5Mb coverage (median-norm)(631 bins — CNA at 5Mb)
+      3. 100kb short/long ratio    (30,894 bins — finer DELFI ratio)
+      4. 100kb coverage (median-norm) (30,894 bins — finer CNA)
+
+    The 100kb channels add ~50x spatial resolution; per-sample median
+    normalization of coverage removes sequencing-depth batch effects.
+    Returns (X, y, order); PCA is applied inside CV folds.
     """
     rows = []
     y = []
@@ -222,10 +226,20 @@ def load_full_profile(features_dir: str, labels: dict[str, int]) -> tuple[np.nda
     for sample in sorted(labels):
         r5 = os.path.join(features_dir, f"{sample}.delfi_5mb_ratio.npy")
         c5 = os.path.join(features_dir, f"{sample}.delfi_5mb_coverage.npy")
+        r100 = os.path.join(features_dir, f"{sample}.delfi_100kb_ratio.npy")
+        cnt100 = os.path.join(features_dir, f"{sample}.delfi_100kb_counts.npy")
         if not (os.path.exists(r5) and os.path.exists(c5)):
             continue
-        v = np.concatenate([np.load(r5), np.load(c5)])
-        rows.append(v)
+        v = [np.load(r5), np.load(c5)]
+        if os.path.exists(r100):
+            v.append(np.load(r100))
+        if os.path.exists(cnt100):
+            c = np.load(cnt100).astype(float)
+            med = np.median(c)
+            if med > 0:
+                c = c / med  # per-sample median-normalize (removes depth)
+            v.append(c)
+        rows.append(np.concatenate(v))
         y.append(labels[sample])
         order.append(sample)
     X = np.asarray(rows, dtype=float)
@@ -266,8 +280,9 @@ def main():
     ap.add_argument("--model", choices=["rf", "gb", "lr"], default="lr")
     ap.add_argument("--pca", action="store_true",
                     help="PCA-reduce the full profile inside each CV fold (DELFI-style)")
-    ap.add_argument("--pca-n", type=int, default=80,
-                    help="number of PCA components (default 80 — under-fitting at 30)")
+    ap.add_argument("--pca-n", type=int, default=200,
+                    help="number of PCA components (default 200 — the full "
+                         "4-channel profile needs more than the 5Mb-only 80)")
     ap.add_argument("--cv", type=int, default=5, help="folds (0 = LOOCV)")
     ap.add_argument("--with-motifs", action="store_true")
     ap.add_argument("--n-estimators", type=int, default=300)

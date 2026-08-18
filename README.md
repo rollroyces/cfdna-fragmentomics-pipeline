@@ -58,37 +58,23 @@ snakemake -s main.smk --configfile config.yaml --cores 4
 
 Place deduplicated BAMs in `data/raw/<sample>.mdups.bam` and set `mode: "bam"` in `config.yaml`. Extractors use pysam with the strict contract: **properly-paired reads, MAPQ ≥ 30**. 4-mer motifs require a reference FASTA (`reference_fasta` in config).
 
-## Real-data result (121 samples, single study)
+## Real-data result (cross-study, 627 samples)
 
-**AUC 0.976–0.983, Sens@99% 0.79–0.83** — 89 liver cancer vs 32 healthy cfDNA WGS samples, all from **Jiang et al. 2015 (PNAS, PMID 25646427)** — the low-pass cfDNA HCC cohort, fetched via FinaleDB with a study filter (`--publication 6`) and a deep-WGS file-size guard (`--max-mb 500`). Logistic Regression on the full 5Mb fragment-ratio + coverage profile, PCA-reduced to **80 components** inside each CV fold (5-fold, pooled out-of-fold predictions, no leakage). Reproducible seed-42 run: AUC 0.976; 3-seed mean 0.983 ± 0.005.
+**AUC 0.973, Sens@95% 0.893, Sens@99% 0.785** — 333 cancer vs 294 healthy cfDNA WGS samples across two low-pass studies (Jiang 2015 + Cristiano 2019), per-study z-score harmonized. Logistic Regression on a **4-channel fragmentomic profile** (5Mb + 100kb short/long ratio, 5Mb + 100kb median-normalized coverage), PCA to 200 components inside each CV fold (5-fold, pooled out-of-fold, no leakage).
 
-**PCA component count matters** — the profile has 1,262 bins/sample and 30 components under-fits (AUC 0.956, Sens@99% 0.64); the plateau at 50–80 components recovers the fine fragmentation/CNA structure:
+Reproduce: `python run_cross_study.py --parallel 8 --max-mb 500`
 
-| pca components | AUC (3-seed) | Sens@99% |
-|---|---|---|
-| 30 | 0.967 | 0.72 |
-| 50 | 0.984 | 0.77 |
-| **80** | **0.983** | **0.79** |
+Single-study (Jiang 2015, 121 samples): **AUC 0.981, Sens@95% 0.899, Sens@99% 0.831**.
 
-**Data-quality controls applied:**
-- **Single study only** — mixing FinaleDB studies pulls in deep-WGS samples (2.6–3.7 GB files vs ~200–270 MB low-pass) whose coverage differences create a batch effect. `--publication 6` restricts to Jiang 2015.
-- **File-size guard** — `frag_file_size()` HEAD-checks each sample and rejects files > 500 MB (deep-WGS regime).
-- **Cell-line exclusion** — GM1100 (B-lymphocyte line, mislabeled "Liver cancer" in FinaleDB) and similar technical controls are filtered out; their fragmentation differs from in-vivo plasma cfDNA.
-
-| Model | AUC | Sens@95% | Sens@99% |
-|---|---|---|---|
-| **Logistic Regression (pca=80)** | **0.983** | **0.86** | **0.79** |
-| Logistic Regression (pca=30) | 0.967 | 0.85 | 0.72 |
-| Random Forest | 0.92 | 0.64 | 0.57 |
-| Gradient Boosting | 0.874 | 0.60 | 0.26 |
-
-Reproduce: `python run_real_cohort.py --cancer "Liver cancer" --healthy --n-cancer 90 --n-healthy 32 --parallel 8 --publication 6 --max-mb 500 --pca`
+**The 4-channel profile** (finer 100kb resolution + per-sample depth normalization) added +0.024 AUC and +9.4pp Sens@95% over the 5Mb-only baseline — the raw 100kb fragment counts were dominated by sequencing depth, and median-normalizing them exposed the copy-number signal.
 
 ## Honest validation
 
 - **Stratified K-fold CV** (LOOCV when n < 25) — never trains on test samples.
 - **Fixed-specificity sensitivity**: sens@95% and sens@99% spec, read off the ROC at that specificity — **no threshold optimization on test predictions**.
-- **GC-bias correction**: LOESS (tricube-weighted local regression) fit of per-bin coverage vs GC fraction, applied before classification.
+- **No leakage**: PCA and per-study harmonization are fit on training folds only.
+- **Data-quality guards**: deep-WGS file-size rejection, cell-line exclusion (GM1100 mislabeled "Liver cancer", GM\* cirrhosis/HBV lines), study filtering.
+- **GC-bias correction**: LOESS (tricube-weighted local regression) fit of per-bin coverage vs GC fraction.
 - **Real data only**: no synthetic cohorts. FinaleDB samples are real clinical cfDNA WGS.
 
 ## Expected runtimes

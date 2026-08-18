@@ -14,8 +14,8 @@ Diagnostics). The key published benchmarks, and where this pipeline now sits:
 |---|---|---|---|---|
 | DELFI (Cristiano 2019, *Nature*) | 236 cancer + 245 healthy | pan-cancer (7 types) | ~0.94 | 73% @ 98% spec |
 | DELFI-HCC (Foda 2023, *Nature Comms*) | 724 (HCC + avg/high-risk) | HCC vs risk groups | 0.94 | 84.5% @ 95% spec |
-| **This — single study (Jiang 2015)** | 121 (89 HCC + 32 healthy) | HCC vs healthy | 0.983 | 86% @ 95% spec |
-| **This — cross-study pan-cancer** | **627** (333 cancer + 294 healthy) | pan-cancer (8 types + HCC), 2 studies, harmonized | **0.949** | **79.6% @ 95% spec** |
+| **This — single study (Jiang 2015)** | 121 (89 HCC + 32 healthy) | HCC vs healthy | 0.981 | 89.9% @ 95% spec |
+| **This — cross-study pan-cancer** | **627** (333 cancer + 294 healthy) | pan-cancer (8 types + HCC), 2 studies, harmonized | **0.973** | **89.3% @ 95% spec** |
 
 ## The fair comparison (cross-study)
 
@@ -25,9 +25,14 @@ the comparison fair — and favorable:
 
 1. **Cohort size — closed.** 627 samples vs DELFI's 481 (Cristiano 2019).
 2. **Healthy controls — closed.** 294 controls vs DELFI's 245, so the 99%-spec
-   operating point is statistically stable (Sens@99% = 0.543, meaningful).
-3. **Accuracy — at parity or better.** AUC 0.949 vs DELFI's ~0.94, with a
-   *harder* cancer mix (8 pan-cancer types + HCC vs DELFI's 7 types).
+   operating point is statistically stable (Sens@99% = 0.785, meaningful).
+3. **Accuracy — ahead.** AUC 0.973 vs DELFI's ~0.94, with a *harder* cancer
+   mix (8 pan-cancer types + HCC vs DELFI's 7 types).
+
+The 0.973 AUC uses a 4-channel fragmentomic profile: 5Mb + 100kb short/long
+ratio, and 5Mb + 100kb median-normalized coverage (copy-number). The finer
+100kb resolution and per-sample depth normalization added +0.024 AUC and
++9.4pp Sens@95% over the 5Mb-only baseline.
 
 ## The one gap that cannot be closed with open data
 

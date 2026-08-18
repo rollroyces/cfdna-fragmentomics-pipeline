@@ -93,7 +93,7 @@ def main():
     ap.add_argument("--parallel", type=int, default=8)
     ap.add_argument("--max-mb", type=float, default=500)
     ap.add_argument("--model", default="lr")
-    ap.add_argument("--pca-n", type=int, default=80)
+    ap.add_argument("--pca-n", type=int, default=200)
     args = ap.parse_args()
     os.makedirs(RAW, exist_ok=True)
     os.makedirs(FEAT, exist_ok=True)
