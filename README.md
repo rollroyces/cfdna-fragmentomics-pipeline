@@ -8,6 +8,26 @@ A production-oriented pipeline that extracts the "Big Three" fragmentomic signat
 
 ---
 
+## Installation
+
+```bash
+# Pure-Python install (no Java, no Snakemake required for the scripts)
+pip install -e .
+
+# With Snakemake workflow execution
+pip install -e ".[snakemake]"
+
+# With BAM-mode pysam support
+pip install -e ".[bam]"
+
+# After install, five CLI entry points are globally available:
+cfdna-fetch --help        # fetch FinaleDB samples
+cfdna-classify --help     # train classifier + 5-seed CV
+cfdna-benchmark --help    # honest multi-cohort benchmark
+cfdna-fsd --help          # fragment-size extraction
+cfdna-delfi --help        # DELFI ratio + coverage extraction
+```
+
 ## The Big Three fragmentomic features
 
 | Feature | Biology | Signal |

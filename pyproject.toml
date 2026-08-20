@@ -1,0 +1,79 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cfdna-fragmentomics-pipeline"
+version = "0.2.0"
+description = "Tumor-naive cfDNA fragmentomics pipeline for cancer detection from FinaleDB"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "Royce", email = "rollroyces@users.noreply.github.com"},
+]
+keywords = ["cfDNA", "fragmentomics", "liquid-biopsy", "cancer-detection",
+            "DELFI", "Jiang", "FinaleDB"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Topic :: Scientific/Engineering :: Medical Science Apps.",
+]
+
+dependencies = [
+    "numpy>=1.24",
+    "scipy>=1.10",
+    "scikit-learn>=1.3",
+    "pandas>=2.0",
+    "requests>=2.31",
+    # pysam is optional — only needed for BAM mode, not the default
+    # FinaleDB frag.tsv path.
+]
+
+[project.optional-dependencies]
+# BAM mode requires pysam + reference FASTA
+bam = ["pysam>=0.22"]
+# Snakemake workflow execution
+snakemake = ["snakemake>=8"]
+# Jupyter notebook reproduction
+notebook = [
+    "jupyter>=1.0",
+    "matplotlib>=3.7",
+    "seaborn>=0.13",
+]
+# Development
+dev = [
+    "pytest>=7.4",
+    "ruff>=0.1",
+]
+
+[project.urls]
+Homepage = "https://github.com/rollroyces/cfdna-fragmentomics-pipeline"
+Repository = "https://github.com/rollroyces/cfdna-fragmentomics-pipeline"
+Issues = "https://github.com/rollroyces/cfdna-fragmentomics-pipeline/issues"
+Benchmark = "https://github.com/rollroyces/cfdna-fragmentomics-pipeline/blob/main/BENCHMARK.md"
+
+[project.scripts]
+# CLI entry points — installed automatically by `pip install`.
+# Run as: `cfdna-fetch`, `cfdna-classify`, `cfdna-benchmark`.
+cfdna-fetch = "scripts.fetch_finaledb:main"
+cfdna-classify = "scripts.train_classifier:main"
+cfdna-fsd = "scripts.extract_fsd:main"
+cfdna-delfi = "scripts.extract_delfi:main"
+
+[project.entry-points."scripts"]
+# honest_benchmark uses module-level execution (legacy); expose as a
+# console-script-style callable so `cfdna-benchmark` still works.
+cfdna-benchmark = "scripts.honest_benchmark:main"
+
+[tool.setuptools]
+packages = ["scripts"]
+
+[tool.setuptools.package-data]
+scripts = ["py.typed"]

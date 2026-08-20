@@ -158,7 +158,29 @@ for line in open('data/features/labels_cross_study.tsv'):
 X8, y8, st8 = load8(labels, studies)
 if len(X8) >= 50:
     print(f"\n=== E: CROSS-STUDY 8-channel (98-subset) (PCA n=200) ===")
-    print(f"  Cohort: {(y8==1).sum()} cancer + {(y8==0).sum()} healthy = {len(y8)} total")
+    print(f"  Cohort: {(y8==1).sum()} cancer + {(y8==0).sum()} healthy = {len(X8)} total")
     run("8-channel (PCA n=200, harmonized)", X8, y8, st8, 200, True)
 else:
     print(f"\n=== E: skipped (only {len(X8)} samples have all 8 channels) ===")
+
+
+def main():
+    """CLI shim — module-level code above already ran at import time.
+
+    The honest_benchmark script predates the [project.scripts] convention;
+    the work happens at the top of the file. This shim exists so
+    `pyproject.toml`'s console_scripts entry can resolve to a callable
+    and `python -m scripts.honest_benchmark --help` works.
+    """
+    import argparse
+    ap = argparse.ArgumentParser(description=__doc__,
+                                  formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--features-dir", default="data/features",
+                    help="Directory of {sample}.delfi_*.npy + .fsd.json")
+    args = ap.parse_args()
+    return 0
+
+
+if __name__ == "__main__":
+    import sys
+    sys.exit(main())
