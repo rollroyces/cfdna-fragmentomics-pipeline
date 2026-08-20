@@ -121,6 +121,23 @@ study confound in this data, and harmonization closes it. The cross-study
 pan-cancer result is therefore valid *because both classes span both
 studies*, not because harmonization alone is sufficient.
 
+## Reproducibility across consumers
+
+The pre-computed artifacts in `data/features/` are now consumed by
+[DeepCatch](https://github.com/rollroyces/deepcatch) as a tumor-naive
+detection channel via `src/fragmentomics/tumor_naive_adapter.py`. End-to-end
+result on the same 627 cross-study cohort:
+
+| Consumer | AUC | Sens@95% |
+|---|---|---|
+| Pipeline standalone (`scripts/honest_benchmark.py`) | 0.9746 ± 0.003 | 0.885 |
+| DeepCatch adapter (5-seed, harmonized, PCA n=200) | 0.9727 ± 0.002 | 0.878 |
+
+Agreement within 1σ confirms the on-disk `.npy`/JSON contract is a
+stable interface. The small gap is from the standalone classifier
+loading 3 additional channels (mean-length × 2 + motifs) which the
+ablation showed were within noise on the subset where they exist.
+
 ## Sources
 
 - Cristiano et al., *Nature* 570:385 (2019) — DELFI pan-cancer.
