@@ -37,15 +37,21 @@ import numpy as np
 
 
 def extract_from_frag_tsv(path: str, mapq_threshold: int = 0) -> np.ndarray:
-    """Read fragment lengths from FinaleDB frag.tsv.bgz (length = end - start)."""
+    """Read fragment lengths from FinaleDB frag.tsv.bgz (length = end - start).
+
+    FinaleDB's pre-computed fragment records follow the bedtools bamtobed
+    -bedpe schema: `chrom start end name mapq strand` (6 columns). The
+    pipeline's older 5-column format `[chrom, start, end, mapq, strand]`
+    silently dropped every real fragment; the fixed index 4 = mapq below.
+    """
     lengths = []
     with gzip.open(path, "rt") as f:
         for line in f:
             parts = line.rstrip("\n").split("\t")
-            if len(parts) < 5:
+            if len(parts) < 6:
                 continue
             try:
-                start, end, mapq = int(parts[1]), int(parts[2]), int(parts[3])
+                start, end, mapq = int(parts[1]), int(parts[2]), int(parts[4])
             except ValueError:
                 continue
             if mapq < mapq_threshold:
