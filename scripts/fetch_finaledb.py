@@ -94,14 +94,41 @@ def download_frag(seqrun_id: int, out_path: str,
     key = f"entries/EE{seqrun_id}/hg38/EE{seqrun_id}.hg38.frag.tsv.bgz"
     url = f"{S3}/{key}"
     size = frag_file_size(seqrun_id)
-    if 0 < size > max_mb * 1024 * 1024:
-        print(f"  ! skip {seqrun_id}: {size/1e6:.0f}MB (deep WGS, > {max_mb:.0f}MB)",
-              file=sys.stderr)
+    # REGRESSION FIX (was: `if 0 < size > max_mb * 1024 * 1024:`).
+    # The old guard was bypassed when size == 0 (HEAD timeout/404),
+    # which is exactly the path that caused the 9.7GB disk-fill
+    # incident: HEAD fails → guard skipped → download of unknown-size
+    # file proceeds. Now: if we don't know the size, err on the side
+    # of caution and skip.
+    if size <= 0 or size > max_mb * 1024 * 1024:
+        reason = "unknown size (HEAD failed)" if size <= 0 else \
+                 f"{size/1e6:.0f}MB (deep WGS, > {max_mb:.0f}MB)"
+        print(f"  ! skip {seqrun_id}: {reason}", file=sys.stderr)
         return False
     tmp = out_path + ".part"
     try:
+        # Stream with a hard upper bound: abort the download if we
+        # exceed max_mb * 1.1 (defense in depth — covers the case where
+        # the HEAD-reported size is much smaller than the actual file).
+        max_bytes = int(max_mb * 1024 * 1024 * 1.1)
+        bytes_written = 0
+        aborted = False
         with urllib.request.urlopen(url, timeout=600) as u, open(tmp, "wb") as f:
-            shutil.copyfileobj(u, f, length=1024 * 1024)
+            while True:
+                chunk = u.read(1024 * 1024)
+                if not chunk:
+                    break
+                bytes_written += len(chunk)
+                if bytes_written > max_bytes:
+                    aborted = True
+                    break
+                f.write(chunk)
+        if aborted:
+            if os.path.exists(tmp):
+                os.remove(tmp)
+            print(f"  ! abort {seqrun_id}: exceeded {max_bytes/1e6:.0f}MB streaming cap",
+                  file=sys.stderr)
+            return False
         os.replace(tmp, out_path)
         return True
     except (urllib.error.HTTPError, urllib.error.URLError, OSError) as e:

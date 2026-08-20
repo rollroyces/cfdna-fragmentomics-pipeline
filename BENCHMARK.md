@@ -15,7 +15,7 @@ Diagnostics). The key published benchmarks, and where this pipeline now sits:
 | DELFI (Cristiano 2019, *Nature*) | 236 cancer + 245 healthy | pan-cancer (7 types) | ~0.94 | 73% @ 98% spec |
 | DELFI-HCC (Foda 2023, *Nature Comms*) | 724 (HCC + avg/high-risk) | HCC vs risk groups | 0.94 | 84.5% @ 95% spec |
 | **This — single study (Jiang 2015)** | 121 (89 HCC + 32 healthy) | HCC vs healthy | **0.9716 ± 0.003** (5-seed) | 89.4% @ 95% spec |
-| **This — cross-study pan-cancer** | **627** (363 cancer + 264 healthy) | pan-cancer (8 types + HCC), 2 studies, harmonized | **0.9753 ± 0.002** (5-seed) | **88.6% @ 95% spec** |
+| **This — cross-study pan-cancer** | **627** (363 cancer + 264 healthy) | pan-cancer (8 types + HCC), 2 studies, harmonized | **0.9745 ± 0.002** (5-seed) | **88.8% @ 95% spec** |
 
 ## The fair comparison (cross-study)
 
@@ -26,11 +26,11 @@ the comparison fair — and favorable:
 1. **Cohort size — closed.** 627 samples vs DELFI's 481 (Cristiano 2019).
 2. **Healthy controls — closed.** 264 controls vs DELFI's 245, so the 99%-spec
    operating point is statistically stable.
-3. **Accuracy — at parity or ahead.** AUC 0.9753 ± 0.002 vs DELFI's ~0.94, on a
+3. **Accuracy — at parity or ahead.** AUC 0.9745 ± 0.002 vs DELFI's ~0.94, on a
    harder cancer mix (8 pan-cancer types + HCC vs DELFI's 7 types), and
    3-seed-averaged for honest error bars.
 
-The 0.975 AUC uses a 5-channel fragmentomic profile: 5Mb + 100kb
+The 0.974 AUC uses a 5-channel fragmentomic profile: 5Mb + 100kb
 short/long ratio, 5Mb + 100kb median-normalized coverage, and the
 full FSD size histogram. The finer 100kb resolution and per-sample
 depth normalization drove most of the gain over the 5Mb-only baseline.
@@ -106,7 +106,7 @@ for this data, so the full 627-sample motif re-extraction was not justified.
 Two controls for cross-study confounding:
 
 **A. Pan-cancer vs healthy (both classes span both studies) — VALID setup**
-AUC 0.9753 ± 0.002. Both classes span both studies, so the study effect
+AUC 0.9745 ± 0.002. Both classes span both studies, so the study effect
 partially cancels. This is the number reported above as the main result.
 
 **B. TRUE study-confound (only-Jiang cancer vs only-Cristiano healthy)**

@@ -82,9 +82,16 @@ Place deduplicated BAMs in `data/raw/<sample>.mdups.bam` and set `mode: "bam"` i
 
 ## Real-data result (cross-study, 627 samples)
 
-**AUC 0.9753 ± 0.0018 (5-seed CV, 95% CI ≈ ±0.004)** — 363 cancer vs 264
+**AUC 0.9745 ± 0.0023 (5-seed CV, 95% CI ≈ ±0.005)** — 363 cancer vs 264
 healthy cfDNA WGS samples across two low-pass studies (Jiang 2015 +
-Cristiano 2019), per-...[truncated>
+Cristiano 2019), per-study z-score harmonized. Logistic Regression on a
+**5-channel fragmentomic profile** (5Mb + 100kb short/long ratio,
+5Mb + 100kb median-normalized coverage, FSD size histogram),
+PCA to 200 components inside each CV fold (5-fold, pooled out-of-fold,
+no leakage).
+
+(Numbers from `python scripts/honest_benchmark.py` on the 627 cohort;
+single-seed re-runs vary by ±0.001 AUC.)
 
 Reproduce: `python run_cross_study.py --parallel 8 --max-mb 500`
 
