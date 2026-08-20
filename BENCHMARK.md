@@ -14,8 +14,8 @@ Diagnostics). The key published benchmarks, and where this pipeline now sits:
 |---|---|---|---|---|
 | DELFI (Cristiano 2019, *Nature*) | 236 cancer + 245 healthy | pan-cancer (7 types) | ~0.94 | 73% @ 98% spec |
 | DELFI-HCC (Foda 2023, *Nature Comms*) | 724 (HCC + avg/high-risk) | HCC vs risk groups | 0.94 | 84.5% @ 95% spec |
-| **This — single study (Jiang 2015)** | 121 (89 HCC + 32 healthy) | HCC vs healthy | 0.981 | 89.9% @ 95% spec |
-| **This — cross-study pan-cancer** | **627** (333 cancer + 294 healthy) | pan-cancer (8 types + HCC), 2 studies, harmonized | **0.973** | **89.3% @ 95% spec** |
+| **This — single study (Jiang 2015)** | 121 (89 HCC + 32 healthy) | HCC vs healthy | **0.9716 ± 0.003** (5-seed) | 89.4% @ 95% spec |
+| **This — cross-study pan-cancer** | **627** (363 cancer + 264 healthy) | pan-cancer (8 types + HCC), 2 studies, harmonized | **0.9753 ± 0.002** (5-seed) | **88.6% @ 95% spec** |
 
 ## The fair comparison (cross-study)
 
@@ -24,15 +24,16 @@ classes spanning both studies, per-study z-score harmonization) now makes
 the comparison fair — and favorable:
 
 1. **Cohort size — closed.** 627 samples vs DELFI's 481 (Cristiano 2019).
-2. **Healthy controls — closed.** 294 controls vs DELFI's 245, so the 99%-spec
-   operating point is statistically stable (Sens@99% = 0.785, meaningful).
-3. **Accuracy — ahead.** AUC 0.973 vs DELFI's ~0.94, with a *harder* cancer
-   mix (8 pan-cancer types + HCC vs DELFI's 7 types).
+2. **Healthy controls — closed.** 264 controls vs DELFI's 245, so the 99%-spec
+   operating point is statistically stable.
+3. **Accuracy — at parity or ahead.** AUC 0.9753 ± 0.002 vs DELFI's ~0.94, on a
+   harder cancer mix (8 pan-cancer types + HCC vs DELFI's 7 types), and
+   3-seed-averaged for honest error bars.
 
-The 0.973 AUC uses a 4-channel fragmentomic profile: 5Mb + 100kb short/long
-ratio, and 5Mb + 100kb median-normalized coverage (copy-number). The finer
-100kb resolution and per-sample depth normalization added +0.024 AUC and
-+9.4pp Sens@95% over the 5Mb-only baseline.
+The 0.975 AUC uses a 5-channel fragmentomic profile: 5Mb + 100kb
+short/long ratio, 5Mb + 100kb median-normalized coverage, and the
+full FSD size histogram. The finer 100kb resolution and per-sample
+depth normalization drove most of the gain over the 5Mb-only baseline.
 
 ## The one gap that cannot be closed with open data
 
@@ -100,18 +101,25 @@ consistent +0.005 but below the noise floor at n=98; per-bin mean length is
 redundant with the short/long ratio. The 5-channel profile is near-optimal
 for this data, so the full 627-sample motif re-extraction was not justified.
 
-## Batch-effect demonstration (why the cross-study setup is the only valid one)
+## Batch-effect demonstration (corrected)
 
-A naive "HCC vs all healthy" cross-study pooling (89 Jiang HCC vs 32 Jiang +
-262 Cristiano healthy) **collapses to AUC 0.505 — random**. This is the
-study-confound: the cancer class is 100% Jiang, the healthy class 89%
-Cristiano, so the classifier learns "which study" instead of "cancer vs
-healthy". Per-study z-scoring cannot remove it.
+Two controls for cross-study confounding:
 
-The pan-cancer cross-study result (AUC 0.978) is valid *because both classes
-span both studies* — the study effect partially cancels. This is why the
-cross-study number is pan-cancer (harder task) rather than HCC-only (easier
-task), and why it is the honest, comparable result.
+**A. Pan-cancer vs healthy (both classes span both studies) — VALID setup**
+AUC 0.9753 ± 0.002. Both classes span both studies, so the study effect
+partially cancels. This is the number reported above as the main result.
+
+**B. TRUE study-confound (only-Jiang cancer vs only-Cristiano healthy)**
+
+| Setting | AUC (5-seed) | What it measures |
+|---|---|---|
+| **No harmonization** | **0.9992 ± 0.002** | Classifier learns "which study is this sample from?" — perfect, since studies perfectly identify class. |
+| **With harmonization** | **0.4966 ± 0.008** | Random — per-study z-scoring removes the confounding signal entirely. |
+
+The 0.50 gap between A and B (0.50 AUC drop) is the *magnitude* of the
+study confound in this data, and harmonization closes it. The cross-study
+pan-cancer result is therefore valid *because both classes span both
+studies*, not because harmonization alone is sufficient.
 
 ## Sources
 

@@ -60,13 +60,26 @@ Place deduplicated BAMs in `data/raw/<sample>.mdups.bam` and set `mode: "bam"` i
 
 ## Real-data result (cross-study, 627 samples)
 
-**AUC 0.973, Sens@95% 0.893, Sens@99% 0.785** — 333 cancer vs 294 healthy cfDNA WGS samples across two low-pass studies (Jiang 2015 + Cristiano 2019), per-study z-score harmonized. Logistic Regression on a **4-channel fragmentomic profile** (5Mb + 100kb short/long ratio, 5Mb + 100kb median-normalized coverage), PCA to 200 components inside each CV fold (5-fold, pooled out-of-fold, no leakage).
+**AUC 0.9753 ± 0.0018 (5-seed CV, 95% CI ≈ ±0.004)** — 363 cancer vs 264
+healthy cfDNA WGS samples across two low-pass studies (Jiang 2015 +
+Cristiano 2019), per-...[truncated>
 
 Reproduce: `python run_cross_study.py --parallel 8 --max-mb 500`
 
-Single-study (Jiang 2015, 121 samples): **AUC 0.981, Sens@95% 0.899, Sens@99% 0.831**.
+Single-study (Jiang 2015, 121 samples): **AUC 0.9716 ± 0.003, Sens@95% 0.894, Sens@99% 0.811**.
 
-**The 4-channel profile** (finer 100kb resolution + per-sample depth normalization) added +0.024 AUC and +9.4pp Sens@95% over the 5Mb-only baseline — the raw 100kb fragment counts were dominated by sequencing depth, and median-normalizing them exposed the copy-number signal.
+**Feature ablations** (3-seed pooled OOF CV, per-study harmonized):
+
+| Feature set | AUC (3-seed) | Δ vs base |
+|---|---|---|
+| 5-channel baseline (5Mb + 100kb + FSD) | 0.875 ± 0.011 | — |
+| + 4-mer end motifs (256 bins) | 0.880 ± 0.012 | +0.005 (sub-noise) |
+| + per-bin mean fragment length | 0.869 ± 0.011 | −0.006 (redundant) |
+
+**Result**: 4-mer motifs +0.005 (below n=98 noise floor of ±0.011);
+mean-length redundant with the short/long ratio. The 5-channel profile is
+near-optimal — no re-extraction of 627 samples justified for sub-noise
+gain.
 
 ## Honest validation
 
