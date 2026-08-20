@@ -30,8 +30,10 @@ jobs:
       - run: pip install -q numpy scipy scikit-learn pandas matplotlib seaborn pytest
       - run: pip install -e . --quiet
       - name: Entry points resolve and --help works
+        # cfdna-benchmark is intentionally not a console_script (it runs
+        # at module-import time and takes 10+ minutes); see pyproject.toml.
         run: |
-          for cmd in cfdna-fetch cfdna-classify cfdna-benchmark cfdna-fsd cfdna-delfi; do
+          for cmd in cfdna-fetch cfdna-classify cfdna-fsd cfdna-delfi; do
             $cmd --help > /dev/null || (echo "$cmd: --help failed"; exit 1)
             echo "OK: $cmd"
           done

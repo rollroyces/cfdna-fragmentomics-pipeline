@@ -20,12 +20,14 @@ pip install -e ".[snakemake]"
 # With BAM-mode pysam support
 pip install -e ".[bam]"
 
-# After install, five CLI entry points are globally available:
+# After install, four CLI entry points are globally available:
 cfdna-fetch --help        # fetch FinaleDB samples
 cfdna-classify --help     # train classifier + 5-seed CV
-cfdna-benchmark --help    # honest multi-cohort benchmark
 cfdna-fsd --help          # fragment-size extraction
 cfdna-delfi --help        # DELFI ratio + coverage extraction
+
+# For the multi-cohort honest benchmark, run directly from the repo:
+python scripts/honest_benchmark.py --help  # 10+ minute multi-cohort run
 ```
 
 ## The Big Three fragmentomic features

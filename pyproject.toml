@@ -61,16 +61,16 @@ Benchmark = "https://github.com/rollroyces/cfdna-fragmentomics-pipeline/blob/mai
 
 [project.scripts]
 # CLI entry points — installed automatically by `pip install`.
-# Run as: `cfdna-fetch`, `cfdna-classify`, `cfdna-benchmark`.
+# Run as: `cfdna-fetch`, `cfdna-classify`, `cfdna-fsd`, `cfdna-delfi`.
+#
+# Note: honest_benchmark is intentionally NOT a console_script — it
+# runs the full benchmark suite (10+ minutes) at module-import time.
+# The right invocation is `python scripts/honest_benchmark.py` for
+# power users, or `python -m scripts.honest_benchmark` from the repo root.
 cfdna-fetch = "scripts.fetch_finaledb:main"
 cfdna-classify = "scripts.train_classifier:main"
 cfdna-fsd = "scripts.extract_fsd:main"
 cfdna-delfi = "scripts.extract_delfi:main"
-
-[project.entry-points."scripts"]
-# honest_benchmark uses module-level execution (legacy); expose as a
-# console-script-style callable so `cfdna-benchmark` still works.
-cfdna-benchmark = "scripts.honest_benchmark:main"
 
 [tool.setuptools]
 packages = ["scripts"]
