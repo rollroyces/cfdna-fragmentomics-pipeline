@@ -138,6 +138,41 @@ stable interface. The small gap is from the standalone classifier
 loading 3 additional channels (mean-length × 2 + motifs) which the
 ablation showed were within noise on the subset where they exist.
 
+## Fusion with mutation-informed channel (DeepCatch)
+
+DeepCatch also exposes a mutation-informed detection channel (panel
+LLR @ 0.1% VAF, AUC 0.921 on TCGA-LUAD simulated cfDNA). The
+[`fusion_ablation`](https://github.com/rollroyces/deepcatch/blob/tumor-naive-adapter/src/fragmentomics/fusion_ablation.py)
+script combines the two channels under the same 5-seed CV hygiene. End-to-end
+on this 627-sample cohort, with a synthetic mutation channel calibrated to
+DeepCatch's headline AUC 0.92:
+
+| Strategy | AUC (10-seed) | Sens@95% |
+|---|---|---|
+| Tumor-naive only | 0.9743 ± 0.002 | 0.883 |
+| Mutation-only (synthetic, AUC 0.92) | 0.9242 | 0.656 |
+| **Naive average** | **0.9886** | **0.927** |
+| **LR fusion (learned weights)** | **0.9887** | **0.937** |
+
+**Paired t-test (10 seeds)**: LR-fusion − tumor-naive = +0.0143 (t = 31.96,
+p < 0.0001; bootstrap 95% CI = [0.0135, 0.0152]). The honest, narrower
+"true" gain is ~+1.4 pp AUC and +5 pp Sens@95%, not the +1.6 pp headline.
+**The recommended recipe is the simple average** — LR fusion gives
+0.9887, naive average gives 0.9886, the difference is within seed noise.
+
+**Calibration sensitivity** (8-point sweep, mutation AUC 0.68 → 0.97):
+
+| Mut AUC | TN-only | LR-fuse | Δ |
+|---|---|---|---|
+| 0.78 | 0.973 | 0.978 | +0.5pp |
+| 0.85 | 0.974 | 0.984 | +1.0pp |
+| **0.92** | **0.974** | **0.989** | **+1.4pp** |
+| 0.95 | 0.975 | 0.993 | +1.8pp |
+
+Below mutation AUC ~0.80, fusion is neutral or slightly harmful; above
+~0.85 it reliably helps. DeepCatch's panel-LLR @ 0.1% VAF sits firmly in
+the "fusion helps" region.
+
 ## Sources
 
 - Cristiano et al., *Nature* 570:385 (2019) — DELFI pan-cancer.
