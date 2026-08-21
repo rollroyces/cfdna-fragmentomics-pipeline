@@ -181,3 +181,20 @@ the "fusion helps" region.
 - "Detecting Liver Cancer Using Cell-Free DNA Fragmentomes," *Cancer
   Discovery* 13:616 (2023).
 - Jiang et al., *PNAS* 112:E1317 (2015) — the source cohort (PMID 25646427).
+
+## CI: AUC-reproducibility gate
+
+The pipeline's CI runs `scripts/auc_reproducibility_gate.py` on every
+push. The gate builds a synthetic 80-sample cohort with a known signal
+(+0.20 in the first 50 bins of the 100kb ratio vector for cancer
+samples) and asserts the full feature pipeline produces
+**AUC ≥ 0.80**. If any regression breaks the data path (parser reading
+wrong columns, median-normalization disabled, NaN/Inf in scaling,
+per-study harmonization inverted, etc.) the AUC drops below 0.80 and
+CI fails with a pointed diagnostic message.
+
+This is a class of bug the previous CI didn't catch — the unit tests
+verify shape/contract but not "the assembled feature vector carries
+the biological signal end-to-end". The FinaleDB 5/6-column parser
+bug, for example, would have been caught by this gate the moment it
+was introduced.
