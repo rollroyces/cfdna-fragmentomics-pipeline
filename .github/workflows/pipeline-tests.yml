@@ -19,6 +19,24 @@ jobs:
         run: |
           python -m pytest test/ -v --no-header
 
+  auc-gate:
+    name: AUC-reproducibility gate
+    # Catches silent-failure bugs in the feature pipeline (parser bug,
+    # normalization accidentally disabled, scaling producing NaN, etc.).
+    # Asserts that the full pipeline path produces AUC >= 0.80 on a
+    # synthetic cohort with a known signal in 100kb ratio bins [0:50].
+    # If a regression breaks the path, AUC drops below 0.80 and CI fails.
+    # Runs in <30 seconds, no network required.
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: pip install -q numpy scipy scikit-learn pandas matplotlib seaborn pytest
+      - name: Run AUC gate
+        run: python scripts/auc_reproducibility_gate.py
+
   cli-smoke:
     name: CLI entry-point smoke
     runs-on: ubuntu-latest
