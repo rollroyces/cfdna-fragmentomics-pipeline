@@ -339,3 +339,47 @@ wanted are not in the data; they would have to come from:
     fragment-end 6-mers)
   - Held-out validation (the real bottleneck; not a model issue)
 
+
+## Appendix E: Removing PCA from the LR pipeline (small but real gain)
+
+While running the nucleosome-feature ablations, a model-ablation
+sweep over LR / LR+PCA / RF / GB revealed an unexpected result: **LR
+on the raw harmonized features (no PCA) outperforms LR+PCA(200)** on
+the same 627 cross-study cohort by **+0.0028 AUC** (paired t-test
+p=0.013 across 10 seeds).
+
+Result (10-seed 5-fold CV, harmonized):
+
+| Configuration | AUC | vs LR+PCA(200) |
+|---|---|---|
+| RF(200, max_depth=6) | 0.8883 ± 0.0024 | -0.0849 (severe overfit) |
+| LR + PCA(200) (current baseline) | 0.9732 ± 0.0022 | — |
+| **LR (no PCA, raw 60k features)** | **0.9760 ± 0.0013** | **+0.0028** |
+
+Why does no-PCA win?
+
+- 627 samples x 60k features is high-dim / low-sample. PCA(200)
+  preserves the top 200 components and discards the rest of the
+  variance. The discarded components include *weak but real* cancer
+  signal that lives in many bins simultaneously.
+- L2-regularized LR (C=1.0, default) handles the high-dim / low-sample
+  ratio correctly via shrinkage. It does NOT need PCA for
+  regularization.
+- The PCA(200) baseline was inherited from earlier work when
+  computational cost was a concern. With modern hardware and sklearn,
+  no PCA is fine.
+
+8 of 10 seeds favor no-PCA. The 2 outliers where PCA wins are within
+noise.
+
+Implication: the documented baseline was sub-optimal. The "real"
+headline AUC is **0.976 +/- 0.001** (LR no-PCA), not 0.973 (LR + PCA).
+
+Honest magnitude:
+- +0.0028 AUC = +0.28 percentage points
+- ~10x larger than the +0.0003 AUC from nucleosome features
+- Still much smaller than the 1-2 percentage points the asked-for
+  range; that level of gain is not available through model-class
+  changes alone
+
+Reproduce: `python scripts/lr_no_pca_vs_pca200.py --seeds 10`
