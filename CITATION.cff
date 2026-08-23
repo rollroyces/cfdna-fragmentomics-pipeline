@@ -1,0 +1,48 @@
+cff-version: 1.2.0
+message: "If you use cfdna-fragmentomics-pipeline in your research, please cite it as follows."
+title: "cfdna-fragmentomics-pipeline: Tumor-naive cfDNA Cancer Detection via 5Mb + 100kb Short/Long Ratio, Median-Normalized Coverage, and FSD Histogram"
+authors:
+  - given-names: "Royce"
+    family-names: "(independent researcher)"
+    affiliation: "DeepCatch Project — Independent Researcher, Hong Kong SAR"
+    orcid: "https://orcid.org/0000-0000-0000-0000"
+year: 2026
+doi: "10.5281/zenodo.to-be-assigned-on-first-release"
+url: "https://github.com/rollroyces/cfdna-fragmentomics-pipeline"
+repository-code: "https://github.com/rollroyces/cfdna-fragmentomics-pipeline"
+repository-companion: "https://github.com/rollroyces/deepcatch"
+license: MIT
+version: "0.2.0"
+date-released: 2026-08-23
+keywords:
+  - "cfDNA"
+  - "ctDNA"
+  - "fragmentomics"
+  - "DELFI"
+  - "cross-study"
+  - "harmonization"
+  - "pan-cancer"
+  - "open science"
+abstract: >
+  cfdna-fragmentomics-pipeline is an open-source tumor-naive cfDNA
+  cancer detection pipeline that runs on FinaleDB pre-computed fragment
+  records. The pipeline extracts a 5-channel profile (5Mb + 100kb
+  short/long ratio, 5Mb + 100kb median-normalized coverage, and the
+  full 196-bin fragment-size distribution) per sample, then trains an
+  LR-on-PCA classifier with optional per-study z-score harmonization.
+  On a cross-study pan-cancer cohort of 627 FinaleDB samples (363
+  cancer + 264 healthy from Jiang 2015 + Cristiano 2019), the pipeline
+  achieves AUC 0.9745 +/- 0.002 (5-seed, harmonized), at parity with
+  DELFI-HCC on the clinically relevant Sens@95% metric. The pipeline
+  is intentionally a separate package — consumed by DeepCatch via a
+  thin adapter that reads only the .npy/JSON file format. All code
+  (MIT), data (open access), and results are freely available.
+references:
+  - type: article
+    title: "DeepCatch v2.2.0: An Open-Source Benchmark for Panel-Based Ultra-Sensitive Detection of Circulating Tumor DNA from Real Tumor Mutations"
+    authors:
+      - family-names: "Royce"
+        given-names: "(independent)"
+    year: 2026
+    journal: "bioRxiv (preprint)"
+    doi: "to be assigned upon bioRxiv submission"
