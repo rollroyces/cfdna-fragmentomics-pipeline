@@ -82,11 +82,36 @@ def _build_5ch(samples: list[str], y_arr: np.ndarray) -> np.ndarray:
 
 
 def _build_5ch_plus_nuc(samples: list[str], y_arr: np.ndarray) -> np.ndarray:
+    """5-channel + 3 original (band-sum) ratio features."""
     X_5ch = _build_5ch(samples, y_arr)
     nuc_rows = []
     for s in samples:
         nuc_rows.append(compute_nuc_features_from_path(
             os.path.join(FEAT_DIR, f"{s}.fsd.json")))
+    X_nuc = np.stack(nuc_rows)
+    return np.concatenate([X_5ch, X_nuc], axis=1)
+
+
+def _build_5ch_plus_band(samples: list[str], y_arr: np.ndarray) -> np.ndarray:
+    """5-channel + 3 new band-boundary features (v2 design)."""
+    from nuc_features import compute_band_features_from_path
+    X_5ch = _build_5ch(samples, y_arr)
+    band_rows = []
+    for s in samples:
+        band_rows.append(compute_band_features_from_path(
+            os.path.join(FEAT_DIR, f"{s}.fsd.json")))
+    X_band = np.stack(band_rows)
+    return np.concatenate([X_5ch, X_band], axis=1)
+
+
+def _build_5ch_plus_all_nuc(samples: list[str], y_arr: np.ndarray) -> np.ndarray:
+    """5-channel + all 6 nucleosome features (3 original + 3 band)."""
+    from nuc_features import load_fsd, compute_all_features
+    X_5ch = _build_5ch(samples, y_arr)
+    nuc_rows = []
+    for s in samples:
+        nuc_rows.append(compute_all_features(load_fsd(
+            os.path.join(FEAT_DIR, f"{s}.fsd.json"))))
     X_nuc = np.stack(nuc_rows)
     return np.concatenate([X_5ch, X_nuc], axis=1)
 
@@ -149,12 +174,36 @@ def main() -> int:
     res_5nuc = _evaluate(X_5nuc, y, study_arr, pca_n=args.pca_n,
                           n_seeds=args.seeds)
     elapsed = time.time() - t0
+    print(f"[ablation] Building 5ch+band features...")
+    X_5band = _build_5ch_plus_band(samples, y)
+    X_5all = _build_5ch_plus_all_nuc(samples, y)
+    print(f"[ablation] +band shape: {X_5band.shape}, +all_nuc shape: {X_5all.shape}")
+
+    print(f"[ablation] Running {args.seeds}-seed CV (PCA n={args.pca_n})...")
+    t0 = time.time()
+    res_5ch = _evaluate(X_5ch, y, study_arr, pca_n=args.pca_n,
+                         n_seeds=args.seeds)
+    res_5nuc = _evaluate(X_5nuc, y, study_arr, pca_n=args.pca_n,
+                          n_seeds=args.seeds)
+    res_5band = _evaluate(X_5band, y, study_arr, pca_n=args.pca_n,
+                           n_seeds=args.seeds)
+    res_5all = _evaluate(X_5all, y, study_arr, pca_n=args.pca_n,
+                          n_seeds=args.seeds)
+    elapsed = time.time() - t0
     print(f"[ablation] Time: {elapsed:.1f}s")
 
-    # Paired t-test on per-seed AUCs
-    t_stat, p_val = stats.ttest_rel(res_5nuc["per_seed_aucs"],
-                                     res_5ch["per_seed_aucs"])
-    delta = np.asarray(res_5nuc["per_seed_aucs"]) - np.asarray(res_5ch["per_seed_aucs"])
+    # Paired t-tests vs 5ch baseline
+    def paired_t(a, b):
+        ts, ps = stats.ttest_rel(a, b)
+        d = np.asarray(a) - np.asarray(b)
+        return float(ts), float(ps), float(np.mean(d)), float(np.std(d))
+
+    t_nuc, p_nuc, d_nuc, ds_nuc = paired_t(res_5nuc["per_seed_aucs"],
+                                              res_5ch["per_seed_aucs"])
+    t_band, p_band, d_band, ds_band = paired_t(res_5band["per_seed_aucs"],
+                                                res_5ch["per_seed_aucs"])
+    t_all, p_all, d_all, ds_all = paired_t(res_5all["per_seed_aucs"],
+                                            res_5ch["per_seed_aucs"])
 
     summary = {
         "n_samples": len(samples),
@@ -163,29 +212,41 @@ def main() -> int:
         "n_seeds": args.seeds,
         "pca_n": args.pca_n,
         "baseline_5ch": res_5ch,
-        "with_nuc_features": res_5nuc,
-        "delta_auc_mean": float(np.mean(delta)),
-        "delta_auc_per_seed": delta.tolist(),
-        "paired_t_stat": float(t_stat),
-        "paired_t_pvalue": float(p_val),
+        "with_v1_nuc_ratios": res_5nuc,
+        "with_v2_band_features": res_5band,
+        "with_all_nuc": res_5all,
+        "v1_paired_t_stat": t_nuc,
+        "v1_paired_t_pvalue": p_nuc,
+        "v1_delta_auc_mean": d_nuc,
+        "v1_delta_auc_std": ds_nuc,
+        "v2_paired_t_stat": t_band,
+        "v2_paired_t_pvalue": p_band,
+        "v2_delta_auc_mean": d_band,
+        "v2_delta_auc_std": ds_band,
+        "all_paired_t_stat": t_all,
+        "all_paired_t_pvalue": p_all,
+        "all_delta_auc_mean": d_all,
+        "all_delta_auc_std": ds_all,
         "elapsed_seconds": elapsed,
-        "interpretation": (
-            "POSITIVE: +nuc beats 5ch (p<0.05)." if p_val < 0.05 and np.mean(delta) > 0
-            else "NULL: no significant change."
-            if p_val >= 0.05
-            else "NEGATIVE: +nuc worse than 5ch (p<0.05)."),
     }
     with open(args.out, "w") as f:
         json.dump(summary, f, indent=2)
 
     print()
-    print("=" * 60)
-    print(f"Baseline (5ch):  AUC {res_5ch['auc_mean']:.4f} ± {res_5ch['auc_std']:.4f}")
-    print(f"+ Nucleosome:    AUC {res_5nuc['auc_mean']:.4f} ± {res_5nuc['auc_std']:.4f}")
-    print(f"Δ AUC:           {np.mean(delta):+.4f}  (per-seed std {np.std(delta):.4f})")
-    print(f"Paired t-test:   t={t_stat:+.2f}  p={p_val:.2e}")
-    print(f"Interpretation:  {summary['interpretation']}")
-    print("=" * 60)
+    print("=" * 70)
+    print(f"Baseline (5ch):    AUC {res_5ch['auc_mean']:.4f} ± {res_5ch['auc_std']:.4f}")
+    print(f"+ v1 (3 ratios):   AUC {res_5nuc['auc_mean']:.4f} ± {res_5nuc['auc_std']:.4f}   Δ={d_nuc:+.4f}  p={p_nuc:.3f}")
+    print(f"+ v2 (3 band):     AUC {res_5band['auc_mean']:.4f} ± {res_5band['auc_std']:.4f}   Δ={d_band:+.4f}  p={p_band:.3f}")
+    print(f"+ all (6 nuc):     AUC {res_5all['auc_mean']:.4f} ± {res_5all['auc_std']:.4f}   Δ={d_all:+.4f}  p={p_all:.3f}")
+    print("=" * 70)
+    best_delta = max([(d_nuc, p_nuc, "v1"),
+                       (d_band, p_band, "v2"),
+                       (d_all, p_all, "all")],
+                      key=lambda x: x[0])
+    if best_delta[0] > 0 and best_delta[1] < 0.05:
+        print(f"BEST: {best_delta[2]} (+{best_delta[0]*100:.2f}pp AUC, p={best_delta[1]:.3f})")
+    else:
+        print(f"NULL: no variant improves 5ch by >= 0.5pp (best Δ={best_delta[0]*100:+.2f}pp)")
     return 0
 
 

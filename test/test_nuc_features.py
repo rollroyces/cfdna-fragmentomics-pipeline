@@ -13,15 +13,18 @@ from nuc_features import (  # noqa: E402
     DINUCLEOSOME_RANGE,
     NUC_FEATURE_NAMES,
     compute_nuc_features_from_fsd,
+    compute_band_features_from_fsd,
+    compute_all_features,
     compute_nuc_features_from_path,
     load_fsd,
+    BAND_FEATURE_NAMES,
 )
 
 
 def test_nuc_features_returns_three_values():
     """Each sample produces exactly 3 features in the documented order."""
     fsd = np.zeros(196)
-    fsd[20:30] = 0.5  # bin centers 120..165
+    fsd[20:30] = 0.5
     fsd /= fsd.sum()
     feats = compute_nuc_features_from_fsd(fsd)
     assert feats.shape == (3,)
@@ -33,7 +36,6 @@ def test_nuc_features_handle_zero_fsd():
     fsd = np.zeros(196)
     feats = compute_nuc_features_from_fsd(fsd)
     assert np.all(np.isfinite(feats))
-    # All zeros -> every sum is 0, every ratio is 0/eps ~= small finite
     assert (np.abs(feats) < 1e6).all()
 
 
@@ -42,12 +44,12 @@ def test_nuc_features_submono_direction_is_correct():
     If mass is concentrated in mononucleosome, submono_ratio < 1."""
     # Subnucleosome-heavy FSD
     fsd_sub = np.zeros(196)
-    fsd_sub[8:18] = 1.0  # bin centers 60..105 (subnucleosomal)
+    fsd_sub[8:18] = 1.0
     fsd_sub /= fsd_sub.sum()
     f_submono = compute_nuc_features_from_fsd(fsd_sub)[0]
     # Mononucleosome-heavy FSD
     fsd_mono = np.zeros(196)
-    fsd_mono[22:32] = 1.0  # bin centers 130..175 (mononucleosomal)
+    fsd_mono[22:32] = 1.0
     fsd_mono /= fsd_mono.sum()
     f_submono_mono = compute_nuc_features_from_fsd(fsd_mono)[0]
     assert f_submono > f_submono_mono
@@ -71,7 +73,6 @@ def test_nuc_features_match_disk_fsd_format():
             for k in range(196):
                 lo = 20 + 5 * k
                 hi = lo + 5
-                # Synthetic: peak at ~167bp
                 bins[f"{lo}-{hi}"] = float(np.exp(-((lo - 167) / 10) ** 2))
             total = sum(bins.values())
             bins = {k: v / total for k, v in bins.items()}
@@ -89,28 +90,69 @@ def test_feature_names_match_implementation():
 
 def test_index_ranges_are_within_fsd():
     """The bin-index ranges must not exceed the 196 FSD bins."""
-    assert SUBNUCLEOSOME_RANGE[1] <= 1000  # well within range
+    assert SUBNUCLEOSOME_RANGE[1] <= 1000
     assert MONONUCLEOSOME_RANGE[1] <= 1000
     assert DINUCLEOSOME_RANGE[1] <= 1000
 
 
 def test_nuc_features_distinguish_cancer_like_from_healthy_like():
-    """A 'cancer-like' FSD (mass shifted to short fragments) should
-    have a higher submono_ratio than a 'healthy-like' FSD. This is
-    the headline biological signal."""
-    rng = np.random.default_rng(42)
-    # Cancer-like: 60% mass at subnucleosome, 30% mono, 10% long
+    """A cancer-like FSD (mass shifted to short fragments) should have
+    a higher submono_ratio than a healthy-like FSD. This is the
+    headline biological signal."""
     cancer = np.zeros(196)
-    cancer[5:14] = 0.6   # 45..85 bp
-    cancer[22:32] = 0.3  # 130..175 bp (mono)
-    cancer[40:60] = 0.1  # 220..315 bp (long)
-    # Healthy-like: 5% subnuc, 70% mono, 25% long
+    cancer[5:14] = 0.6   # bin centers 45 to 85 bp
+    cancer[22:32] = 0.3
+    cancer[40:60] = 0.1
     healthy = np.zeros(196)
     healthy[5:14] = 0.05
     healthy[22:32] = 0.70
     healthy[40:60] = 0.25
     f_cancer = compute_nuc_features_from_fsd(cancer / cancer.sum())
     f_healthy = compute_nuc_features_from_fsd(healthy / healthy.sum())
-    assert f_cancer[0] > f_healthy[0], (
-        f"submono_ratio should be higher for cancer-like FSD; "
-        f"got cancer={f_cancer[0]:.3f}, healthy={f_healthy[0]:.3f}")
+    assert f_cancer[0] > f_healthy[0]
+
+
+# ---- v2 band-boundary feature tests ----
+
+def test_band_features_returns_three_values():
+    fsd = np.zeros(196); fsd[20:40] = 1.0; fsd /= fsd.sum()
+    feats = compute_band_features_from_fsd(fsd)
+    assert feats.shape == (3,)
+    assert len(BAND_FEATURE_NAMES) == 3
+
+
+def test_band_features_distinguish_cancer_like_from_healthy_like():
+    """Cancer-like FSD has high sub-band, low peak, and high di-band;
+    healthy-like FSD has the opposite. The di-band feature should be
+    much higher for the cancer-like FSD."""
+    cancer = np.zeros(196)
+    cancer[9:16] = 0.3   # sub-band 65 to 95 bp
+    cancer[23:30] = 0.05  # mono peak 135 to 170 bp
+    cancer[30:41] = 0.2   # valley 170 to 220 bp
+    cancer[47:56] = 0.4   # di-band 255 to 295 bp
+    cancer /= cancer.sum()
+
+    healthy = np.zeros(196)
+    healthy[9:16] = 0.1
+    healthy[23:30] = 0.6
+    healthy[30:41] = 0.1
+    healthy[47:56] = 0.1
+    healthy /= healthy.sum()
+
+    f_cancer = compute_band_features_from_fsd(cancer)
+    f_healthy = compute_band_features_from_fsd(healthy)
+    assert f_cancer[2] > f_healthy[2] * 2, (
+        f"di_band_density should be much higher for cancer-like FSD; "
+        f"got cancer={f_cancer[2]:.4f}, healthy={f_healthy[2]:.4f}")
+
+
+def test_compute_all_features_returns_six():
+    fsd = np.zeros(196); fsd[20:40] = 1.0; fsd /= fsd.sum()
+    feats = compute_all_features(fsd)
+    assert feats.shape == (6,)
+
+
+def test_band_features_handle_zero_fsd():
+    fsd = np.zeros(196)
+    feats = compute_band_features_from_fsd(fsd)
+    assert np.all(np.isfinite(feats))

@@ -96,6 +96,75 @@ def compute_nuc_features_from_fsd(fsd: np.ndarray) -> np.ndarray:
     ], dtype=float)
 
 
+# ----- Band-boundary features (v2 — designed after t-statistic analysis) -----
+
+# Bin index ranges for the 3 Bonferroni-significant bands
+# (bp values; _idx_for_band converts to bin indices)
+SUB_BAND = (65, 95)         # 65-95bp
+MONO_VALLEY_BAND = (170, 220)  # 170-220bp (centered on the 180bp peak t-stat)
+DI_BAND = (255, 295)        # 255-295bp
+# Use the regions *between* the bands as "stabilizers"
+MONO_PEAK_BAND = (135, 170)  # 135-170bp (where mass is high but t is weak)
+
+
+def _idx_for_band(low_bp: int, high_bp: int) -> tuple[int, int]:
+    return ((low_bp - 20) // 5, (high_bp - 20) // 5 + 1)
+
+
+_SUB_BAND_IDX = _idx_for_band(*SUB_BAND)
+_MONO_VALLEY_IDX = _idx_for_band(*MONO_VALLEY_BAND)
+_DI_BAND_IDX = _idx_for_band(*DI_BAND)
+_MONO_PEAK_IDX = _idx_for_band(*MONO_PEAK_BAND)
+
+BAND_FEATURE_NAMES = [
+    "sub_to_valley_ratio",   # cancer shift: subnuc up, valley up
+    "valley_to_peak_ratio",  # cancer shift: valley up, peak down
+    "di_band_density",        # cancer shift: di-region up
+]
+
+
+def compute_band_features_from_fsd(fsd: np.ndarray) -> np.ndarray:
+    """Compute band-boundary ratio features.
+
+    Designed from the per-bin Welch t-statistic analysis:
+    cancer cfDNA shifts mass AWAY from the mono-nucleosome peak
+    (170-200bp) and TOWARD both sub-nucleosomal (65-95bp) and
+    di-region (255-295bp) bins. These three features each measure
+    one of these redistribution axes.
+
+    Returns shape (3,) array.
+    """
+    eps = 1e-9
+    sub = float(fsd[_SUB_BAND_IDX[0]:_SUB_BAND_IDX[1]].sum())
+    valley = float(fsd[_MONO_VALLEY_IDX[0]:_MONO_VALLEY_IDX[1]].sum())
+    peak = float(fsd[_MONO_PEAK_IDX[0]:_MONO_PEAK_IDX[1]].sum())
+    di = float(fsd[_DI_BAND_IDX[0]:_DI_BAND_IDX[1]].sum())
+    return np.asarray([
+        sub / (valley + eps),       # higher in cancer (mass moves both ways)
+        valley / (peak + eps),        # higher in cancer (valley erodes peak)
+        di,                            # raw density; higher in cancer
+    ], dtype=float)
+
+
+def compute_all_features(fsd: np.ndarray) -> np.ndarray:
+    """All 6 features (3 original + 3 band-boundary)."""
+    return np.concatenate([
+        compute_nuc_features_from_fsd(fsd),
+        compute_band_features_from_fsd(fsd),
+    ])
+
+
+def compute_band_features_from_path(fsd_json_path: str) -> np.ndarray:
+    """Convenience: load FSD from path and compute 3 band-boundary features."""
+    return compute_band_features_from_fsd(load_fsd(fsd_json_path))
+
+
+def compute_nuc_band_features_from_path(fsd_json_path: str) -> np.ndarray:
+    """Convenience: load FSD from path and compute all 6 nucleosome features."""
+    fsd = load_fsd(fsd_json_path)
+    return compute_all_features(fsd)
+
+
 def load_fsd(fsd_json_path: str) -> np.ndarray:
     """Load FSD from the on-disk JSON. Returns shape (196,) normalized."""
     with open(fsd_json_path) as f:
