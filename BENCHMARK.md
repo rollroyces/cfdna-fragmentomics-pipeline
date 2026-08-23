@@ -301,3 +301,41 @@ user asked for is NOT available through nucleosome-aware features.
 Future gains must come from elsewhere (held-out clinical validation,
 different feature classes like methylation or fragment-end motifs
 beyond 4-mers).
+
+### Appendix D.1: Follow-up with band-boundary features (null result #2)
+
+Following the user's intuition that 'protein-aware features could
+help' and after the v1 ratio ablation returned +0.0002 AUC, I
+re-analyzed the per-bin t-statistic and identified 3 distinct
+Bonferroni-significant signal bands in the FSD:
+  - 65-95 bp (sub-nucleosomal, +t, cancer enriched)
+  - 170-220 bp (mono-nucleosome valley, -t at 170-200, depleted)
+  - 255-295 bp (di-nucleosome region, +t, cancer enriched)
+
+Designed v2 features targeting the band boundaries specifically:
+  - sub_to_valley_ratio: mass at 65-95bp / mass at 170-220bp
+  - valley_to_peak_ratio: mass at 170-220bp / mass at 135-170bp
+  - di_band_density: raw mass at 255-295bp
+
+Honest 5-seed ablation (results/nuc_ablation_v2.json):
+  Baseline (5ch):    AUC 0.9723 ± 0.0035
+  + v1 (3 ratios):   AUC 0.9725  Δ=+0.0002  p=0.019
+  + v2 (3 band):     AUC 0.9724  Δ=+0.0001  p=0.036
+  + all (6 nuc):     AUC 0.9726  Δ=+0.0003  p=0.002
+
+Same magnitude as v1: statistically detectable, practically zero.
+The directional finding is consistent (cancer mass shifts outward
+from the mono peak), but at this AUC level (~0.97) with LR-on-PCA(200),
+the classifier has already extracted essentially all the linear
+signal in the 63,000-dim feature vector.
+
+Honest reading: the 196-bin FSD + LR-on-PCA pipeline is
+near-optimal for the linear signal in cfDNA fragmentomics at this
+cohort size and assay. The remaining 3 percentage points the user
+wanted are not in the data; they would have to come from:
+  - Non-linear methods (deep learning, kernel SVM) on richer
+    feature spaces
+  - Different feature classes (methylation, motif transitions,
+    fragment-end 6-mers)
+  - Held-out validation (the real bottleneck; not a model issue)
+
