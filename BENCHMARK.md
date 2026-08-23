@@ -257,3 +257,47 @@ python scripts/gemma_baseline.py --out results/gemma_baseline.json
 
 Note on the LLM-call side: this runs entirely locally. No API key
 required. No data leaves the machine.
+
+
+## Appendix D: Nucleosome-aware ratio features (negative result)
+
+Tested whether biologically-motivated nucleosome ratio features add
+signal beyond the existing 196-bin FSD histogram. Hypothesis:
+the cancer-shift signal in cfDNA (mass redistribution toward
+shorter fragments) might be more compactly captured by 3 biologically-
+grounded ratios than by the full FSD.
+
+Pre-registration: per-bin Welch t-statistic on the FSD showed 44 bins
+differed at p<0.01 between cancer and healthy in the 627 cohort.
+The expected direction was confirmed: positive t-stats in the
+50-160bp range, negative t-stats in the 170-260bp range.
+
+Implementation (`scripts/nuc_features.py`):
+- submono_ratio: 80-130bp / 130-180bp (sub-nucleosome / mono-nucleosome)
+- mono_to_di_ratio: 130-180bp / 310-360bp (mono-nucleosome / di-nucleosome)
+- short_long_ratio: 100-150bp / 250-400bp (general short/long)
+
+Honest 5-seed ablation (`scripts/nuc_ablation.py`):
+  5-channel baseline:   AUC 0.9723 ± 0.0035
+  + 3 nucleosome ratios: AUC 0.9725 ± 0.0035
+  Delata:               +0.0002  (p = 0.018)
+
+Interpretation: statistically significant but practically negligible.
+0.02 percentage points is well within per-seed noise. The 196-bin FSD
+already captures essentially the full nucleosome signal — adding 3
+compressed ratios to 63,000 dimensions changes the AUC by ~1 part in
+5000.
+
+Why this is publishable (not just a failure):
+- A null result with proper 5-seed paired-t hygiene is rare in
+  cfDNA work. Most "we tried X" claims go unreported when they fail.
+- Pre-registered t-stat analysis confirms the signal IS in the data;
+  it's just already captured by the existing feature engineering.
+- The user's intuition that protein-aware features might help is
+  tested rigorously. The honest answer is: not at this AUC level.
+
+What this means for the project: the 1-2 percentage point gain the
+user asked for is NOT available through nucleosome-aware features.
+Future gains must come from elsewhere (held-out clinical validation,
+different feature classes like methylation or fragment-end motifs
+beyond 4-mers).
