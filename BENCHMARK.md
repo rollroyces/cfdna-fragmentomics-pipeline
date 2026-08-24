@@ -417,3 +417,19 @@ shrinkage dominates on this dataset.
 **Recommended default for the pipeline going forward:**
 `LogisticRegression(penalty="l2", C=1000, solver="lbfgs")` on the
 harmonized 60k feature vector (no PCA).
+
+### Appendix E.2: L1 sparse regularization — not viable on this data
+
+Tried L1 with saga solver as an alternative to L2. Each L1 fit on
+the 60k-features × 627-samples matrix took >10 minutes per
+(5-fold × 5-seed) block — too slow for a meaningful ablation. L1
+with `liblinear` would be faster but doesn't support multinomial
+loss with our data shape. **Conclusion: L2 with weak shrinkage
+(C=1000) is the recommended default.** L1 sparsity is theoretically
+attractive for interpretability (sparse model = "explainable") but
+operationally not viable at this scale.
+
+If interpretability is critical for downstream work (e.g., feature
+selection for a smaller clinical model), the recommended path is:
+fit L2 C=1000, then threshold the coefficients (e.g., keep the
+top-200 features by |coef|) and refit on that smaller set.
