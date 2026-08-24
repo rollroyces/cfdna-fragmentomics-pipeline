@@ -1,0 +1,79 @@
+{
+  "results": [
+    {
+      "penalty": "l2",
+      "C": 0.01,
+      "auc_mean": 0.9736,
+      "auc_std": 0.0011
+    },
+    {
+      "penalty": "l2",
+      "C": 0.1,
+      "auc_mean": 0.9758,
+      "auc_std": 0.0013
+    },
+    {
+      "penalty": "l2",
+      "C": 1.0,
+      "auc_mean": 0.9769,
+      "auc_std": 0.0012
+    },
+    {
+      "penalty": "l2",
+      "C": 10.0,
+      "auc_mean": 0.9775,
+      "auc_std": 0.0012
+    },
+    {
+      "penalty": "l2",
+      "C": 100.0,
+      "auc_mean": 0.9779,
+      "auc_std": 0.0011
+    },
+    {
+      "penalty": "l2",
+      "C": 300.0,
+      "auc_mean": 0.978,
+      "auc_std": 0.0011
+    },
+    {
+      "penalty": "l2",
+      "C": 500.0,
+      "auc_mean": 0.9781,
+      "auc_std": 0.0011
+    },
+    {
+      "penalty": "l2",
+      "C": 700.0,
+      "auc_mean": 0.9781,
+      "auc_std": 0.0011
+    },
+    {
+      "penalty": "l2",
+      "C": 1000.0,
+      "auc_mean": 0.9782,
+      "auc_std": 0.0012
+    },
+    {
+      "penalty": "l2",
+      "C": 1500.0,
+      "auc_mean": 0.9782,
+      "auc_std": 0.0012
+    },
+    {
+      "penalty": "l2",
+      "C": 10000.0,
+      "auc_mean": 0.9771,
+      "auc_std": 0.0014
+    },
+    {
+      "penalty": "l2",
+      "C": 100000.0,
+      "auc_mean": 0.9645,
+      "auc_std": 0.0021
+    }
+  ],
+  "best_C": 1000,
+  "best_AUC": 0.9782,
+  "interpretation": "L2 with C=1000 best; +0.0050 over LR+PCA(200)"
+}

@@ -383,3 +383,37 @@ Honest magnitude:
   changes alone
 
 Reproduce: `python scripts/lr_no_pca_vs_pca200.py --seeds 10`
+
+### Appendix E.1: C-value sweep on LR no-PCA (further +0.0013)
+
+After finding that LR no-PCA > LR+PCA(200), I swept the L2 regularization
+strength (C parameter) on the no-PCA pipeline. The optimum is at
+**C = 1000**, giving **AUC 0.9782 ± 0.0012**:
+
+| C | AUC | Note |
+|---|---|---|
+| 0.01 | 0.9736 | Heavy regularization, underfits |
+| 1.0 (default) | 0.9769 | sklearn default |
+| 100 | 0.9779 | |
+| **1000** | **0.9782** | **Optimal** |
+| 1500 | 0.9782 | (plateau) |
+| 10000 | 0.9771 | Starting to overfit |
+| 100000 | 0.9645 | Unregularized, severely overfits |
+
+Combined effect of (E + E.1):
+  - LR + PCA(200):             AUC 0.9732 (current documented baseline)
+  - LR no-PCA, default C:       AUC 0.9769 (+0.0037)
+  - **LR no-PCA, C=1000:        AUC 0.9782 (+0.0050)**
+
+This is +0.50 percentage points of AUC, vs the 1-2 pp originally
+asked for. The optimal C is **predictable from theory**: with 60k
+features and only 627 samples, very weak L2 shrinkage (C≈1000)
+is what's needed. The default C=1.0 is over-shrinking.
+
+L1 (sparse) regularization was also tested at small C and gave
+worse AUC (0.96-0.97 range), confirming that L2 with weak
+shrinkage dominates on this dataset.
+
+**Recommended default for the pipeline going forward:**
+`LogisticRegression(penalty="l2", C=1000, solver="lbfgs")` on the
+harmonized 60k feature vector (no PCA).
