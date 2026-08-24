@@ -137,6 +137,13 @@ gain.
 - FinaleDB data is versioned upstream (uniform processing pipeline)
 - Full result JSON in `results/classifier_results.json`
 
+## Consolidated research summary
+
+See [RESULTS.md](RESULTS.md) for a single-document summary of
+all findings across both DeepCatch and this pipeline (mutation-informed
+channel, tumor-naive channel, cross-repo fusion, LLM baseline,
+decision curve, documented negative results, test status).
+
 ## License
 
 MIT
