@@ -128,7 +128,7 @@ def main():
              "elapsed": time.time() - t0,
              "n_nonzero": n_nonzero_seed}
         print(f"  AUC {r['auc_mean']:.4f} ± {r['auc_std']:.4f}  "
-              f"({r['elapsed']:.1f}s, {n_nonzero}/{X.shape[1]} features)")
+              f"({r['elapsed']:.1f}s, {r.get('n_nonzero', '?')}/{X.shape[1]} features)")
         results.append(r)
 
     # Summary
