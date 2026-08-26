@@ -369,8 +369,8 @@ Why does no-PCA win?
   computational cost was a concern. With modern hardware and sklearn,
   no PCA is fine.
 
-8 of 10 seeds favor no-PCA. The 2 outliers where PCA wins are within
-noise.
+7 of 10 seeds favor no-PCA. The 3 outliers where PCA wins are within
+noise (each by less than 0.0013 AUC).
 
 Implication: the documented baseline was sub-optimal. The "real"
 headline AUC is **0.976 +/- 0.001** (LR no-PCA), not 0.973 (LR + PCA).
