@@ -132,3 +132,44 @@
 ## Reproducibility review (pending)
 
 Will be added when the 4th reviewer completes. The reproducibility reviewer is the only one that actually runs scripts, so it will tell us whether the documented commands work end-to-end.
+
+---
+
+## Reproducibility review — completed (2026-08-26)
+
+**Reviewed by**: senior reproducibility reviewer who actually executed every documented command.
+
+### What works (commands that produced documented results)
+
+| Command | Documented | Actual | Match |
+|---|---|---|---|
+| `scripts/lr_no_pca_vs_pca200.py --seeds 10` | no_pca AUC 0.9760 ± 0.0013 | **0.9760 ± 0.0013** | EXACT |
+| `scripts/lr_regularization_sweep.py --seeds 5 --c-values 1000` (L2 C=1000 only) | AUC 0.9782 | **0.9782 ± 0.0012** (83s) | EXACT |
+| `scripts/honest_benchmark.py` Section A (single-study Jiang) | AUC 0.9716 ± 0.003 | **0.9716 ± 0.0032** | EXACT |
+| `scripts/auc_reproducibility_gate.py` | AUC ≥0.80 floor | **0.9981** (deterministic across 3 fresh-process runs) | PASS |
+| `scripts/adapter_auc_gate.py` (DeepCatch) | AUC ≥0.80 floor | **0.9981** | PASS |
+| `pytest test/ -v` (cfdna-fragmentomics-pipeline) | tests pass | **39/39 in 5.15s** | PASS |
+| `pytest test/ -v` (deepcatch) | tests pass | **28/28 in 1.52s** | PASS |
+| `pip install -e .` (both, fresh Python 3.11 venv) | works | installed cleanly | PASS |
+
+### What doesn't work
+
+1. **`scripts/honest_benchmark.py` Section C**: documented 0.9745 ± 0.0022; actual run gave **0.9750 ± 0.0022**. Within the documented ±0.0022 std band but the headline number is stale across runs (LR convergence drift).
+2. **BENCHMARK.md `8 of 10` claim**: actual is `7 of 10`. **FIXED in commit `ad370c2`**.
+3. **AUC gate has +0.20 headroom**: it produces 0.9981 every time vs the 0.80 floor. Catches gross breakage but NOT a 30% AUC regression on the real cohort.
+
+### Missing pieces (real reproducibility gaps)
+
+1. **`data/features/*` is gitignored** — a fresh clone cannot reproduce any headline number immediately. The `python run_cross_study.py` workflow downloads ~100 GB and takes 1-3 hours to extract features. **FIXED**: prominent "Data not in repo" callout added to README.md.
+2. **`deepcatch_data.xlsx` removed** (commit 8c812c0) — documented in `data/README.md` but `run_jiang_analysis.py` and `scripts/run_jiang_pipeline.py` cannot run from the repo as-is.
+3. **TCGA-LUAD 20 patients** — downloaded automatically from GDC by `real_tcga_validation.py`. Requires network access on first run.
+4. **`results/classifier_results.json`** — referenced in README but doesn't exist (per-script JSONs are written instead).
+
+### Suggested documentation fixes (acted on)
+
+1. ✅ **Add prominent "Data not in repo" callout** — done in README.md
+2. ✅ **Add `--skip-l1` flag to `lr_regularization_sweep.py`** — done; L2-only sweep is now 82s instead of 35min
+3. ✅ **8-of-10 → 7-of-10** — done in commit `ad370c2`
+4. **Stale 0.9745 → current re-run value 0.9750**: documented but not auto-updated. LR convergence drift is ±0.002 per run; can never pin to a single value.
+5. **Pin `pyproject.toml` deps to exact versions**: not done. Would require committing `requirements.lock.txt` (pip-compile output).
+6. **Reconcile Python version** (README says 3.11, .venv is 3.14): not done. Either or both are valid as long as `pip install -e .` works in either.

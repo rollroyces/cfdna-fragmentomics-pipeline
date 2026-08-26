@@ -6,6 +6,25 @@ A production-oriented pipeline that extracts the "Big Three" fragmentomic signat
 
 > **How it compares to industry:** see [BENCHMARK.md](BENCHMARK.md) — at parity with DELFI-HCC on the clinically relevant metric (86% vs 84.5% sensitivity @ 95% specificity), with an honest accounting of where the comparison is and isn't fair.
 
+## ⚠️ Data not in repo (read this before running)
+
+The 627-sample FinaleDB feature set used by every headline number
+(`data/features/*.npy`, `*.fsd.json`) is **gitignored** — a fresh
+clone cannot reproduce any headline number immediately. To
+reproduce:
+
+```bash
+# ~100 GB download + 1-3 hours of feature extraction
+python run_cross_study.py --parallel 8 --max-mb 500
+```
+
+Or run the synthetic-cohort AUC gate to verify the pipeline runs
+end-to-end (no FinaleDB needed; ~30 seconds):
+
+```bash
+python scripts/auc_reproducibility_gate.py  # expects AUC >= 0.80
+```
+
 ---
 
 ## Installation

@@ -38,6 +38,11 @@ def main():
     ap.add_argument("--c-values", nargs="+", type=float,
                     default=[0.001, 0.01, 0.1, 1.0, 10.0])
     ap.add_argument("--out", default="/tmp/lr_reg_sweep.json")
+    ap.add_argument("--skip-l1", action="store_true",
+                    help="Skip the L1 saga sweep. By default it runs "
+                         "L1 at C=[0.01, 0.1, 1.0] which takes ~35 "
+                         "minutes and produces all-zero coefficients "
+                         "(see BENCHMARK.md Appendix E.2).")
     args = ap.parse_args()
 
     print("[reg_sweep] Loading cohort...")
@@ -103,7 +108,8 @@ def main():
         results.append(r)
 
     # L1 sweep (only one C, just to see if sparsity helps)
-    for C in [0.01, 0.1, 1.0]:
+    if not args.skip_l1:
+      for C in [0.01, 0.1, 1.0]:
         print(f"\n[reg_sweep] LR L1 C={C}...")
         t0 = time.time()
         aucs = []
