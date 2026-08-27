@@ -1,0 +1,46 @@
+{
+  "n_8channel_samples": 98,
+  "n_5channel_full_samples": 627,
+  "results": {
+    "5ch_98sub": {
+      "auc_mean": 0.8774166666666667,
+      "auc_std": 0.008213302218555794,
+      "per_seed_aucs": [
+        0.8683333333333334,
+        0.8679166666666667,
+        0.8891666666666668,
+        0.8820833333333333,
+        0.8795833333333333
+      ]
+    },
+    "8ch_98sub": {
+      "auc_mean": 0.8744999999999999,
+      "auc_std": 0.010939860856316022,
+      "per_seed_aucs": [
+        0.8666666666666667,
+        0.86125,
+        0.8933333333333333,
+        0.8770833333333333,
+        0.8741666666666666
+      ]
+    },
+    "5ch_full": {
+      "auc_mean": 0.9775294264963685,
+      "auc_std": 0.0015584710505564437,
+      "per_seed_aucs": [
+        0.9795684113865931,
+        0.9785353535353536,
+        0.976145755071375,
+        0.9753422656315218,
+        0.9780553468569998
+      ]
+    },
+    "8ch_vs_5ch_98sub_paired_t": {
+      "delta_mean": -0.0029166666666667006,
+      "delta_std": 0.003908679799852813,
+      "t_stat": -1.4924050144893075,
+      "p_value": 0.20987507129405258
+    }
+  },
+  "note": "8-channel features (4-mer motifs + per-bin mean length) are available for only 98 of 627 cross-study samples. Re-extracting these features for the other 529 samples would require running extract_motifs.py + a mean-length extractor on each .frag.tsv (~1-2 hour job)."
+}

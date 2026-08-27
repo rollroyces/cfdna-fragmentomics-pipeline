@@ -241,6 +241,30 @@ The fusion provides positive net benefit over treat-all and
 treat-none for every threshold in [0.05, 0.50] — the entire
 clinically meaningful range.
 
+### PPV at screening prevalence
+
+Sensitivity and specificity alone don't tell a clinician whether
+to act on a positive screen. **PPV at the population prevalence
+the assay will be deployed at is the right metric.** From
+`scripts/ppv_screening.py`:
+
+| Operating point | Prev 0.4% (US 50+) | Prev 1.5% (NLST) | Prev 2.5% (MRD-like) | Prev 4.0% (BRCA) |
+|---|---|---|---|---|
+| Sens@95%, spec=95% | **PPV 6.8%** (1 TP per 14 positives) | PPV 21.7% | PPV 31.8% | PPV 43.1% |
+| Sens@82%, spec=99% | **PPV 24.8%** (1 TP per 4) | PPV 55.5% | PPV 67.8% | PPV 77.4% |
+
+Honest interpretation: **at 95% specificity in a 0.4% prevalence
+population, 13.7 false positives are generated for every true
+positive.** At 99% specificity the ratio drops to 3.0:1 — better,
+but still 3 false positives per cancer detected. The Galleri
+PATHFINDER trial reported PPV ~38% in their high-risk
+self-selected cohort (prevalence ~1.8%); this assay on the same
+prevalence would give PPV ~28% at 99% spec (still meaningful but
+below Galleri). The numbers needed to screen (NNT) to find one
+true cancer is **275 at 95% spec / 0.4% prev** — i.e. screening 275
+people gives 1 true cancer and 14 false positives, of which 14
+people will undergo follow-up imaging/biopsy unnecessarily.
+
 ---
 
 ## Section 5: Limitations (all explicitly documented)

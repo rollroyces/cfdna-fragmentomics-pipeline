@@ -173,3 +173,76 @@ Will be added when the 4th reviewer completes. The reproducibility reviewer is t
 4. **Stale 0.9745 → current re-run value 0.9750**: documented but not auto-updated. LR convergence drift is ±0.002 per run; can never pin to a single value.
 5. **Pin `pyproject.toml` deps to exact versions**: not done. Would require committing `requirements.lock.txt` (pip-compile output).
 6. **Reconcile Python version** (README says 3.11, .venv is 3.14): not done. Either or both are valid as long as `pip install -e .` works in either.
+
+---
+
+## Audit round 2 update (2026-08-26) — deferred fixes worked
+
+A second audit round worked through 4 of 7 deferred fixes:
+
+### Fixed in this round
+
+| # | Fix | Status |
+|---|---|---|
+| E2 | `honest_benchmark.py` runs full benchmark on `--help` | **FIXED** (rewrote to use `run_honest_benchmark()` function; `--help` now takes 2.8s instead of triggering the full 5-min benchmark) |
+| E3 | Bare `open()` in `honest_benchmark.py` | **FIXED** (rewrote with `with open()` blocks; module-level reloads eliminated) |
+| S6 | No PPV at screening prevalence | **FIXED** (`scripts/ppv_screening.py` computes PPV/NPV at 5 prevalences × 4 operating points; 6 unit tests pass) |
+| R-data | `data/features/*` is gitignored | **FIXED** (prominent "Data not in repo" callout in pipeline README) |
+| S4 | 5-channel vs 8-channel choice not defended | **TESTED**: 8-channel on 98-subset gives AUC 0.8745 ± 0.011 vs 5-channel 0.8774 ± 0.008 (paired t = −1.49, **p=0.21 — NOT significant**). Full 627 re-run would require motif extraction on 529 missing samples. |
+
+### New scripts added
+
+- `scripts/ppv_screening.py` (212 lines) + 6 unit tests
+- `scripts/eval_8channel.py` (300 lines) + 2 unit tests
+
+### Test count progression
+
+- Round 1: 39 tests
+- Round 2: 45 tests (39 + 6 PPV + 2 8ch, minus 2 prior counts = +6 net)
+
+### 8-channel honest evaluation result
+
+LR no-PCA C=1000, 5 seeds × 5-fold CV, 98-sample subset where
+motif features exist:
+
+| Setup | AUC |
+|---|---|
+| 5-channel (98-subset) | 0.8774 ± 0.0082 |
+| 8-channel (98-subset) | 0.8745 ± 0.0109 |
+| **Paired 8ch − 5ch** | **−0.0029 ± 0.0039**, t=−1.49, p=0.21 |
+| 5-channel (full 627 cohort) | 0.9775 ± 0.0016 |
+
+The Scientific reviewer's hypothesis that "4-mer motifs add
++0.005 AUC" was based on the older PCA(80) configuration; with
+the recommended LR no-PCA C=1000 config, the 8-channel is
+slightly worse (within noise) on the same 98-sample subset.
+The 5-channel baseline is therefore the more defensible
+headline.
+
+### PPV at screening prevalence (the new Section 4.1)
+
+| Operating point | Prev 0.4% (US 50+) | Prev 1.5% (NLST) | Prev 2.5% (MRD-like) | Prev 4.0% (BRCA) |
+|---|---|---|---|---|
+| Sens@95%, spec=95% | PPV 6.8% | PPV 21.7% | PPV 31.8% | PPV 43.1% |
+| Sens@82%, spec=99% | PPV 24.8% | PPV 55.5% | PPV 67.8% | PPV 77.4% |
+
+Honest framing: at population-level screening (0.4% prevalence),
+even the 99%-specificity operating point gives PPV ~25% — meaning
+3 false positives for every cancer detected. The Numbers Needed
+to Screen (NNT) to find one true cancer is 275 at 95% spec /
+0.4% prev.
+
+### Still deferred (genuinely large work)
+
+- E1 (`nuc_ablation.py` duplicate `_evaluate`) — needs deeper read
+- E4 (NaN→median test leakage) — would require moving median calc
+  inside evaluate_cv and re-running all benchmarks
+- E6 (Gemma `p=0.5` fallback) — needs explicit failure rate tracker
+- E8 (hardcoded paths) — non-urgent; would make scripts portable
+- S1 (per-cancer-type AUC) — cancer-type not in current labels file
+- S3 (ComBat/limma-style harmonization) — needs new dependency
+- ST4/5 (per-study-per-class z-score, BH correction) — would need
+  full re-runs of every benchmark
+
+These are documented but require either significant code work
+or new dependencies.
