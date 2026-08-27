@@ -12,8 +12,8 @@ import subprocess
 import sys
 import time
 
-ROOT = "/Users/hermes/cfdna-fragmentomics-pipeline"
-PY = "/Users/hermes/deepcatch/.venv/bin/python"
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PY = sys.executable
 TIMEOUT_SEC = 10
 
 
