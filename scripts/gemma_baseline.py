@@ -51,9 +51,10 @@ from sklearn.metrics import roc_auc_score, roc_curve
 from sklearn.model_selection import StratifiedKFold
 from sklearn.preprocessing import StandardScaler
 
-# Add both repos to path so we can use the pipeline's data loaders
-sys.path.insert(0, "/Users/hermes/cfdna-fragmentomics-pipeline")
-sys.path.insert(0, "/Users/hermes/cfdna-fragmentomics-pipeline/scripts")
+# Add the pipeline repo to path so we can use the pipeline's data loaders
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from _paths import FEAT_DIR, LABELS_CROSS_STUDY_TSV, DEFAULT_GEMMA_MODEL_PATH
 
 from train_classifier import _harmonize  # noqa: E402
 
@@ -264,13 +265,28 @@ def run_gemma_baseline(samples: list[str], features: dict,
                         labels: dict, studies: dict,
                         llm, n_few_shot: int = 4,
                         n_seeds: int = 1,
-                        max_tokens: int = 20) -> dict:
-    """Run the Gemma few-shot baseline. Returns AUC per seed."""
+                        max_tokens: int = 20,
+                        on_parse_failure: str = "mark") -> dict:
+    """Run the Gemma few-shot baseline. Returns AUC per seed.
+
+    on_parse_failure controls what happens when Gemma's response
+    cannot be parsed for P(cancer):
+      "mark"  — replace the failed sample with NaN so it is excluded
+                from AUC computation (scikit-learn ignores NaN pairs).
+                This is the honest option: any failed sample is reported
+                separately via n_parse_failures.
+      "chance" — replace the failed sample with 0.5 (constant).
+                This is the original behavior; WARNING: if parse failures
+                are class-correlated (e.g., healthy samples are simpler
+                and Gemma hallucinates format), the constant signal
+                introduces label-correlated bias.
+    """
     y = np.asarray([labels[s] for s in samples], dtype=int)
     aucs = []
+    n_parse_failures_total = 0
     for s in range(n_seeds):
         cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=s)
-        ys, yt = [], []
+        ys, yt, n_fail_this_seed = [], [], 0
         for fold_idx, (tr, te) in enumerate(cv.split(samples, y)):
             train_sids = [samples[i] for i in tr]
             test_sids = [samples[i] for i in te]
@@ -298,32 +314,56 @@ def run_gemma_baseline(samples: list[str], features: dict,
                 txt = resp["choices"][0]["message"]["content"]
                 p = _parse_p_cancer(txt)
                 if p is None:
-                    p = 0.5  # default to chance if parsing fails
-                ys.append(p)
+                    n_fail_this_seed += 1
+                    if on_parse_failure == "mark":
+                        # NaN pair: ROC AUC ignores these samples.
+                        # This is the HONEST option because the AUC
+                        # is then computed on samples Gemma responded
+                        # about. The fraction is reported below.
+                        ys.append(float("nan"))
+                    elif on_parse_failure == "chance":
+                        # ORIGINAL behavior. WARNING: introduces bias
+                        # if parse failures correlate with class label.
+                        p = 0.5
+                        ys.append(p)
+                    else:
+                        raise ValueError(
+                            f"Unknown on_parse_failure={on_parse_failure!r}; "
+                            f"use 'mark' or 'chance'")
+                else:
+                    ys.append(p)
                 yt.append(labels[tsid])
             print(f"  seed {s} fold {fold_idx}/4 done "
-                  f"({len(yt)}/{len(y)} samples total so far)",
+                  f"({len(yt)}/{len(y)} samples total so far, "
+                  f"{n_fail_this_seed} parse failures in this fold)",
                   flush=True)
+        n_parse_failures_total += n_fail_this_seed
+        # Filter out NaN pairs before computing AUC. AUC will only be
+        # computed on the samples Gemma actually responded about.
+        ys_arr = np.asarray(ys)
+        yt_arr = np.asarray(yt)
+        valid = ~np.isnan(ys_arr)
         try:
-            auc = roc_auc_score(yt, ys)
+            auc = float(roc_auc_score(yt_arr[valid], ys_arr[valid]))
         except ValueError:
             auc = float("nan")
         aucs.append(auc)
-        print(f"  seed {s} AUC: {auc:.4f}", flush=True)
+        print(f"  seed {s} AUC: {auc:.4f} "
+              f"(on {valid.sum()}/{len(yt)} valid responses)",
+              flush=True)
     return {"auc_mean": float(np.mean(aucs)),
             "auc_std": float(np.std(aucs)),
             "per_seed_aucs": aucs,
-            "n_few_shot": n_few_shot}
+            "n_few_shot": n_few_shot,
+            "n_parse_failures": n_parse_failures_total,
+            "on_parse_failure": on_parse_failure}
 
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--features-dir",
-                    default="/Users/hermes/cfdna-fragmentomics-pipeline/data/features")
-    ap.add_argument("--labels",
-                    default="/Users/hermes/cfdna-fragmentomics-pipeline/data/features/labels_cross_study.tsv")
-    ap.add_argument("--model-path",
-                    default="/Users/hermes/models/gemma-2-9b-it-Q4_K_M.gguf")
+    ap.add_argument("--features-dir", default=str(FEAT_DIR))
+    ap.add_argument("--labels", default=str(LABELS_CROSS_STUDY_TSV))
+    ap.add_argument("--model-path", default=str(DEFAULT_GEMMA_MODEL_PATH))
     ap.add_argument("--n-few-shot", type=int, default=4)
     ap.add_argument("--n-ctx", type=int, default=2048)
     ap.add_argument("--n-gpu-layers", type=int, default=99)
@@ -337,6 +377,15 @@ def main() -> int:
     ap.add_argument("--out", default="/tmp/gemma_baseline.json")
     ap.add_argument("--limit", type=int, default=0,
                     help="If >0, take a balanced subset of N cancer + N healthy")
+    ap.add_argument("--on-parse-failure", default="mark",
+                    choices=["mark", "chance"],
+                    help="What to do when Gemma's response can't be parsed "
+                         "for P(cancer). 'mark' (default, honest) replaces "
+                         "with NaN so the AUC is computed only on valid "
+                         "responses, and reports the failure count. "
+                         "'chance' (original) replaces with 0.5; "
+                         "WARNING: introduces label-correlated bias "
+                         "if failures are class-correlated.")
     args = ap.parse_args()
 
     print("[experiment] Loading features...")
@@ -384,9 +433,12 @@ def main() -> int:
     gemma = run_gemma_baseline(samples, features, labels, studies, llm,
                                 n_few_shot=args.n_few_shot,
                                 n_seeds=args.gemma_seeds,
-                                max_tokens=args.max_tokens)
+                                max_tokens=args.max_tokens,
+                                on_parse_failure=args.on_parse_failure)
     elapsed = time.time() - t0
     print(f"[experiment] Gemma baseline: AUC {gemma['auc_mean']:.4f} +/- {gemma['auc_std']:.4f}")
+    print(f"[experiment] Parse failures: {gemma['n_parse_failures']} "
+          f"(on_parse_failure='{gemma['on_parse_failure']}')")
     print(f"[experiment] Gemma runtime: {elapsed:.1f}s "
           f"({elapsed / len(samples):.2f}s/sample)")
 

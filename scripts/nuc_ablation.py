@@ -39,13 +39,12 @@ from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import StratifiedKFold
 from sklearn.preprocessing import StandardScaler
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__)))
-from nuc_features import compute_nuc_features_from_path  # noqa: E402
-from train_classifier import _harmonize  # noqa: E402
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from _paths import FEAT_DIR, LABELS_CROSS_STUDY_TSV
+from nuc_features import compute_nuc_features_from_path
+from train_classifier import _harmonize
 
-
-FEAT_DIR = "/Users/hermes/cfdna-fragmentomics-pipeline/data/features"
-LABELS_TSV = "/Users/hermes/cfdna-fragmentomics-pipeline/data/features/labels_cross_study.tsv"
+LABELS_TSV = str(LABELS_CROSS_STUDY_TSV)
 
 
 def _load_labels() -> tuple[list[str], np.ndarray, dict, dict]:

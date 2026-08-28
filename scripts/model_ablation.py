@@ -36,10 +36,10 @@ from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import StratifiedKFold
 
 sys.path.insert(0, os.path.dirname(__file__))
+from _paths import FEAT_DIR, LABELS_CROSS_STUDY_TSV  # noqa
 from train_classifier import _harmonize  # noqa
 
-FEAT_DIR = "/Users/hermes/cfdna-fragmentomics-pipeline/data/features"
-LABELS_TSV = "/Users/hermes/cfdna-fragmentomics-pipeline/data/features/labels_cross_study.tsv"
+LABELS_TSV = str(LABELS_CROSS_STUDY_TSV)
 
 
 def _load():

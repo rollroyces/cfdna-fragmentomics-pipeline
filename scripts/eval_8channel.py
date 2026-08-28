@@ -37,10 +37,11 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import StratifiedKFold
 
-sys.path.insert(0, "/Users/hermes/cfdna-fragmentomics-pipeline/scripts")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from _paths import FEAT_DIR
 from train_classifier import _harmonize  # noqa
 
-FEAT = "/Users/hermes/cfdna-fragmentomics-pipeline/data/features"
+FEAT = str(FEAT_DIR)
 SEEDS = [42, 13, 7, 99, 1234]
 
 
