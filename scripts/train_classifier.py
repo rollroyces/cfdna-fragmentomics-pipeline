@@ -134,10 +134,10 @@ def load_features(features_dir: str, labels: dict[str, int],
             continue
     X = np.asarray(rows, dtype=float)
     y = np.asarray([labels[s] for s, _ in zip(sorted(labels), rows)], dtype=int)
-    # NaN → column median
-    col_med = np.nanmedian(X, axis=0)
-    for c in range(X.shape[1]):
-        X[np.isnan(X[:, c]), c] = col_med[c]
+    # NaN values are kept here and imputed INSIDE evaluate_cv using only
+    # the train-fold median. The previous version used the full-cohort
+    # median here, which leaked test-set NaN structure into the train
+    # statistics. This function returns X with NaNs preserved.
     return X, y, names
 
 
@@ -158,13 +158,26 @@ def evaluate_cv(X, y, model, cv, use_pca: bool = False, pca_n: int = 20,
     if X.shape[1] == 0:
         raise ValueError("all features are constant — nothing to learn")
     for tr, te in cv.split(X, y):
+        # Per-fold NaN imputation using train-fold median only (was
+        # previously applied once to the full cohort, leaking test-set
+        # NaN structure into the train statistics).
+        col_med = np.nanmedian(X[tr], axis=0)
+        # Replace train NaNs with the train median; replace test NaNs
+        # with the train median too (test never seen). Fill all-NaN
+        # columns with 0 (median of nothing is NaN; avoid that).
+        col_med = np.nan_to_num(col_med, nan=0.0)
+        Xtr = X[tr].copy()
+        Xte = X[te].copy()
+        for c in range(X.shape[1]):
+            Xtr[np.isnan(Xtr[:, c]), c] = col_med[c]
+            Xte[np.isnan(Xte[:, c]), c] = col_med[c]
         if harmonize and study_arr is not None:
-            Xtr, scalers = _harmonize(X[tr], study_arr[tr], None)
-            Xte, _ = _harmonize(X[te], study_arr[te], scalers)
+            Xtr, scalers = _harmonize(Xtr, study_arr[tr], None)
+            Xte, _ = _harmonize(Xte, study_arr[te], scalers)
         else:
-            scaler = StandardScaler().fit(X[tr])
-            Xtr = scaler.transform(X[tr])
-            Xte = scaler.transform(X[te])
+            scaler = StandardScaler().fit(Xtr)
+            Xtr = scaler.transform(Xtr)
+            Xte = scaler.transform(Xte)
         # PCA on the full profile inside the fold (DELFI: profile → PCA → RF)
         if use_pca and pca_n > 0 and Xtr.shape[1] > pca_n:
             n_comp = min(pca_n, Xtr.shape[1], Xtr.shape[0])
