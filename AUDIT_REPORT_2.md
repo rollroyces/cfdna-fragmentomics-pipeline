@@ -246,3 +246,40 @@ to Screen (NNT) to find one true cancer is 275 at 95% spec /
 
 These are documented but require either significant code work
 or new dependencies.
+
+---
+
+## Audit round 3 update (2026-08-28) — 4 more fixes done
+
+A third audit round worked through the remaining quick/medium items:
+
+### Fixed in this round
+
+| # | Fix | Status |
+|---|---|---|
+| E1 | `nuc_ablation.py` calls `_evaluate` twice on same config | **FIXED**: removed duplicate block. nuc_ablation.py 5-seed run: **290s** (was 580s); same numbers (Baseline 0.9723, +nuc 0.9725, +band 0.9724, +all6 0.9726) |
+| E4 | NaN→median uses full-cohort median (test leakage) | **FIXED**: moved imputation inside `evaluate_cv` using train-fold median only. 4 new tests in `test_no_nan_leakage.py` |
+| E6 | Gemma `p=0.5` fallback is silent bias | **FIXED**: added `--on-parse-failure` flag with `mark` (default, NaN excluded from AUC) and `chance` (original). Script now reports `n_parse_failures`. 4 new tests in `test_gemma_parse.py` |
+| E8 | Hardcoded `/Users/hermes/...` paths in 5 scripts | **FIXED**: created `scripts/_paths.py` with `REPO_ROOT`, `FEAT_DIR`, `LABELS_TSV`, `DEFAULT_GEMMA_MODEL_PATH` constants. Updated 6 scripts. **4 of 5 with argparse now work from `/tmp`** |
+
+### New scripts / files added
+
+- `scripts/_paths.py` (42 lines) — single source of truth for paths
+- `test/test_gemma_parse.py` (4 tests)
+- `test/test_no_nan_leakage.py` (4 tests)
+
+### Test count progression
+
+- Round 1: 39 tests
+- Round 2: 49 tests (+10 PPV/8ch/CLI tests)
+- Round 3: **57 tests** (+4 Gemma parse, +4 NaN leakage)
+
+### Performance improvements
+
+- `nuc_ablation.py` 5-seed run: **290s (was 580s)** — 50% reduction from removing duplicate `_evaluate` calls
+
+### Still deferred (genuinely large work)
+
+- S1 (per-cancer-type AUC): cancer type not in current labels file
+- S3 (ComBat/limma-style harmonization): needs new dependency
+- ST4/ST5 (BH correction + per-study-per-class z-score): full re-runs needed
