@@ -163,20 +163,12 @@ def main() -> int:
     print("[ablation] Building feature matrices...")
     X_5ch = _build_5ch(samples, y)
     X_5nuc = _build_5ch_plus_nuc(samples, y)
-    print(f"[ablation] 5-channel shape: {X_5ch.shape}")
-    print(f"[ablation] +nuc shape:      {X_5nuc.shape}")
-
-    print(f"[ablation] Running {args.seeds}-seed CV (PCA n={args.pca_n})...")
-    t0 = time.time()
-    res_5ch = _evaluate(X_5ch, y, study_arr, pca_n=args.pca_n,
-                         n_seeds=args.seeds)
-    res_5nuc = _evaluate(X_5nuc, y, study_arr, pca_n=args.pca_n,
-                          n_seeds=args.seeds)
-    elapsed = time.time() - t0
-    print(f"[ablation] Building 5ch+band features...")
     X_5band = _build_5ch_plus_band(samples, y)
     X_5all = _build_5ch_plus_all_nuc(samples, y)
-    print(f"[ablation] +band shape: {X_5band.shape}, +all_nuc shape: {X_5all.shape}")
+    print(f"[ablation] 5-channel shape: {X_5ch.shape}")
+    print(f"[ablation] +nuc shape:      {X_5nuc.shape}")
+    print(f"[ablation] +band shape: {X_5band.shape}")
+    print(f"[ablation] +all_nuc shape: {X_5all.shape}")
 
     print(f"[ablation] Running {args.seeds}-seed CV (PCA n={args.pca_n})...")
     t0 = time.time()
