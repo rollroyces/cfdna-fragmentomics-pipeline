@@ -8,6 +8,8 @@ A production-oriented pipeline that extracts the "Big Three" fragmentomic signat
 
 **New user?** Start with **[USAGE.md](USAGE.md)** — 30-second TL;DR, install, data, common workflows, CLI reference, troubleshooting.
 
+**New contributor / co-author candidate?** Start with **[TEAM.md](TEAM.md)** — who's involved, what roles are open, how to engage, governance.
+
 ## ⚠️ Data not in repo (read this before running)
 
 The 627-sample FinaleDB feature set used by every headline number
