@@ -158,7 +158,15 @@ gain.
 - `envs/environment.yml` — conda environment (Python 3.11, numpy/scipy/sklearn/pysam/snakemake)
 - All random seeds fixed in the classifier (`random_state=42`)
 - FinaleDB data is versioned upstream (uniform processing pipeline)
-- Full result JSON in `results/classifier_results.json`
+- Headline result JSONs in `results/`:
+  - `lr_no_pca_vs_pca200.json` — LR no-PCA vs LR+PCA(200) (10-seed)
+  - `lr_reg_sweep.json` — L2 C-sweep (the +0.0050 headline source)
+  - `nuc_ablation_v2.json` — nucleosome-feature ablation (v2 band features)
+  - `8channel_eval.json` — 5-channel vs 8-channel on the 98-subset
+  - `gemma_baseline.json` — Gemma 2 9B baseline
+  - `ppv_screening.json` — PPV at screening prevalences
+  - `classifier_results.json` — single-study Jiang 2015 (n=121), kept for reference
+- Reproduce the headline: `python scripts/lr_no_pca_vs_pca200.py --seeds 10` (see [USAGE.md](USAGE.md) §3)
 
 ## Resource budget
 
@@ -184,7 +192,7 @@ an M-series MacBook Air (16 GB RAM, 8 cores) and a Linux cloud VM
 | `python run_cross_study.py --parallel 8 --max-mb 500` | **1-3 hours** | single largest time cost; downloads + extracts |
 | `python scripts/honest_benchmark.py` | ~3 min | full 5-section benchmark on local features |
 | `python scripts/lr_no_pca_vs_pca200.py --seeds 10` | ~1 min | LR comparison |
-| `python scripts/lr_regularization_sweep.py --c-values 1000 --skip-l1` | ~1 min | C-sweep without the slow L1 saga |
+| `python scripts/lr_regularization_sweep.py --c-values 1000` | ~1 min | C-sweep (L1 is skipped by default; add `--with-l1` to run the slow saga sweep) |
 | `python scripts/nuc_ablation.py --seeds 5 --pca-n 200` | ~5 min | nucleosome ablation |
 | `python scripts/model_ablation.py --seeds 5` | ~5-10 min | non-linear model comparison |
 | `python scripts/eval_8channel.py --seeds 5` | ~45 s | 5ch vs 8ch (98-subset) |

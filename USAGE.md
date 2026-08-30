@@ -209,8 +209,8 @@ Output (abbreviated):
 ### 3.3 "I want to know which LR config to use" (~2 minutes)
 
 ```bash
-# C-sweep on LR no-PCA (fast, with --skip-l1 to avoid the slow L1 saga sweep)
-python scripts/lr_regularization_sweep.py --seeds 5 --c-values 1000 --skip-l1
+# C-sweep on LR no-PCA (fast; L1 is skipped by default)
+python scripts/lr_regularization_sweep.py --seeds 5 --c-values 1000
 ```
 
 Output:
@@ -421,8 +421,9 @@ to verify the install without data (§3.1).
 
 ### 7.4 "Runtime too long"
 
-- `lr_regularization_sweep.py` defaults to a 35-min L1 saga sweep.
-  Add `--skip-l1` to skip it (run takes ~80s instead).
+- `lr_regularization_sweep.py` runs the L2 C-sweep by default and
+  skips the L1 saga sweep (which takes ~35 min). Add `--with-l1` to
+  run L1 explicitly.
 - `honest_benchmark.py` runs 5 sections; each is ~30s. The bottleneck
   is the cross-study section (627 samples × 5 folds × 5 seeds).
   Reduce `--seeds` to 3 for a faster smoke test.

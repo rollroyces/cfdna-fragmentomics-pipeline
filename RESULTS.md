@@ -359,7 +359,7 @@ is the SUM of two independent steps:
   - **+0.0013** from C=1000 regularization on top of LR no-PCA —
     reproduced by:
     ```
-    python scripts/lr_regularization_sweep.py --seeds 5 --c-values 1000 --skip-l1
+    python scripts/lr_regularization_sweep.py --seeds 5 --c-values 1000
     ```
     (LR no-PCA at C=1000 vs LR no-PCA at default C=1.0; both no-PCA.)
 
