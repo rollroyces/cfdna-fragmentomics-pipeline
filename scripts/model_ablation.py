@@ -24,6 +24,8 @@ in non-linear interactions, suggesting deep learning or kernel SVM
 might gain more.
 """
 from __future__ import annotations
+
+import argparse
 import json
 import os
 import sys
@@ -42,9 +44,9 @@ from train_classifier import _harmonize  # noqa
 LABELS_TSV = str(LABELS_CROSS_STUDY_TSV)
 
 
-def _load():
+def _load(labels_path=LABELS_TSV):
     samples, y, studies = [], {}, {}
-    with open(LABELS_TSV) as f:
+    with open(labels_path) as f:
         for line in f:
             line = line.rstrip("\n")
             if not line:
@@ -56,16 +58,16 @@ def _load():
     return samples, np.asarray([y[s] for s in samples], dtype=int), studies
 
 
-def _build_X(samples):
+def _build_X(samples, feat_dir=FEAT_DIR):
     rows = []
     for s in samples:
-        r5 = np.load(os.path.join(FEAT_DIR, f"{s}.delfi_5mb_ratio.npy"))
-        c5 = np.load(os.path.join(FEAT_DIR, f"{s}.delfi_5mb_coverage.npy"))
-        r100 = np.load(os.path.join(FEAT_DIR, f"{s}.delfi_100kb_ratio.npy"))
-        c100_raw = np.load(os.path.join(FEAT_DIR,
+        r5 = np.load(os.path.join(feat_dir, f"{s}.delfi_5mb_ratio.npy"))
+        c5 = np.load(os.path.join(feat_dir, f"{s}.delfi_5mb_coverage.npy"))
+        r100 = np.load(os.path.join(feat_dir, f"{s}.delfi_100kb_ratio.npy"))
+        c100_raw = np.load(os.path.join(feat_dir,
                                           f"{s}.delfi_100kb_counts.npy"))
         c100 = c100_raw / np.median(c100_raw)
-        with open(os.path.join(FEAT_DIR, f"{s}.fsd.json")) as f:
+        with open(os.path.join(feat_dir, f"{s}.fsd.json")) as f:
             d = json.load(f)
         keys = sorted(d["size_bins"].keys(), key=lambda k: int(k.split("-")[0]))
         fsd = np.asarray([d["size_bins"][k] for k in keys], dtype=float)
@@ -100,32 +102,49 @@ def _evaluate(X, y, study, model_factory, name, n_seeds=3):
 
 
 def main():
+    """CLI entry point. Parses args then runs the model-class ablation."""
+    ap = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--features-dir", default=FEAT_DIR,
+                    help="Directory of {sample}.delfi_*.npy + .fsd.json "
+                         "(default: data/features)")
+    ap.add_argument("--labels", default=LABELS_TSV,
+                    help="Labels TSV with <sample_id>\\t<label>\\t<study>")
+    ap.add_argument("--seeds", type=int, default=5,
+                    help="Number of CV seeds (default: 5)")
+    ap.add_argument("--out", default=None,
+                    help="Optional path to write JSON results to")
+    args = ap.parse_args()
+    run_model_ablation(features_dir=args.features_dir,
+                       labels_tsv=args.labels,
+                       seeds=args.seeds,
+                       out_path=args.out)
+
+
+def run_model_ablation(features_dir=FEAT_DIR, labels_tsv=LABELS_TSV,
+                      seeds=5, out_path=None):
+    """Run the model-class ablation. Returns a list of dicts."""
     print("[model_ablation] Loading cohort...")
-    samples, y, studies = _load()
+    samples, _, studies = _load(labels_path=labels_tsv)
     ok = []
     for s in samples:
-        if all(os.path.exists(os.path.join(FEAT_DIR, f"{s}.{x}.npy"))
+        if all(os.path.exists(os.path.join(features_dir, f"{s}.{x}.npy"))
                 for x in ("delfi_5mb_ratio", "delfi_5mb_coverage",
                            "delfi_100kb_ratio", "delfi_100kb_counts")) \
-                and os.path.exists(os.path.join(FEAT_DIR, f"{s}.fsd.json")):
+                and os.path.exists(os.path.join(features_dir, f"{s}.fsd.json")):
             ok.append(s)
     samples = ok
-    y = np.asarray([studies[s] if False else (1 if studies.get(s) == "cristiano" else 2)  # placeholder
-                     for s in samples])  # not used; we keep study strings
-    study = np.asarray([studies[s] for s in samples])
-    # Re-load y properly
-    y_label = {}
-    with open(LABELS_TSV) as f:
-        for line in f:
-            parts = line.rstrip().split("\t")
-            if parts[0] in samples:
-                y_label[parts[0]] = 1 if parts[1].lower() == "cancer" else 0
-    y = np.asarray([y_label[s] for s in samples], dtype=int)
+    # y_label already loaded by _load; we just re-extract in correct order
+    samples_arr, y_arr, _ = _load(labels_path=labels_tsv)
+    samples_idx = {s: i for i, s in enumerate(samples_arr)}
+    y = np.asarray([y_arr[samples_idx[s]] for s in samples], dtype=int)
+    study = np.asarray([studies.get(s, "unknown") for s in samples])
     print(f"[model_ablation] {len(samples)} samples, {y.sum()} cancer, "
           f"{(y == 0).sum()} healthy")
 
     print("[model_ablation] Building feature matrix...")
-    X = _build_X(samples)
+    X = _build_X(samples, feat_dir=features_dir)
     print(f"[model_ablation] X shape: {X.shape}")
 
     # Drop constant columns (mirrors honest_benchmark.py)
@@ -148,7 +167,7 @@ def main():
     from sklearn.decomposition import PCA
     from sklearn.preprocessing import StandardScaler
     aucs = []
-    for s in range(5):
+    for s in range(seeds):
         cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=s)
         yt, ys = [], []
         for tr, te in cv.split(X, y):
@@ -191,7 +210,8 @@ def main():
     results.append(r)
 
     out = {"results": results, "n_samples": len(samples)}
-    with open("/tmp/model_ablation.json", "w") as f:
+    out_path_resolved = out_path or "/tmp/model_ablation.json"
+    with open(out_path_resolved, "w") as f:
         json.dump(out, f, indent=2)
 
     print("\n" + "=" * 60)
@@ -199,6 +219,7 @@ def main():
     for r in results:
         print(f"{r['name']:<30} {r['auc_mean']:>10.4f} {r['auc_std']:>5.4f}")
     print("=" * 60)
+    print(f"[model_ablation] Wrote {out_path_resolved}")
 
 
 if __name__ == "__main__":

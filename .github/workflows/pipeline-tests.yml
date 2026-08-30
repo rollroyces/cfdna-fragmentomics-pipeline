@@ -55,3 +55,45 @@ jobs:
             $cmd --help > /dev/null || (echo "$cmd: --help failed"; exit 1)
             echo "OK: $cmd"
           done
+
+  script-import-smoke:
+    name: Headline-script --help smoke
+    # Catches import-time bugs in scripts that have --help but aren't
+    # installed as console_scripts (lr_no_pca_vs_pca200, model_ablation,
+    # honest_benchmark, etc.). Without this, a bug like "import scipy"
+    # being accidentally removed would only surface when a user tried
+    # to run the script. Each step must complete in <30 seconds.
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: pip install -q numpy scipy scikit-learn pandas matplotlib seaborn pytest
+      - run: pip install -e . --quiet
+      - name: Verify each headline script's --help is fast and exits 0
+        run: |
+          for script in \
+              scripts/auc_reproducibility_gate.py \
+              scripts/honest_benchmark.py \
+              scripts/lr_no_pca_vs_pca200.py \
+              scripts/lr_regularization_sweep.py \
+              scripts/model_ablation.py \
+              scripts/nuc_ablation.py \
+              scripts/eval_8channel.py \
+              scripts/ppv_screening.py; do
+            start=$(date +%s)
+            python "$script" --help > /dev/null 2>&1
+            rc=$?
+            end=$(date +%s)
+            elapsed=$((end - start))
+            if [ $rc -ne 0 ]; then
+              echo "FAIL: $script --help exited with code $rc in ${elapsed}s"
+              exit 1
+            fi
+            if [ $elapsed -gt 30 ]; then
+              echo "FAIL: $script --help took ${elapsed}s (>30s) — likely running the full benchmark instead of just --help"
+              exit 1
+            fi
+            echo "OK: $script --help (${elapsed}s)"
+          done

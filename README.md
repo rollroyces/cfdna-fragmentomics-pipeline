@@ -160,6 +160,59 @@ gain.
 - FinaleDB data is versioned upstream (uniform processing pipeline)
 - Full result JSON in `results/classifier_results.json`
 
+## Resource budget
+
+The pipeline's headline runs fit in the following budget. Tested on
+an M-series MacBook Air (16 GB RAM, 8 cores) and a Linux cloud VM
+(8 GB RAM, 4 cores).
+
+### Disk
+
+| Asset | Size | On disk by default? |
+|---|---|---|
+| Source repo (clone) | ~10 MB | yes |
+| `data/features/` (627 samples × 6 files) | ~600 MB | **NO** — gitignored, requires `run_cross_study.py` |
+| `data/raw/` (raw FinaleDB downloads, ~100 GB) | ~100 GB | **NO** — gitignored, fetched then deleted by `fetch_finaledb.py` |
+| DeepCatch sister repo | ~10 MB | optional, for fusion work |
+
+### Time (wall-clock)
+
+| Step | Time | Notes |
+|---|---|---|
+| `pip install -e .` | ~30 s | fresh venv |
+| `python scripts/auc_reproducibility_gate.py` | ~30 s | synthetic data, no FinaleDB needed |
+| `python run_cross_study.py --parallel 8 --max-mb 500` | **1-3 hours** | single largest time cost; downloads + extracts |
+| `python scripts/honest_benchmark.py` | ~3 min | full 5-section benchmark on local features |
+| `python scripts/lr_no_pca_vs_pca200.py --seeds 10` | ~1 min | LR comparison |
+| `python scripts/lr_regularization_sweep.py --c-values 1000 --skip-l1` | ~1 min | C-sweep without the slow L1 saga |
+| `python scripts/nuc_ablation.py --seeds 5 --pca-n 200` | ~5 min | nucleosome ablation |
+| `python scripts/model_ablation.py --seeds 5` | ~5-10 min | non-linear model comparison |
+| `python scripts/eval_8channel.py --seeds 5` | ~45 s | 5ch vs 8ch (98-subset) |
+| `python scripts/gemma_baseline.py --limit 40` | ~2 min | Gemma on 40 samples (small subset) |
+| `python scripts/gemma_baseline.py` (full 627) | ~20 min | full Gemma baseline |
+
+### Memory
+
+| Step | RAM | Notes |
+|---|---|---|
+| Most scripts | <2 GB | LR / sklearn on 60k features |
+| `model_ablation.py` | up to 4 GB | RF + GB on 60k features |
+| `gemma_baseline.py` | 8 GB | 5.5 GB GGUF + Python overhead |
+| Peak (full Gemma) | 8-10 GB | tested on M-series MacBook Air |
+
+### CPU cores
+
+| Step | Cores used | Parallelizable? |
+|---|---|---|
+| `auc_reproducibility_gate.py` | 1 | no |
+| `run_cross_study.py --parallel 8` | 8 (configurable) | yes |
+| Other scripts | 1 | no (sklearn `n_jobs=1` by default) |
+
+### Network
+
+The only network call in the headline benchmark is `run_cross_study.py`
+downloading from FinaleDB's S3 bucket. All other steps are local.
+
 ## Consolidated research summary
 
 See [RESULTS.md](RESULTS.md) for a single-document summary of

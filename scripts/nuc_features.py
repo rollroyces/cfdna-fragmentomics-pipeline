@@ -39,9 +39,19 @@ from typing import Optional
 import numpy as np
 
 
+# FSD bin layout — single source of truth used by extract_fsd.py
+# and the loader in tumor_naive_adapter.py.
+# Bins: N_BINS=196, FSD_BIN_START=20 bp, FSD_BIN_STRIDE=5 bp,
+# so centers are 20, 25, ..., 990 (np.arange(20, 20 + 196*5, 5))
+# and edges are 20, 25, ..., 1000 (np.arange(20, 1001, 5))
+FSD_BIN_START = 20     # bp; smallest fragment considered
+FSD_BIN_END = 1000     # bp; largest fragment considered (np.arange edge is exclusive)
+FSD_BIN_STRIDE = 5     # bp per bin
+N_BINS = (FSD_BIN_END - FSD_BIN_START) // FSD_BIN_STRIDE  # =196
+assert N_BINS == 196, f"FSD bin math broken: N_BINS={N_BINS}"
+
 # FSD bin centers (5bp each, 20 to 995 inclusive)
-FSD_BIN_CENTERS = 20 + 5 * np.arange(196)
-N_BINS = 196
+FSD_BIN_CENTERS = FSD_BIN_START + FSD_BIN_STRIDE * np.arange(N_BINS)
 
 # Bin index ranges for biologically-defined fragment groups.
 # Indices: (center - 20) / 5

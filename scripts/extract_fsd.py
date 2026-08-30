@@ -35,6 +35,9 @@ from collections import Counter
 
 import numpy as np
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from nuc_features import FSD_BIN_START, FSD_BIN_END, FSD_BIN_STRIDE  # noqa
+
 
 def extract_from_frag_tsv(path: str, mapq_threshold: int = 0) -> np.ndarray:
     """Read fragment lengths from FinaleDB frag.tsv.bgz (length = end - start).
@@ -57,7 +60,7 @@ def extract_from_frag_tsv(path: str, mapq_threshold: int = 0) -> np.ndarray:
             if mapq < mapq_threshold:
                 continue
             frag_len = end - start
-            if 20 <= frag_len <= 1000:   # cfDNA sanity window
+            if FSD_BIN_START <= frag_len <= FSD_BIN_END:
                 lengths.append(frag_len)
     return np.asarray(lengths, dtype=np.int32)
 
@@ -79,7 +82,7 @@ def extract_from_bam(path: str, mapq_threshold: int = 30) -> np.ndarray:
             if read.mapping_quality < mapq_threshold:
                 continue
             tlen = abs(read.template_length)
-            if 20 <= tlen <= 1000:
+            if FSD_BIN_START <= tlen <= FSD_BIN_END:
                 lengths.append(tlen)
     return np.asarray(lengths, dtype=np.int32)
 
@@ -88,7 +91,8 @@ def summarize(lengths: np.ndarray) -> dict:
     n = len(lengths)
     if n == 0:
         raise ValueError("no fragments in input")
-    hist, edges = np.histogram(lengths, bins=range(20, 1001, 5))
+    hist, edges = np.histogram(lengths,
+                               bins=range(FSD_BIN_START, FSD_BIN_END + 1, FSD_BIN_STRIDE))
     bin_labels = [f"{edges[i]}-{edges[i+1]}" for i in range(len(edges) - 1)]
     size_bins = {bin_labels[i]: float(hist[i] / n) for i in range(len(hist))}
     short = int(((lengths >= 100) & (lengths <= 150)).sum())
