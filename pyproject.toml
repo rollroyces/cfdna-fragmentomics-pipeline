@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
 authors = [
-    {name = "Royce", email = "rollroyces@users.noreply.github.com"},
+    {name = "Yu Ching Lam", email = "rollroyces@users.noreply.github.com"},
 ]
 keywords = ["cfDNA", "fragmentomics", "liquid-biopsy", "cancer-detection",
             "DELFI", "Jiang", "FinaleDB"]

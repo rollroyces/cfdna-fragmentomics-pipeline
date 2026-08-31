@@ -2,10 +2,10 @@ cff-version: 1.2.0
 message: "If you use cfdna-fragmentomics-pipeline in your research, please cite it as follows."
 title: "cfdna-fragmentomics-pipeline: Tumor-naive cfDNA Cancer Detection via 5Mb + 100kb Short/Long Ratio, Median-Normalized Coverage, and FSD Histogram"
 authors:
-  - given-names: "Royce"
-    family-names: "(independent researcher)"
+  - given-names: "Yu Ching"
+    family-names: "Lam"
     affiliation: "DeepCatch Project — Independent Researcher, Hong Kong SAR"
-    orcid: "https://orcid.org/0000-0000-0000-0000"
+    orcid: "https://orcid.org/0009-0008-9113-769X"
 year: 2026
 doi: "10.5281/zenodo.to-be-assigned-on-first-release"
 url: "https://github.com/rollroyces/cfdna-fragmentomics-pipeline"
