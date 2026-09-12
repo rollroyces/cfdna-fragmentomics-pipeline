@@ -13,6 +13,7 @@ import os
 import sys
 
 import numpy as np
+import pytest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "scripts"))
 
@@ -102,6 +103,8 @@ def test_sens_at_spec95_matches_existing_reported_value():
     feat_dir = os.environ.get("FEAT_DIR",
                               os.path.join(os.path.dirname(__file__), "..",
                                            "data", "features"))
+    if not os.path.isdir(feat_dir):
+        pytest.skip(f"data dir not found: {feat_dir} (gitignored; CI provides synthetic only)")
     labels, studies = _load_labels_cross_study(feat_dir)
     X, y, st = load5(labels, studies, feat_dir)
     assert len(y) == 627, f"Expected 627 samples; got {len(y)}"

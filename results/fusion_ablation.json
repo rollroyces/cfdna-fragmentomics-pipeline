@@ -27,51 +27,51 @@
     "mutation_target_sens95": 0.77
   },
   "summary": {
-    "fragmentomics_auc": 0.9770953335002922,
+    "fragmentomics_auc": 0.9779718674346773,
     "mutation_auc_realized": 0.9464270807246015,
-    "fusion_auc": 0.9919755405292595,
-    "delta_auc_fusion_vs_frag": 0.014880207028967307
+    "fusion_auc": 0.9920694548793723,
+    "delta_auc_fusion_vs_frag": 0.014097587444694915
   },
   "per_specificity": {
     "fragmentomics_only": [
       {
         "specificity": 0.95,
-        "sensitivity": 0.8842975206611571,
-        "ci95_lo": 0.8203001829954955,
-        "ci95_hi": 0.9364173825567655,
-        "operating_threshold": 0.6036429530442342,
+        "sensitivity": 0.8980716253443526,
+        "ci95_lo": 0.8428043055078438,
+        "ci95_hi": 0.9321057620228347,
+        "operating_threshold": 0.625221411218352,
         "n_bootstrap": 1000
       },
       {
         "specificity": 0.98,
-        "sensitivity": 0.8154269972451791,
-        "ci95_lo": 0.7646854575163399,
-        "ci95_hi": 0.8888888888888888,
-        "operating_threshold": 0.941158167237778,
+        "sensitivity": 0.8539944903581267,
+        "ci95_lo": 0.7342465753424657,
+        "ci95_hi": 0.8972972972972973,
+        "operating_threshold": 0.9095738091939622,
         "n_bootstrap": 1000
       },
       {
         "specificity": 0.99,
-        "sensitivity": 0.8071625344352618,
-        "ci95_lo": 0.6409335106382978,
-        "ci95_hi": 0.847047041455532,
-        "operating_threshold": 0.9662475492158572,
+        "sensitivity": 0.7548209366391184,
+        "ci95_lo": 0.6332405785533212,
+        "ci95_hi": 0.8763164968873797,
+        "operating_threshold": 0.994223276400942,
         "n_bootstrap": 1000
       },
       {
         "specificity": 0.995,
-        "sensitivity": 0.7410468319559229,
-        "ci95_lo": 0.6264187192118226,
-        "ci95_hi": 0.8433454421614258,
-        "operating_threshold": 0.9946293429382536,
+        "sensitivity": 0.7548209366391184,
+        "ci95_lo": 0.6155986985952616,
+        "ci95_hi": 0.866680790960452,
+        "operating_threshold": 0.994223276400942,
         "n_bootstrap": 1000
       },
       {
         "specificity": 0.999,
-        "sensitivity": 0.6556473829201102,
-        "ci95_lo": 0.6126726486892793,
-        "ci95_hi": 0.826208750103904,
-        "operating_threshold": 0.9989539196963756,
+        "sensitivity": 0.6473829201101928,
+        "ci95_lo": 0.6051146131805157,
+        "ci95_hi": 0.801134929892637,
+        "operating_threshold": 0.9995056873671807,
         "n_bootstrap": 1000
       }
     ],
@@ -120,46 +120,46 @@
     "naive_average_fusion": [
       {
         "specificity": 0.95,
-        "sensitivity": 0.9476584022038568,
-        "ci95_lo": 0.9055518018018018,
-        "ci95_hi": 0.9824612108305445,
-        "operating_threshold": 0.5015665316633586,
+        "sensitivity": 0.9393939393939394,
+        "ci95_lo": 0.9038395316804407,
+        "ci95_hi": 0.9867382776865535,
+        "operating_threshold": 0.49699742823601784,
         "n_bootstrap": 1000
       },
       {
         "specificity": 0.98,
-        "sensitivity": 0.9090909090909091,
-        "ci95_lo": 0.8418081205612851,
-        "ci95_hi": 0.9480944850320742,
-        "operating_threshold": 0.5912224632527117,
+        "sensitivity": 0.9146005509641874,
+        "ci95_lo": 0.8319209706354452,
+        "ci95_hi": 0.9472054002760524,
+        "operating_threshold": 0.586585505548683,
         "n_bootstrap": 1000
       },
       {
         "specificity": 0.99,
-        "sensitivity": 0.8650137741046832,
-        "ci95_lo": 0.7594175906316183,
-        "ci95_hi": 0.924161478894625,
-        "operating_threshold": 0.6952552674519626,
+        "sensitivity": 0.8429752066115702,
+        "ci95_lo": 0.7999596774193549,
+        "ci95_hi": 0.928987304185927,
+        "operating_threshold": 0.7081522578683244,
         "n_bootstrap": 1000
       },
       {
         "specificity": 0.995,
-        "sensitivity": 0.8512396694214877,
-        "ci95_lo": 0.739594105878732,
-        "ci95_hi": 0.917143279797126,
-        "operating_threshold": 0.7020414902593328,
+        "sensitivity": 0.8402203856749312,
+        "ci95_lo": 0.7887635958727189,
+        "ci95_hi": 0.9217949648117245,
+        "operating_threshold": 0.7101878898497003,
         "n_bootstrap": 1000
       },
       {
         "specificity": 0.999,
-        "sensitivity": 0.7658402203856749,
-        "ci95_lo": 0.7240385531833778,
-        "ci95_hi": 0.8933065696915682,
-        "operating_threshold": 0.7549206350633797,
+        "sensitivity": 0.8126721763085399,
+        "ci95_lo": 0.7744499474053297,
+        "ci95_hi": 0.8975210427111711,
+        "operating_threshold": 0.7400879214741425,
         "n_bootstrap": 1000
       }
     ]
   },
   "honest_framing": "The mutation channel is a CALIBRATED SYNTHETIC score, not a real mutation model. It is tuned to DeepCatch's headline panel-LLR @ 0.1% VAF (AUC ~0.92, Sens@95% ~0.77) so the ablation answers: given a mutation channel of this quality, does fusion help? For a real mutation-channel fusion see deepcatch/src/fragmentomics/fusion_ablation.py.",
-  "generated_at": "2026-09-12T10:28:43.455814+00:00"
+  "generated_at": "2026-09-12T10:36:03.200260+00:00"
 }

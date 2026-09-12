@@ -101,11 +101,14 @@ def pooled_oof_predictions(
                 Xte = sc.transform(X[te])
             max_pca = min(Xtr.shape[0], Xtr.shape[1])
             pca = PCA(n_components=min(pca_n, max_pca)).fit(Xtr)
-            # lbfgs with high max_iter converges reliably on this input.
-            # The default honest_benchmark uses max_iter=2000 which hits
-            # the limit and produces stochastic scores; bumping to 50000
-            # lets the solver reach the tolerance threshold.
-            m = LogisticRegression(max_iter=50000, tol=1e-6).fit(
+            # LR with default lbfgs solver. NOTE: on this high-dim PCA
+            # input the solver often hits max_iter without full
+            # convergence, so per-fold scores carry ~1-3pp run-to-run
+            # noise. The pooled 5-seed OOF averages this out somewhat,
+            # and the bootstrap CI captures the remaining variance.
+            # We use the SAME max_iter as honest_benchmark.py for
+            # apples-to-apples comparison against Section C.
+            m = LogisticRegression(max_iter=2000).fit(
                 pca.transform(Xtr), y[tr])
             oof[te] = m.predict_proba(pca.transform(Xte))[:, 1]
         aucs.append(roc_auc_score(y, oof))

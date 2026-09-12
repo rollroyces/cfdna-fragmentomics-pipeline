@@ -11,18 +11,18 @@ This is **Enhancement #2** of the fragmentomics decision-curve work.
 | **Galleri** (CCGA-3, sub-study 3)     |  4,023 |         50+  | **51.5%** @ 99.5% (prespecified)   | Klein et al., *Ann Oncol* 2021; CCGA-3 fact sheet 2024 (specificity 99.5%, 95% CI 99.0–99.8) |
 | **Shield** (Guardant, ECLIPSE)        |  7,861 |     CRC only | **83.1%** @ 89.6%                  | Chung et al., *NEJM* 2024 / ECLIPSE; Lancet Gastroenterology 2024 editorial (n=7,861 average-risk, colonoscopy reference) |
 | **CancerSEEK** (multi-cancer)         |  1,005 |            8 | **median 70%** @ >99% (range 69–98% by type) | Cohen et al., *Science* 2018 (1,005 non-metastatic cancers; 7/812 healthy false positives → spec ~99.1%) |
-| **This — fragmentomics (cross-study)**| **627**|            8 | **79.6%** @ 99%  (95% CI 63.1–86.5) | `honest_benchmark.py` + `scripts/sens_at_specificity.py`, pooled 5-seed 5-fold OOF, 5-channel PCA n=200 + per-study harmonize |
-| **This — fragmentomics + simulated mutation fusion** | **627** | 8 | **85.1%** @ 99% (95% CI 81.6–93.1) | `scripts/fusion_ablation.py`, naive-avg with synthetic-mutation channel (AUC 0.95, calibrated to DeepCatch's panel-LLR @ 0.1% VAF) |
+| **This — fragmentomics (cross-study)**| **627**|            8 | **75.5%** @ 99%  (95% CI 63.3–87.6) | `honest_benchmark.py` + `scripts/sens_at_specificity.py`, pooled 5-seed 5-fold OOF, 5-channel PCA n=200 + per-study harmonize |
+| **This — fragmentomics + simulated mutation fusion** | **627** | 8 | **84.3%** @ 99% (95% CI 80.0–92.9) | `scripts/fusion_ablation.py`, naive-avg with synthetic-mutation channel (AUC 0.95, calibrated to DeepCatch's panel-LLR @ 0.1% VAF) |
 
 ### Full per-specificity table (this work)
 
 | Specificity | Sens (fragmentomics only) | 95% CI (bootstrap, n=1000) | Sens (fragmentomics + fusion) | 95% CI (bootstrap, n=1000) |
 |------------:|--------------------------:|---------------------------:|------------------------------:|---------------------------:|
-|        95%  | **90.1%**                 | 84.8% – 94.0%              | **95.0%**                     | 90.8% – 98.4%              |
-|        98%  | **83.2%**                 | 76.7% – 90.1%              | **91.7%**                     | 83.3% – 94.9%              |
-|        99%  | **79.6%**                 | 63.1% – 86.5%              | **85.1%**                     | 81.6% – 93.1%              |
-|      99.5%  | **76.0%**                 | 61.3% – 85.7%              | **84.9%**                     | 81.3% – 92.3%              |
-|      99.9%  | **64.5%**                 | 60.3% – 83.2%              | **84.9%**                     | 81.2% – 89.4%              |
+|        95%  | **89.8%**                 | 84.3% – 93.2%              | **93.9%**                     | 90.4% – 98.7%              |
+|        98%  | **85.4%**                 | 73.4% – 89.7%              | **91.5%**                     | 83.2% – 94.7%              |
+|        99%  | **75.5%**                 | 63.3% – 87.6%              | **84.3%**                     | 80.0% – 92.9%              |
+|      99.5%  | **75.5%**                 | 61.6% – 86.7%              | **84.0%**                     | 78.9% – 92.2%              |
+|      99.9%  | **64.7%**                 | 60.5% – 80.1%              | **81.3%**                     | 77.4% – 89.8%              |
 
 **Cohort:** 627 samples (363 cancer + 264 healthy) pooled across the
 Cristiano (CRC / breast / lung / ovarian / pancreatic / gastric) and
@@ -30,9 +30,10 @@ Jiang (HCC) FinaleDB studies. 5-channel feature set: 5Mb-arm ratio +
 5Mb-arm coverage + 100kb-bin ratio + 100kb-bin counts + 196-bin
 fragment-size distribution.
 
-**AUC (pooled OOF, 5-seed mean):** 0.9757 ± 0.0015 (fragmentomics only);
-0.9915 (naive-avg fusion). Per-seed std < 0.005 — well within stochastic
-LR-convergence noise.
+**AUC (pooled OOF, 5-seed mean):** 0.9755 ± 0.0016 (fragmentomics only);
+0.9921 (naive-avg fusion). Per-seed std < 0.005 — well within stochastic
+LR-convergence noise (~1-3pp run-to-run on the central sens estimate;
+the bootstrap CIs already absorb this).
 
 ## Honest caveats (READ BEFORE QUOTING)
 
