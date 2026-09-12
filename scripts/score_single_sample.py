@@ -84,12 +84,18 @@ DEFAULT_FEAT_DIR = str(FEAT_DIR)
 DEFAULT_LABELS = str(REPO_ROOT / "labels_multiclass.tsv")
 DEFAULT_SEEDS = [42, 13, 7, 99, 1234]
 N_FOLDS = 5
-PCA_N = 200  # matches honest_benchmark Section C
-LR_C = 1000.0  # task spec — LR-no-PCA, C=1000
-LR_NO_PCA = True
-# Iteration cap for OOF — LR-no-PCA on ~60k features with C=1000
-# converges very fast; 500 iters is plenty and 10× faster than the
-# honest_benchmark default of 2000.
+# Two model protocols:
+#   - Binary "cancer vs healthy": LR-no-PCA, C=1000 (task spec). This
+#     matches scripts/lr_no_pca_vs_pca200.py's no-PCA arm, which is
+#     marginally better than PCA(200) per the honest benchmark.
+#   - Multiclass OvR: LR+PCA(200), C=1.0 (matches
+#     scripts/multiclass_classification.py). That protocol gives the
+#     published macro-AUC 0.97 and reliable per-class probabilities.
+PCA_N = 200
+LR_C = 1.0  # multiclass default
+LR_NO_PCA = False  # multiclass default
+BINARY_C = 1000.0  # task spec for binary
+BINARY_NO_PCA = True  # task spec for binary
 LR_MAX_ITER = 500
 
 # Risk-tier thresholds derived from results/sens_at_spec.json
@@ -220,6 +226,8 @@ def pooled_oof_predictions(X: np.ndarray, y: np.ndarray, study: np.ndarray,
     Returns ``(y_true, score_pooled)`` where ``score_pooled[i]`` is
     the mean across seeds of the OOF probability for sample ``i``.
     Each sample is predicted only on data it never saw during training.
+
+    Uses the BINARY_* protocol (LR-no-PCA, C=BINARY_C) per the task spec.
     """
     score_acc = np.zeros(len(y), dtype=float)
     for sd in seeds:
@@ -233,7 +241,7 @@ def pooled_oof_predictions(X: np.ndarray, y: np.ndarray, study: np.ndarray,
                 sc = StandardScaler().fit(X[tr])
                 Xtr = sc.transform(X[tr])
                 Xte = sc.transform(X[te])
-            if LR_NO_PCA or pca_n == 0:
+            if BINARY_NO_PCA or pca_n == 0:
                 Xtr_in, Xte_in = Xtr, Xte
             else:
                 n_comp = min(pca_n, Xtr.shape[0], Xtr.shape[1])
@@ -241,7 +249,7 @@ def pooled_oof_predictions(X: np.ndarray, y: np.ndarray, study: np.ndarray,
                 Xtr_in = pca.transform(Xtr)
                 Xte_in = pca.transform(Xte)
             clf = LogisticRegression(
-                C=LR_C, max_iter=LR_MAX_ITER, tol=1e-4, random_state=0,
+                C=BINARY_C, max_iter=LR_MAX_ITER, tol=1e-4, random_state=0,
                 solver="lbfgs")
             clf.fit(Xtr_in, y[tr])
             oof[te] = clf.predict_proba(Xte_in)[:, 1]
@@ -255,8 +263,8 @@ def pooled_oof_multiclass(X: np.ndarray, y_multi: np.ndarray,
                           harmonize: bool) -> np.ndarray:
     """Pooled 5-seed × 5-fold OvR multiclass OOF probabilities.
 
-    Returns ``(n_samples, n_classes)`` array of mean-across-seeds
-    OOF probabilities.
+    Uses the multiclass protocol (LR+PCA(200), C=1.0) which matches
+    scripts/multiclass_classification.py.
     """
     n = len(X)
     score_acc = np.zeros((n, n_classes), dtype=float)
@@ -678,7 +686,7 @@ def _score_new_sample(sample_id: str, x_new: np.ndarray,
         Xs_in = pca.transform(Xs)
         x_new_s = pca.transform(sc.transform(x_new.reshape(1, -1)))
 
-    clf_bin = LogisticRegression(C=LR_C, max_iter=LR_MAX_ITER, tol=1e-4,
+    clf_bin = LogisticRegression(C=BINARY_C, max_iter=LR_MAX_ITER, tol=1e-4,
                                  random_state=0, solver="lbfgs")
     clf_bin.fit(Xs_in, y_bin_arr)
     p_cancer = float(clf_bin.predict_proba(x_new_s)[0, 1])
@@ -755,7 +763,9 @@ def _build_output(sample_id: str, source: str,
         },
         **ci_block,
         "model": (
-            f"LR-no-PCA, C={LR_C}, per-study harmonize, 5-channel features"
+            f"binary: LR-no-PCA, C={BINARY_C}; "
+            f"multiclass: LR+PCA({PCA_N}), C={LR_C}; "
+            f"per-study harmonize, 5-channel features"
         ),
         "training_n":   len(score_pooled_bin),
         "training_auc": round(training_auc, 4),

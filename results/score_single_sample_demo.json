@@ -1,0 +1,962 @@
+{
+  "n_samples": 30,
+  "n_picked_per_class": {
+    "BRCA": 3,
+    "CRC": 3,
+    "HCC_J": 3,
+    "LUAD": 3,
+    "OV": 3,
+    "PAAD": 3,
+    "HEALTHY": 12
+  },
+  "overall_risk_tier_accuracy": 0.8666666666666667,
+  "top1_disease_class_accuracy": 0.5666666666666667,
+  "per_class": {
+    "BRCA": {
+      "n": 3,
+      "risk_tier_accuracy": 1.0,
+      "mean_p_cancer": 1.0,
+      "top1_accuracy": 0.6666666666666666
+    },
+    "CRC": {
+      "n": 3,
+      "risk_tier_accuracy": 0.3333333333333333,
+      "mean_p_cancer": 0.3333333333333333,
+      "top1_accuracy": 0.0
+    },
+    "HCC_J": {
+      "n": 3,
+      "risk_tier_accuracy": 1.0,
+      "mean_p_cancer": 0.999915,
+      "top1_accuracy": 1.0
+    },
+    "HEALTHY": {
+      "n": 12,
+      "risk_tier_accuracy": 0.9166666666666666,
+      "mean_p_cancer": 0.07882041666666667,
+      "top1_accuracy": 0.9166666666666666
+    },
+    "LUAD": {
+      "n": 3,
+      "risk_tier_accuracy": 0.6666666666666666,
+      "mean_p_cancer": 0.6666686666666667,
+      "top1_accuracy": 0.3333333333333333
+    },
+    "OV": {
+      "n": 3,
+      "risk_tier_accuracy": 1.0,
+      "mean_p_cancer": 1.0,
+      "top1_accuracy": 0.0
+    },
+    "PAAD": {
+      "n": 3,
+      "risk_tier_accuracy": 1.0,
+      "mean_p_cancer": 1.0,
+      "top1_accuracy": 0.0
+    }
+  },
+  "scored_samples": [
+    {
+      "sample_id": "CGPLBR101",
+      "source": "labels_multiclass.tsv",
+      "ground_truth_class": "BRCA",
+      "p_cancer": 1.0,
+      "p_cancer_class": {
+        "BRCA": 0.780537,
+        "HCC_J": 0.202181,
+        "HEALTHY": 0.017212,
+        "LUAD": 1e-05,
+        "PAAD": 6e-05
+      },
+      "risk_tier": "high",
+      "risk_tier_thresholds": {
+        "low_max": 0.6252,
+        "medium_max": 0.9096,
+        "high_min": 0.9096,
+        "source": "results/sens_at_spec.json (spec=0.95, 0.98)"
+      },
+      "model": "binary: LR-no-PCA, C=1000.0; multiclass: LR+PCA(200), C=1.0; per-study harmonize, 5-channel features",
+      "training_n": 545,
+      "training_auc": 0.9566,
+      "is_pooled_oof": true,
+      "research_use_only": true,
+      "disclaimer": "RESEARCH USE ONLY. The pooled out-of-fold score is computed on the same 627-sample cohort used to fit the model. The CI estimates sampling variance, not external-validation uncertainty. Do NOT use this output to guide clinical decisions.",
+      "generated_at": "2026-09-12T13:40:26.916909+00:00",
+      "runtime_seconds": 0.32,
+      "true_class": "BRCA",
+      "picked_sample": "CGPLBR101"
+    },
+    {
+      "sample_id": "CGPLBR81",
+      "source": "labels_multiclass.tsv",
+      "ground_truth_class": "BRCA",
+      "p_cancer": 1.0,
+      "p_cancer_class": {
+        "BRCA": 0.857134,
+        "HCC_J": 0.141081,
+        "HEALTHY": 0.0,
+        "LUAD": 0.001785,
+        "PAAD": 0.0
+      },
+      "risk_tier": "high",
+      "risk_tier_thresholds": {
+        "low_max": 0.6252,
+        "medium_max": 0.9096,
+        "high_min": 0.9096,
+        "source": "results/sens_at_spec.json (spec=0.95, 0.98)"
+      },
+      "model": "binary: LR-no-PCA, C=1000.0; multiclass: LR+PCA(200), C=1.0; per-study harmonize, 5-channel features",
+      "training_n": 545,
+      "training_auc": 0.9566,
+      "is_pooled_oof": true,
+      "research_use_only": true,
+      "disclaimer": "RESEARCH USE ONLY. The pooled out-of-fold score is computed on the same 627-sample cohort used to fit the model. The CI estimates sampling variance, not external-validation uncertainty. Do NOT use this output to guide clinical decisions.",
+      "generated_at": "2026-09-12T13:40:28.063271+00:00",
+      "runtime_seconds": 0.29,
+      "true_class": "BRCA",
+      "picked_sample": "CGPLBR81"
+    },
+    {
+      "sample_id": "CGPLBR28",
+      "source": "labels_multiclass.tsv",
+      "ground_truth_class": "BRCA",
+      "p_cancer": 1.0,
+      "p_cancer_class": {
+        "BRCA": 0.13381,
+        "HCC_J": 0.551484,
+        "HEALTHY": 0.0,
+        "LUAD": 0.314681,
+        "PAAD": 2.5e-05
+      },
+      "risk_tier": "high",
+      "risk_tier_thresholds": {
+        "low_max": 0.6252,
+        "medium_max": 0.9096,
+        "high_min": 0.9096,
+        "source": "results/sens_at_spec.json (spec=0.95, 0.98)"
+      },
+      "model": "binary: LR-no-PCA, C=1000.0; multiclass: LR+PCA(200), C=1.0; per-study harmonize, 5-channel features",
+      "training_n": 545,
+      "training_auc": 0.9566,
+      "is_pooled_oof": true,
+      "research_use_only": true,
+      "disclaimer": "RESEARCH USE ONLY. The pooled out-of-fold score is computed on the same 627-sample cohort used to fit the model. The CI estimates sampling variance, not external-validation uncertainty. Do NOT use this output to guide clinical decisions.",
+      "generated_at": "2026-09-12T13:40:29.210654+00:00",
+      "runtime_seconds": 0.3,
+      "true_class": "BRCA",
+      "picked_sample": "CGPLBR28"
+    },
+    {
+      "sample_id": "CGCRC305",
+      "source": "labels_multiclass.tsv",
+      "ground_truth_class": "CRC",
+      "p_cancer": 0.0,
+      "p_cancer_class": {
+        "BRCA": 0.000205,
+        "HCC_J": 0.0,
+        "HEALTHY": 0.999781,
+        "LUAD": 1.3e-05,
+        "PAAD": 1e-06
+      },
+      "risk_tier": "low",
+      "risk_tier_thresholds": {
+        "low_max": 0.6252,
+        "medium_max": 0.9096,
+        "high_min": 0.9096,
+        "source": "results/sens_at_spec.json (spec=0.95, 0.98)"
+      },
+      "model": "binary: LR-no-PCA, C=1000.0; multiclass: LR+PCA(200), C=1.0; per-study harmonize, 5-channel features",
+      "training_n": 545,
+      "training_auc": 0.9566,
+      "is_pooled_oof": false,
+      "research_use_only": true,
+      "disclaimer": "RESEARCH USE ONLY. The pooled out-of-fold score is computed on the same 627-sample cohort used to fit the model. The CI estimates sampling variance, not external-validation uncertainty. Do NOT use this output to guide clinical decisions.",
+      "generated_at": "2026-09-12T13:40:31.615116+00:00",
+      "runtime_seconds": 1.56,
+      "true_class": "CRC",
+      "picked_sample": "CGCRC305"
+    },
+    {
+      "sample_id": "CGCRC306",
+      "source": "labels_multiclass.tsv",
+      "ground_truth_class": "CRC",
+      "p_cancer": 1.0,
+      "p_cancer_class": {
+        "BRCA": 0.851429,
+        "HCC_J": 0.0,
+        "HEALTHY": 0.0,
+        "LUAD": 0.118419,
+        "PAAD": 0.030151
+      },
+      "risk_tier": "high",
+      "risk_tier_thresholds": {
+        "low_max": 0.6252,
+        "medium_max": 0.9096,
+        "high_min": 0.9096,
+        "source": "results/sens_at_spec.json (spec=0.95, 0.98)"
+      },
+      "model": "binary: LR-no-PCA, C=1000.0; multiclass: LR+PCA(200), C=1.0; per-study harmonize, 5-channel features",
+      "training_n": 545,
+      "training_auc": 0.9566,
+      "is_pooled_oof": false,
+      "research_use_only": true,
+      "disclaimer": "RESEARCH USE ONLY. The pooled out-of-fold score is computed on the same 627-sample cohort used to fit the model. The CI estimates sampling variance, not external-validation uncertainty. Do NOT use this output to guide clinical decisions.",
+      "generated_at": "2026-09-12T13:40:34.024786+00:00",
+      "runtime_seconds": 1.56,
+      "true_class": "CRC",
+      "picked_sample": "CGCRC306"
+    },
+    {
+      "sample_id": "CGCRC293",
+      "source": "labels_multiclass.tsv",
+      "ground_truth_class": "CRC",
+      "p_cancer": 0.0,
+      "p_cancer_class": {
+        "BRCA": 0.0,
+        "HCC_J": 0.0,
+        "HEALTHY": 0.932852,
+        "LUAD": 0.067128,
+        "PAAD": 2e-05
+      },
+      "risk_tier": "low",
+      "risk_tier_thresholds": {
+        "low_max": 0.6252,
+        "medium_max": 0.9096,
+        "high_min": 0.9096,
+        "source": "results/sens_at_spec.json (spec=0.95, 0.98)"
+      },
+      "model": "binary: LR-no-PCA, C=1000.0; multiclass: LR+PCA(200), C=1.0; per-study harmonize, 5-channel features",
+      "training_n": 545,
+      "training_auc": 0.9566,
+      "is_pooled_oof": false,
+      "research_use_only": true,
+      "disclaimer": "RESEARCH USE ONLY. The pooled out-of-fold score is computed on the same 627-sample cohort used to fit the model. The CI estimates sampling variance, not external-validation uncertainty. Do NOT use this output to guide clinical decisions.",
+      "generated_at": "2026-09-12T13:40:36.461571+00:00",
+      "runtime_seconds": 1.58,
+      "true_class": "CRC",
+      "picked_sample": "CGCRC293"
+    },
+    {
+      "sample_id": "H216",
+      "source": "labels_multiclass.tsv",
+      "ground_truth_class": "HCC_J",
+      "p_cancer": 0.999992,
+      "p_cancer_class": {
+        "BRCA": 1e-06,
+        "HCC_J": 0.948609,
+        "HEALTHY": 3e-06,
+        "LUAD": 0.004857,
+        "PAAD": 0.04653
+      },
+      "risk_tier": "high",
+      "risk_tier_thresholds": {
+        "low_max": 0.6252,
+        "medium_max": 0.9096,
+        "high_min": 0.9096,
+        "source": "results/sens_at_spec.json (spec=0.95, 0.98)"
+      },
+      "model": "binary: LR-no-PCA, C=1000.0; multiclass: LR+PCA(200), C=1.0; per-study harmonize, 5-channel features",
+      "training_n": 545,
+      "training_auc": 0.9566,
+      "is_pooled_oof": true,
+      "research_use_only": true,
+      "disclaimer": "RESEARCH USE ONLY. The pooled out-of-fold score is computed on the same 627-sample cohort used to fit the model. The CI estimates sampling variance, not external-validation uncertainty. Do NOT use this output to guide clinical decisions.",
+      "generated_at": "2026-09-12T13:40:37.613872+00:00",
+      "runtime_seconds": 0.3,
+      "true_class": "HCC_J",
+      "picked_sample": "H216"
+    },
+    {
+      "sample_id": "H278",
+      "source": "labels_multiclass.tsv",
+      "ground_truth_class": "HCC_J",
+      "p_cancer": 0.999999,
+      "p_cancer_class": {
+        "BRCA": 8e-06,
+        "HCC_J": 0.973067,
+        "HEALTHY": 0.001045,
+        "LUAD": 0.000396,
+        "PAAD": 0.025483
+      },
+      "risk_tier": "high",
+      "risk_tier_thresholds": {
+        "low_max": 0.6252,
+        "medium_max": 0.9096,
+        "high_min": 0.9096,
+        "source": "results/sens_at_spec.json (spec=0.95, 0.98)"
+      },
+      "model": "binary: LR-no-PCA, C=1000.0; multiclass: LR+PCA(200), C=1.0; per-study harmonize, 5-channel features",
+      "training_n": 545,
+      "training_auc": 0.9566,
+      "is_pooled_oof": true,
+      "research_use_only": true,
+      "disclaimer": "RESEARCH USE ONLY. The pooled out-of-fold score is computed on the same 627-sample cohort used to fit the model. The CI estimates sampling variance, not external-validation uncertainty. Do NOT use this output to guide clinical decisions.",
+      "generated_at": "2026-09-12T13:40:38.771146+00:00",
+      "runtime_seconds": 0.3,
+      "true_class": "HCC_J",
+      "picked_sample": "H278"
+    },
+    {
+      "sample_id": "H218",
+      "source": "labels_multiclass.tsv",
+      "ground_truth_class": "HCC_J",
+      "p_cancer": 0.999754,
+      "p_cancer_class": {
+        "BRCA": 1e-06,
+        "HCC_J": 0.984557,
+        "HEALTHY": 0.014473,
+        "LUAD": 0.000559,
+        "PAAD": 0.00041
+      },
+      "risk_tier": "high",
+      "risk_tier_thresholds": {
+        "low_max": 0.6252,
+        "medium_max": 0.9096,
+        "high_min": 0.9096,
+        "source": "results/sens_at_spec.json (spec=0.95, 0.98)"
+      },
+      "model": "binary: LR-no-PCA, C=1000.0; multiclass: LR+PCA(200), C=1.0; per-study harmonize, 5-channel features",
+      "training_n": 545,
+      "training_auc": 0.9566,
+      "is_pooled_oof": true,
+      "research_use_only": true,
+      "disclaimer": "RESEARCH USE ONLY. The pooled out-of-fold score is computed on the same 627-sample cohort used to fit the model. The CI estimates sampling variance, not external-validation uncertainty. Do NOT use this output to guide clinical decisions.",
+      "generated_at": "2026-09-12T13:40:39.939698+00:00",
+      "runtime_seconds": 0.31,
+      "true_class": "HCC_J",
+      "picked_sample": "H218"
+    },
+    {
+      "sample_id": "CGPLLU43_D6",
+      "source": "labels_multiclass.tsv",
+      "ground_truth_class": "LUAD",
+      "p_cancer": 6e-06,
+      "p_cancer_class": {
+        "BRCA": 1.7e-05,
+        "HCC_J": 0.141682,
+        "HEALTHY": 0.858223,
+        "LUAD": 7.7e-05,
+        "PAAD": 0.0
+      },
+      "risk_tier": "low",
+      "risk_tier_thresholds": {
+        "low_max": 0.6252,
+        "medium_max": 0.9096,
+        "high_min": 0.9096,
+        "source": "results/sens_at_spec.json (spec=0.95, 0.98)"
+      },
+      "model": "binary: LR-no-PCA, C=1000.0; multiclass: LR+PCA(200), C=1.0; per-study harmonize, 5-channel features",
+      "training_n": 545,
+      "training_auc": 0.9566,
+      "is_pooled_oof": true,
+      "research_use_only": true,
+      "disclaimer": "RESEARCH USE ONLY. The pooled out-of-fold score is computed on the same 627-sample cohort used to fit the model. The CI estimates sampling variance, not external-validation uncertainty. Do NOT use this output to guide clinical decisions.",
+      "generated_at": "2026-09-12T13:40:41.093667+00:00",
+      "runtime_seconds": 0.3,
+      "true_class": "LUAD",
+      "picked_sample": "CGPLLU43_D6"
+    },
+    {
+      "sample_id": "CGPLLU266_D328",
+      "source": "labels_multiclass.tsv",
+      "ground_truth_class": "LUAD",
+      "p_cancer": 1.0,
+      "p_cancer_class": {
+        "BRCA": 9.5e-05,
+        "HCC_J": 0.160485,
+        "HEALTHY": 3e-06,
+        "LUAD": 0.839417,
+        "PAAD": 0.0
+      },
+      "risk_tier": "high",
+      "risk_tier_thresholds": {
+        "low_max": 0.6252,
+        "medium_max": 0.9096,
+        "high_min": 0.9096,
+        "source": "results/sens_at_spec.json (spec=0.95, 0.98)"
+      },
+      "model": "binary: LR-no-PCA, C=1000.0; multiclass: LR+PCA(200), C=1.0; per-study harmonize, 5-channel features",
+      "training_n": 545,
+      "training_auc": 0.9566,
+      "is_pooled_oof": true,
+      "research_use_only": true,
+      "disclaimer": "RESEARCH USE ONLY. The pooled out-of-fold score is computed on the same 627-sample cohort used to fit the model. The CI estimates sampling variance, not external-validation uncertainty. Do NOT use this output to guide clinical decisions.",
+      "generated_at": "2026-09-12T13:40:42.250523+00:00",
+      "runtime_seconds": 0.3,
+      "true_class": "LUAD",
+      "picked_sample": "CGPLLU266_D328"
+    },
+    {
+      "sample_id": "CGPLLU162",
+      "source": "labels_multiclass.tsv",
+      "ground_truth_class": "LUAD",
+      "p_cancer": 1.0,
+      "p_cancer_class": {
+        "BRCA": 0.263949,
+        "HCC_J": 0.566617,
+        "HEALTHY": 0.0,
+        "LUAD": 0.000353,
+        "PAAD": 0.16908
+      },
+      "risk_tier": "high",
+      "risk_tier_thresholds": {
+        "low_max": 0.6252,
+        "medium_max": 0.9096,
+        "high_min": 0.9096,
+        "source": "results/sens_at_spec.json (spec=0.95, 0.98)"
+      },
+      "model": "binary: LR-no-PCA, C=1000.0; multiclass: LR+PCA(200), C=1.0; per-study harmonize, 5-channel features",
+      "training_n": 545,
+      "training_auc": 0.9566,
+      "is_pooled_oof": true,
+      "research_use_only": true,
+      "disclaimer": "RESEARCH USE ONLY. The pooled out-of-fold score is computed on the same 627-sample cohort used to fit the model. The CI estimates sampling variance, not external-validation uncertainty. Do NOT use this output to guide clinical decisions.",
+      "generated_at": "2026-09-12T13:40:43.416140+00:00",
+      "runtime_seconds": 0.31,
+      "true_class": "LUAD",
+      "picked_sample": "CGPLLU162"
+    },
+    {
+      "sample_id": "CGPLOV49",
+      "source": "labels_multiclass.tsv",
+      "ground_truth_class": "OV",
+      "p_cancer": 1.0,
+      "p_cancer_class": {
+        "BRCA": 0.959858,
+        "HCC_J": 0.0,
+        "HEALTHY": 0.0,
+        "LUAD": 0.040141,
+        "PAAD": 1e-06
+      },
+      "risk_tier": "high",
+      "risk_tier_thresholds": {
+        "low_max": 0.6252,
+        "medium_max": 0.9096,
+        "high_min": 0.9096,
+        "source": "results/sens_at_spec.json (spec=0.95, 0.98)"
+      },
+      "model": "binary: LR-no-PCA, C=1000.0; multiclass: LR+PCA(200), C=1.0; per-study harmonize, 5-channel features",
+      "training_n": 545,
+      "training_auc": 0.9566,
+      "is_pooled_oof": false,
+      "research_use_only": true,
+      "disclaimer": "RESEARCH USE ONLY. The pooled out-of-fold score is computed on the same 627-sample cohort used to fit the model. The CI estimates sampling variance, not external-validation uncertainty. Do NOT use this output to guide clinical decisions.",
+      "generated_at": "2026-09-12T13:40:45.840860+00:00",
+      "runtime_seconds": 1.56,
+      "true_class": "OV",
+      "picked_sample": "CGPLOV49"
+    },
+    {
+      "sample_id": "CGPLOV16",
+      "source": "labels_multiclass.tsv",
+      "ground_truth_class": "OV",
+      "p_cancer": 1.0,
+      "p_cancer_class": {
+        "BRCA": 0.000693,
+        "HCC_J": 0.0,
+        "HEALTHY": 0.0,
+        "LUAD": 0.998897,
+        "PAAD": 0.000409
+      },
+      "risk_tier": "high",
+      "risk_tier_thresholds": {
+        "low_max": 0.6252,
+        "medium_max": 0.9096,
+        "high_min": 0.9096,
+        "source": "results/sens_at_spec.json (spec=0.95, 0.98)"
+      },
+      "model": "binary: LR-no-PCA, C=1000.0; multiclass: LR+PCA(200), C=1.0; per-study harmonize, 5-channel features",
+      "training_n": 545,
+      "training_auc": 0.9566,
+      "is_pooled_oof": false,
+      "research_use_only": true,
+      "disclaimer": "RESEARCH USE ONLY. The pooled out-of-fold score is computed on the same 627-sample cohort used to fit the model. The CI estimates sampling variance, not external-validation uncertainty. Do NOT use this output to guide clinical decisions.",
+      "generated_at": "2026-09-12T13:40:48.256483+00:00",
+      "runtime_seconds": 1.55,
+      "true_class": "OV",
+      "picked_sample": "CGPLOV16"
+    },
+    {
+      "sample_id": "CGPLOV42",
+      "source": "labels_multiclass.tsv",
+      "ground_truth_class": "OV",
+      "p_cancer": 1.0,
+      "p_cancer_class": {
+        "BRCA": 0.521813,
+        "HCC_J": 0.0,
+        "HEALTHY": 0.011685,
+        "LUAD": 0.465997,
+        "PAAD": 0.000505
+      },
+      "risk_tier": "high",
+      "risk_tier_thresholds": {
+        "low_max": 0.6252,
+        "medium_max": 0.9096,
+        "high_min": 0.9096,
+        "source": "results/sens_at_spec.json (spec=0.95, 0.98)"
+      },
+      "model": "binary: LR-no-PCA, C=1000.0; multiclass: LR+PCA(200), C=1.0; per-study harmonize, 5-channel features",
+      "training_n": 545,
+      "training_auc": 0.9566,
+      "is_pooled_oof": false,
+      "research_use_only": true,
+      "disclaimer": "RESEARCH USE ONLY. The pooled out-of-fold score is computed on the same 627-sample cohort used to fit the model. The CI estimates sampling variance, not external-validation uncertainty. Do NOT use this output to guide clinical decisions.",
+      "generated_at": "2026-09-12T13:40:50.677295+00:00",
+      "runtime_seconds": 1.55,
+      "true_class": "OV",
+      "picked_sample": "CGPLOV42"
+    },
+    {
+      "sample_id": "CGPLPA130",
+      "source": "labels_multiclass.tsv",
+      "ground_truth_class": "PAAD",
+      "p_cancer": 1.0,
+      "p_cancer_class": {
+        "BRCA": 0.006963,
+        "HCC_J": 0.838169,
+        "HEALTHY": 0.018007,
+        "LUAD": 5.9e-05,
+        "PAAD": 0.136803
+      },
+      "risk_tier": "high",
+      "risk_tier_thresholds": {
+        "low_max": 0.6252,
+        "medium_max": 0.9096,
+        "high_min": 0.9096,
+        "source": "results/sens_at_spec.json (spec=0.95, 0.98)"
+      },
+      "model": "binary: LR-no-PCA, C=1000.0; multiclass: LR+PCA(200), C=1.0; per-study harmonize, 5-channel features",
+      "training_n": 545,
+      "training_auc": 0.9566,
+      "is_pooled_oof": true,
+      "research_use_only": true,
+      "disclaimer": "RESEARCH USE ONLY. The pooled out-of-fold score is computed on the same 627-sample cohort used to fit the model. The CI estimates sampling variance, not external-validation uncertainty. Do NOT use this output to guide clinical decisions.",
+      "generated_at": "2026-09-12T13:40:51.839268+00:00",
+      "runtime_seconds": 0.3,
+      "true_class": "PAAD",
+      "picked_sample": "CGPLPA130"
+    },
+    {
+      "sample_id": "CGPLPA115",
+      "source": "labels_multiclass.tsv",
+      "ground_truth_class": "PAAD",
+      "p_cancer": 1.0,
+      "p_cancer_class": {
+        "BRCA": 1.5e-05,
+        "HCC_J": 0.509117,
+        "HEALTHY": 0.0,
+        "LUAD": 0.007287,
+        "PAAD": 0.483581
+      },
+      "risk_tier": "high",
+      "risk_tier_thresholds": {
+        "low_max": 0.6252,
+        "medium_max": 0.9096,
+        "high_min": 0.9096,
+        "source": "results/sens_at_spec.json (spec=0.95, 0.98)"
+      },
+      "model": "binary: LR-no-PCA, C=1000.0; multiclass: LR+PCA(200), C=1.0; per-study harmonize, 5-channel features",
+      "training_n": 545,
+      "training_auc": 0.9566,
+      "is_pooled_oof": true,
+      "research_use_only": true,
+      "disclaimer": "RESEARCH USE ONLY. The pooled out-of-fold score is computed on the same 627-sample cohort used to fit the model. The CI estimates sampling variance, not external-validation uncertainty. Do NOT use this output to guide clinical decisions.",
+      "generated_at": "2026-09-12T13:40:53.032046+00:00",
+      "runtime_seconds": 0.3,
+      "true_class": "PAAD",
+      "picked_sample": "CGPLPA115"
+    },
+    {
+      "sample_id": "CGPLPA117",
+      "source": "labels_multiclass.tsv",
+      "ground_truth_class": "PAAD",
+      "p_cancer": 1.0,
+      "p_cancer_class": {
+        "BRCA": 1e-05,
+        "HCC_J": 0.957453,
+        "HEALTHY": 6.8e-05,
+        "LUAD": 0.028726,
+        "PAAD": 0.013742
+      },
+      "risk_tier": "high",
+      "risk_tier_thresholds": {
+        "low_max": 0.6252,
+        "medium_max": 0.9096,
+        "high_min": 0.9096,
+        "source": "results/sens_at_spec.json (spec=0.95, 0.98)"
+      },
+      "model": "binary: LR-no-PCA, C=1000.0; multiclass: LR+PCA(200), C=1.0; per-study harmonize, 5-channel features",
+      "training_n": 545,
+      "training_auc": 0.9566,
+      "is_pooled_oof": true,
+      "research_use_only": true,
+      "disclaimer": "RESEARCH USE ONLY. The pooled out-of-fold score is computed on the same 627-sample cohort used to fit the model. The CI estimates sampling variance, not external-validation uncertainty. Do NOT use this output to guide clinical decisions.",
+      "generated_at": "2026-09-12T13:40:54.210490+00:00",
+      "runtime_seconds": 0.31,
+      "true_class": "PAAD",
+      "picked_sample": "CGPLPA117"
+    },
+    {
+      "sample_id": "CGPLH494",
+      "source": "labels_multiclass.tsv",
+      "ground_truth_class": "HEALTHY",
+      "p_cancer": 2.5e-05,
+      "p_cancer_class": {
+        "BRCA": 1e-06,
+        "HCC_J": 0.140388,
+        "HEALTHY": 0.859348,
+        "LUAD": 3e-06,
+        "PAAD": 0.00026
+      },
+      "risk_tier": "low",
+      "risk_tier_thresholds": {
+        "low_max": 0.6252,
+        "medium_max": 0.9096,
+        "high_min": 0.9096,
+        "source": "results/sens_at_spec.json (spec=0.95, 0.98)"
+      },
+      "model": "binary: LR-no-PCA, C=1000.0; multiclass: LR+PCA(200), C=1.0; per-study harmonize, 5-channel features",
+      "training_n": 545,
+      "training_auc": 0.9566,
+      "is_pooled_oof": true,
+      "research_use_only": true,
+      "disclaimer": "RESEARCH USE ONLY. The pooled out-of-fold score is computed on the same 627-sample cohort used to fit the model. The CI estimates sampling variance, not external-validation uncertainty. Do NOT use this output to guide clinical decisions.",
+      "generated_at": "2026-09-12T13:40:55.376141+00:00",
+      "runtime_seconds": 0.3,
+      "true_class": "HEALTHY",
+      "picked_sample": "CGPLH494"
+    },
+    {
+      "sample_id": "CGPLH330",
+      "source": "labels_multiclass.tsv",
+      "ground_truth_class": "HEALTHY",
+      "p_cancer": 0.001785,
+      "p_cancer_class": {
+        "BRCA": 0.0,
+        "HCC_J": 0.14799,
+        "HEALTHY": 0.85188,
+        "LUAD": 1e-05,
+        "PAAD": 0.000119
+      },
+      "risk_tier": "low",
+      "risk_tier_thresholds": {
+        "low_max": 0.6252,
+        "medium_max": 0.9096,
+        "high_min": 0.9096,
+        "source": "results/sens_at_spec.json (spec=0.95, 0.98)"
+      },
+      "model": "binary: LR-no-PCA, C=1000.0; multiclass: LR+PCA(200), C=1.0; per-study harmonize, 5-channel features",
+      "training_n": 545,
+      "training_auc": 0.9566,
+      "is_pooled_oof": true,
+      "research_use_only": true,
+      "disclaimer": "RESEARCH USE ONLY. The pooled out-of-fold score is computed on the same 627-sample cohort used to fit the model. The CI estimates sampling variance, not external-validation uncertainty. Do NOT use this output to guide clinical decisions.",
+      "generated_at": "2026-09-12T13:40:56.543127+00:00",
+      "runtime_seconds": 0.3,
+      "true_class": "HEALTHY",
+      "picked_sample": "CGPLH330"
+    },
+    {
+      "sample_id": "CGPLH404",
+      "source": "labels_multiclass.tsv",
+      "ground_truth_class": "HEALTHY",
+      "p_cancer": 0.0,
+      "p_cancer_class": {
+        "BRCA": 0.0,
+        "HCC_J": 0.14004,
+        "HEALTHY": 0.859959,
+        "LUAD": 0.0,
+        "PAAD": 0.0
+      },
+      "risk_tier": "low",
+      "risk_tier_thresholds": {
+        "low_max": 0.6252,
+        "medium_max": 0.9096,
+        "high_min": 0.9096,
+        "source": "results/sens_at_spec.json (spec=0.95, 0.98)"
+      },
+      "model": "binary: LR-no-PCA, C=1000.0; multiclass: LR+PCA(200), C=1.0; per-study harmonize, 5-channel features",
+      "training_n": 545,
+      "training_auc": 0.9566,
+      "is_pooled_oof": true,
+      "research_use_only": true,
+      "disclaimer": "RESEARCH USE ONLY. The pooled out-of-fold score is computed on the same 627-sample cohort used to fit the model. The CI estimates sampling variance, not external-validation uncertainty. Do NOT use this output to guide clinical decisions.",
+      "generated_at": "2026-09-12T13:40:57.700762+00:00",
+      "runtime_seconds": 0.3,
+      "true_class": "HEALTHY",
+      "picked_sample": "CGPLH404"
+    },
+    {
+      "sample_id": "CGPLH384",
+      "source": "labels_multiclass.tsv",
+      "ground_truth_class": "HEALTHY",
+      "p_cancer": 0.0,
+      "p_cancer_class": {
+        "BRCA": 0.0,
+        "HCC_J": 0.140047,
+        "HEALTHY": 0.859948,
+        "LUAD": 3e-06,
+        "PAAD": 2e-06
+      },
+      "risk_tier": "low",
+      "risk_tier_thresholds": {
+        "low_max": 0.6252,
+        "medium_max": 0.9096,
+        "high_min": 0.9096,
+        "source": "results/sens_at_spec.json (spec=0.95, 0.98)"
+      },
+      "model": "binary: LR-no-PCA, C=1000.0; multiclass: LR+PCA(200), C=1.0; per-study harmonize, 5-channel features",
+      "training_n": 545,
+      "training_auc": 0.9566,
+      "is_pooled_oof": true,
+      "research_use_only": true,
+      "disclaimer": "RESEARCH USE ONLY. The pooled out-of-fold score is computed on the same 627-sample cohort used to fit the model. The CI estimates sampling variance, not external-validation uncertainty. Do NOT use this output to guide clinical decisions.",
+      "generated_at": "2026-09-12T13:40:58.863427+00:00",
+      "runtime_seconds": 0.3,
+      "true_class": "HEALTHY",
+      "picked_sample": "CGPLH384"
+    },
+    {
+      "sample_id": "CGPLH194",
+      "source": "labels_multiclass.tsv",
+      "ground_truth_class": "HEALTHY",
+      "p_cancer": 0.0,
+      "p_cancer_class": {
+        "BRCA": 0.0,
+        "HCC_J": 0.140723,
+        "HEALTHY": 0.859271,
+        "LUAD": 4e-06,
+        "PAAD": 2e-06
+      },
+      "risk_tier": "low",
+      "risk_tier_thresholds": {
+        "low_max": 0.6252,
+        "medium_max": 0.9096,
+        "high_min": 0.9096,
+        "source": "results/sens_at_spec.json (spec=0.95, 0.98)"
+      },
+      "model": "binary: LR-no-PCA, C=1000.0; multiclass: LR+PCA(200), C=1.0; per-study harmonize, 5-channel features",
+      "training_n": 545,
+      "training_auc": 0.9566,
+      "is_pooled_oof": true,
+      "research_use_only": true,
+      "disclaimer": "RESEARCH USE ONLY. The pooled out-of-fold score is computed on the same 627-sample cohort used to fit the model. The CI estimates sampling variance, not external-validation uncertainty. Do NOT use this output to guide clinical decisions.",
+      "generated_at": "2026-09-12T13:41:00.029437+00:00",
+      "runtime_seconds": 0.3,
+      "true_class": "HEALTHY",
+      "picked_sample": "CGPLH194"
+    },
+    {
+      "sample_id": "CGPLH315",
+      "source": "labels_multiclass.tsv",
+      "ground_truth_class": "HEALTHY",
+      "p_cancer": 3.5e-05,
+      "p_cancer_class": {
+        "BRCA": 0.000263,
+        "HCC_J": 0.142957,
+        "HEALTHY": 0.856734,
+        "LUAD": 6e-06,
+        "PAAD": 4e-05
+      },
+      "risk_tier": "low",
+      "risk_tier_thresholds": {
+        "low_max": 0.6252,
+        "medium_max": 0.9096,
+        "high_min": 0.9096,
+        "source": "results/sens_at_spec.json (spec=0.95, 0.98)"
+      },
+      "model": "binary: LR-no-PCA, C=1000.0; multiclass: LR+PCA(200), C=1.0; per-study harmonize, 5-channel features",
+      "training_n": 545,
+      "training_auc": 0.9566,
+      "is_pooled_oof": true,
+      "research_use_only": true,
+      "disclaimer": "RESEARCH USE ONLY. The pooled out-of-fold score is computed on the same 627-sample cohort used to fit the model. The CI estimates sampling variance, not external-validation uncertainty. Do NOT use this output to guide clinical decisions.",
+      "generated_at": "2026-09-12T13:41:01.204166+00:00",
+      "runtime_seconds": 0.3,
+      "true_class": "HEALTHY",
+      "picked_sample": "CGPLH315"
+    },
+    {
+      "sample_id": "CGPLH430",
+      "source": "labels_multiclass.tsv",
+      "ground_truth_class": "HEALTHY",
+      "p_cancer": 5.4e-05,
+      "p_cancer_class": {
+        "BRCA": 4e-06,
+        "HCC_J": 0.140813,
+        "HEALTHY": 0.858874,
+        "LUAD": 0.000307,
+        "PAAD": 2e-06
+      },
+      "risk_tier": "low",
+      "risk_tier_thresholds": {
+        "low_max": 0.6252,
+        "medium_max": 0.9096,
+        "high_min": 0.9096,
+        "source": "results/sens_at_spec.json (spec=0.95, 0.98)"
+      },
+      "model": "binary: LR-no-PCA, C=1000.0; multiclass: LR+PCA(200), C=1.0; per-study harmonize, 5-channel features",
+      "training_n": 545,
+      "training_auc": 0.9566,
+      "is_pooled_oof": true,
+      "research_use_only": true,
+      "disclaimer": "RESEARCH USE ONLY. The pooled out-of-fold score is computed on the same 627-sample cohort used to fit the model. The CI estimates sampling variance, not external-validation uncertainty. Do NOT use this output to guide clinical decisions.",
+      "generated_at": "2026-09-12T13:41:02.363609+00:00",
+      "runtime_seconds": 0.3,
+      "true_class": "HEALTHY",
+      "picked_sample": "CGPLH430"
+    },
+    {
+      "sample_id": "CGPLH197",
+      "source": "labels_multiclass.tsv",
+      "ground_truth_class": "HEALTHY",
+      "p_cancer": 0.943867,
+      "p_cancer_class": {
+        "BRCA": 6e-06,
+        "HCC_J": 0.696623,
+        "HEALTHY": 0.30223,
+        "LUAD": 0.001057,
+        "PAAD": 8.4e-05
+      },
+      "risk_tier": "high",
+      "risk_tier_thresholds": {
+        "low_max": 0.6252,
+        "medium_max": 0.9096,
+        "high_min": 0.9096,
+        "source": "results/sens_at_spec.json (spec=0.95, 0.98)"
+      },
+      "model": "binary: LR-no-PCA, C=1000.0; multiclass: LR+PCA(200), C=1.0; per-study harmonize, 5-channel features",
+      "training_n": 545,
+      "training_auc": 0.9566,
+      "is_pooled_oof": true,
+      "research_use_only": true,
+      "disclaimer": "RESEARCH USE ONLY. The pooled out-of-fold score is computed on the same 627-sample cohort used to fit the model. The CI estimates sampling variance, not external-validation uncertainty. Do NOT use this output to guide clinical decisions.",
+      "generated_at": "2026-09-12T13:41:03.533024+00:00",
+      "runtime_seconds": 0.31,
+      "true_class": "HEALTHY",
+      "picked_sample": "CGPLH197"
+    },
+    {
+      "sample_id": "CGPLH346",
+      "source": "labels_multiclass.tsv",
+      "ground_truth_class": "HEALTHY",
+      "p_cancer": 9e-06,
+      "p_cancer_class": {
+        "BRCA": 2.4e-05,
+        "HCC_J": 0.140499,
+        "HEALTHY": 0.85946,
+        "LUAD": 3e-06,
+        "PAAD": 1.4e-05
+      },
+      "risk_tier": "low",
+      "risk_tier_thresholds": {
+        "low_max": 0.6252,
+        "medium_max": 0.9096,
+        "high_min": 0.9096,
+        "source": "results/sens_at_spec.json (spec=0.95, 0.98)"
+      },
+      "model": "binary: LR-no-PCA, C=1000.0; multiclass: LR+PCA(200), C=1.0; per-study harmonize, 5-channel features",
+      "training_n": 545,
+      "training_auc": 0.9566,
+      "is_pooled_oof": true,
+      "research_use_only": true,
+      "disclaimer": "RESEARCH USE ONLY. The pooled out-of-fold score is computed on the same 627-sample cohort used to fit the model. The CI estimates sampling variance, not external-validation uncertainty. Do NOT use this output to guide clinical decisions.",
+      "generated_at": "2026-09-12T13:41:04.712603+00:00",
+      "runtime_seconds": 0.31,
+      "true_class": "HEALTHY",
+      "picked_sample": "CGPLH346"
+    },
+    {
+      "sample_id": "CGPLH435",
+      "source": "labels_multiclass.tsv",
+      "ground_truth_class": "HEALTHY",
+      "p_cancer": 0.0,
+      "p_cancer_class": {
+        "BRCA": 0.0,
+        "HCC_J": 0.140377,
+        "HEALTHY": 0.859603,
+        "LUAD": 0.0,
+        "PAAD": 2e-05
+      },
+      "risk_tier": "low",
+      "risk_tier_thresholds": {
+        "low_max": 0.6252,
+        "medium_max": 0.9096,
+        "high_min": 0.9096,
+        "source": "results/sens_at_spec.json (spec=0.95, 0.98)"
+      },
+      "model": "binary: LR-no-PCA, C=1000.0; multiclass: LR+PCA(200), C=1.0; per-study harmonize, 5-channel features",
+      "training_n": 545,
+      "training_auc": 0.9566,
+      "is_pooled_oof": true,
+      "research_use_only": true,
+      "disclaimer": "RESEARCH USE ONLY. The pooled out-of-fold score is computed on the same 627-sample cohort used to fit the model. The CI estimates sampling variance, not external-validation uncertainty. Do NOT use this output to guide clinical decisions.",
+      "generated_at": "2026-09-12T13:41:05.873969+00:00",
+      "runtime_seconds": 0.31,
+      "true_class": "HEALTHY",
+      "picked_sample": "CGPLH435"
+    },
+    {
+      "sample_id": "CGPLH387",
+      "source": "labels_multiclass.tsv",
+      "ground_truth_class": "HEALTHY",
+      "p_cancer": 7e-05,
+      "p_cancer_class": {
+        "BRCA": 0.000115,
+        "HCC_J": 0.14105,
+        "HEALTHY": 0.858821,
+        "LUAD": 3e-06,
+        "PAAD": 1e-05
+      },
+      "risk_tier": "low",
+      "risk_tier_thresholds": {
+        "low_max": 0.6252,
+        "medium_max": 0.9096,
+        "high_min": 0.9096,
+        "source": "results/sens_at_spec.json (spec=0.95, 0.98)"
+      },
+      "model": "binary: LR-no-PCA, C=1000.0; multiclass: LR+PCA(200), C=1.0; per-study harmonize, 5-channel features",
+      "training_n": 545,
+      "training_auc": 0.9566,
+      "is_pooled_oof": true,
+      "research_use_only": true,
+      "disclaimer": "RESEARCH USE ONLY. The pooled out-of-fold score is computed on the same 627-sample cohort used to fit the model. The CI estimates sampling variance, not external-validation uncertainty. Do NOT use this output to guide clinical decisions.",
+      "generated_at": "2026-09-12T13:41:07.031289+00:00",
+      "runtime_seconds": 0.3,
+      "true_class": "HEALTHY",
+      "picked_sample": "CGPLH387"
+    },
+    {
+      "sample_id": "CGPLH478",
+      "source": "labels_multiclass.tsv",
+      "ground_truth_class": "HEALTHY",
+      "p_cancer": 0.0,
+      "p_cancer_class": {
+        "BRCA": 0.000132,
+        "HCC_J": 0.140366,
+        "HEALTHY": 0.8595,
+        "LUAD": 0.0,
+        "PAAD": 2e-06
+      },
+      "risk_tier": "low",
+      "risk_tier_thresholds": {
+        "low_max": 0.6252,
+        "medium_max": 0.9096,
+        "high_min": 0.9096,
+        "source": "results/sens_at_spec.json (spec=0.95, 0.98)"
+      },
+      "model": "binary: LR-no-PCA, C=1000.0; multiclass: LR+PCA(200), C=1.0; per-study harmonize, 5-channel features",
+      "training_n": 545,
+      "training_auc": 0.9566,
+      "is_pooled_oof": true,
+      "research_use_only": true,
+      "disclaimer": "RESEARCH USE ONLY. The pooled out-of-fold score is computed on the same 627-sample cohort used to fit the model. The CI estimates sampling variance, not external-validation uncertainty. Do NOT use this output to guide clinical decisions.",
+      "generated_at": "2026-09-12T13:41:08.197064+00:00",
+      "runtime_seconds": 0.3,
+      "true_class": "HEALTHY",
+      "picked_sample": "CGPLH478"
+    }
+  ],
+  "research_use_only": true,
+  "disclaimer": "RESEARCH USE ONLY. Pooled OOF on the same 627-sample cohort. Do not use for clinical decisions."
+}
