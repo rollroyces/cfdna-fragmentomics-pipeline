@@ -1,0 +1,113 @@
+{
+  "n_samples": 545,
+  "n_features": 63246,
+  "n_classes": 5,
+  "classes": [
+    "BRCA",
+    "HCC_J",
+    "HEALTHY",
+    "LUAD",
+    "PAAD"
+  ],
+  "class_counts": {
+    "BRCA": 53,
+    "HCC_J": 89,
+    "HEALTHY": 264,
+    "LUAD": 79,
+    "PAAD": 60
+  },
+  "dropped_classes": [
+    {
+      "class": "CRC",
+      "n": 27
+    },
+    {
+      "class": "OTHER_C",
+      "n": 27
+    },
+    {
+      "class": "OV",
+      "n": 28
+    }
+  ],
+  "seeds": [
+    42
+  ],
+  "n_folds": 2,
+  "pca_n": 200,
+  "lr_C": 1.0,
+  "min_class_n": 30,
+  "oof_per_class_auc": {
+    "BRCA": 0.9631845375057525,
+    "HCC_J": 0.9957372363493002,
+    "HEALTHY": 0.9671357705165534,
+    "LUAD": 0.9527625359917422,
+    "PAAD": 0.927319587628866
+  },
+  "per_class_auc_mean_across_seeds": {
+    "BRCA": 0.9631845375057525,
+    "HCC_J": 0.9957372363493002,
+    "HEALTHY": 0.9671357705165534,
+    "LUAD": 0.9527625359917422,
+    "PAAD": 0.927319587628866
+  },
+  "per_class_auc_std_across_seeds": {
+    "BRCA": 0.0,
+    "HCC_J": 0.0,
+    "HEALTHY": 0.0,
+    "LUAD": 0.0,
+    "PAAD": 0.0
+  },
+  "macro_auc_mean": 0.9612279335984428,
+  "macro_auc_std": 0.0,
+  "top2_accuracy_mean": 0.963302752293578,
+  "top2_accuracy_std": 0.0,
+  "binary_cancer_vs_healthy_auc": 0.9673244904561631,
+  "binary_cancer_vs_healthy_auc_std": 0.0,
+  "information_delta_multi_vs_binary": -0.006096556857720259,
+  "confusion_matrix": [
+    [
+      32,
+      0,
+      15,
+      5,
+      1
+    ],
+    [
+      0,
+      85,
+      3,
+      1,
+      0
+    ],
+    [
+      1,
+      4,
+      257,
+      0,
+      2
+    ],
+    [
+      5,
+      0,
+      14,
+      59,
+      1
+    ],
+    [
+      4,
+      0,
+      21,
+      3,
+      32
+    ]
+  ],
+  "confusion_matrix_labels": [
+    "BRCA",
+    "HCC_J",
+    "HEALTHY",
+    "LUAD",
+    "PAAD"
+  ],
+  "runtime_seconds": 23.98
+}

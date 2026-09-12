@@ -19,6 +19,31 @@
       "name": "Fusion @ 95% spec (decision curve)",
       "sens": 0.92,
       "spec": 0.95
+    },
+    {
+      "name": "Sens@95.0% (5-channel pooled OOF, n=627)",
+      "sens": 0.8787878787878788,
+      "spec": 0.95
+    },
+    {
+      "name": "Sens@98.0% (5-channel pooled OOF, n=627)",
+      "sens": 0.8264462809917356,
+      "spec": 0.98
+    },
+    {
+      "name": "Sens@99.0% (5-channel pooled OOF, n=627)",
+      "sens": 0.7741046831955923,
+      "spec": 0.99
+    },
+    {
+      "name": "Sens@99.5% (5-channel pooled OOF, n=627)",
+      "sens": 0.7575757575757576,
+      "spec": 0.995
+    },
+    {
+      "name": "Sens@99.9% (5-channel pooled OOF, n=627)",
+      "sens": 0.6804407713498623,
+      "spec": 0.999
     }
   ],
   "prevalences": [
@@ -288,8 +313,309 @@
       "npv": 0.9965034965034966,
       "fp_per_tp": 1.3043478260869577,
       "nnt": 27.17391304347826
+    },
+    {
+      "operating_point": "Sens@95.0% (5-channel pooled OOF, n=627)",
+      "sens": 0.8787878787878788,
+      "spec": 0.95,
+      "prevalence_label": "US adults 50+ (general pop, age-adjusted)",
+      "prevalence": 0.004,
+      "prevalence_source": "ACS Cancer Statistics 2024, ~0.4% annual incidence in 50+ adults",
+      "ppv": 0.06593156757985671,
+      "npv": 0.9994878459440599,
+      "fp_per_tp": 14.167241379310356,
+      "nnt": 284.48275862068965
+    },
+    {
+      "operating_point": "Sens@95.0% (5-channel pooled OOF, n=627)",
+      "sens": 0.8787878787878788,
+      "spec": 0.95,
+      "prevalence_label": "US adults 50+, age-adjusted, NHW",
+      "prevalence": 0.005,
+      "prevalence_source": "ACS Cancer Statistics 2024, NHW non-Hispanic white, ~0.5% annual incidence",
+      "ppv": 0.08115293129984602,
+      "npv": 0.9993592464738532,
+      "fp_per_tp": 11.32241379310346,
+      "nnt": 227.58620689655174
+    },
+    {
+      "operating_point": "Sens@95.0% (5-channel pooled OOF, n=627)",
+      "sens": 0.8787878787878788,
+      "spec": 0.95,
+      "prevalence_label": "Heavy smokers 50-80 (NLST cohort)",
+      "prevalence": 0.015,
+      "prevalence_source": "National Lung Screening Trial, ~1.5% lung cancer per year",
+      "ppv": 0.21113942482708395,
+      "npv": 0.9980607470971808,
+      "fp_per_tp": 3.7362068965517277,
+      "nnt": 75.86206896551724
+    },
+    {
+      "operating_point": "Sens@95.0% (5-channel pooled OOF, n=627)",
+      "sens": 0.8787878787878788,
+      "spec": 0.95,
+      "prevalence_label": "High-risk surveillance (post-diagnosis MRD-like)",
+      "prevalence": 0.025,
+      "prevalence_source": "Surveillance cohort (typical MRD program, 2-3%)",
+      "ppv": 0.31065881092662007,
+      "npv": 0.9967390861288876,
+      "fp_per_tp": 2.218965517241381,
+      "nnt": 45.51724137931034
+    },
+    {
+      "operating_point": "Sens@95.0% (5-channel pooled OOF, n=627)",
+      "sens": 0.8787878787878788,
+      "spec": 0.95,
+      "prevalence_label": "High-risk surveillance (upper bound, BRCA carriers)",
+      "prevalence": 0.04,
+      "prevalence_source": "BRCA-carrier surveillance cohorts, ~3-4% annual cancer incidence",
+      "ppv": 0.42274052478134083,
+      "npv": 0.994711792702274,
+      "fp_per_tp": 1.3655172413793117,
+      "nnt": 28.448275862068968
+    },
+    {
+      "operating_point": "Sens@98.0% (5-channel pooled OOF, n=627)",
+      "sens": 0.8264462809917356,
+      "spec": 0.98,
+      "prevalence_label": "US adults 50+ (general pop, age-adjusted)",
+      "prevalence": 0.004,
+      "prevalence_source": "ACS Cancer Statistics 2024, ~0.4% annual incidence in 50+ adults",
+      "ppv": 0.14233254575991336,
+      "npv": 0.9992892780486419,
+      "fp_per_tp": 6.025800000000005,
+      "nnt": 302.49999999999994
+    },
+    {
+      "operating_point": "Sens@98.0% (5-channel pooled OOF, n=627)",
+      "sens": 0.8264462809917356,
+      "spec": 0.98,
+      "prevalence_label": "US adults 50+, age-adjusted, NHW",
+      "prevalence": 0.005,
+      "prevalence_source": "ACS Cancer Statistics 2024, NHW non-Hispanic white, ~0.5% annual incidence",
+      "ppv": 0.1719453901440901,
+      "npv": 0.999110863470122,
+      "fp_per_tp": 4.815800000000005,
+      "nnt": 242.0
+    },
+    {
+      "operating_point": "Sens@98.0% (5-channel pooled OOF, n=627)",
+      "sens": 0.8264462809917356,
+      "spec": 0.98,
+      "prevalence_label": "Heavy smokers 50-80 (NLST cohort)",
+      "prevalence": 0.015,
+      "prevalence_source": "National Lung Screening Trial, ~1.5% lung cancer per year",
+      "ppv": 0.38622962638720787,
+      "npv": 0.997310365850014,
+      "fp_per_tp": 1.5891333333333346,
+      "nnt": 80.66666666666667
+    },
+    {
+      "operating_point": "Sens@98.0% (5-channel pooled OOF, n=627)",
+      "sens": 0.8264462809917356,
+      "spec": 0.98,
+      "prevalence_label": "High-risk surveillance (post-diagnosis MRD-like)",
+      "prevalence": 0.025,
+      "prevalence_source": "Surveillance cohort (typical MRD program, 2-3%)",
+      "ppv": 0.5144562197756969,
+      "npv": 0.9954796130548775,
+      "fp_per_tp": 0.9438000000000009,
+      "nnt": 48.4
+    },
+    {
+      "operating_point": "Sens@98.0% (5-channel pooled OOF, n=627)",
+      "sens": 0.8264462809917356,
+      "spec": 0.98,
+      "prevalence_label": "High-risk surveillance (upper bound, BRCA carriers)",
+      "prevalence": 0.04,
+      "prevalence_source": "BRCA-carrier surveillance cohorts, ~3-4% annual cancer incidence",
+      "ppv": 0.6325910931174087,
+      "npv": 0.9926750659244067,
+      "fp_per_tp": 0.5808000000000004,
+      "nnt": 30.25
+    },
+    {
+      "operating_point": "Sens@99.0% (5-channel pooled OOF, n=627)",
+      "sens": 0.7741046831955923,
+      "spec": 0.99,
+      "prevalence_label": "US adults 50+ (general pop, age-adjusted)",
+      "prevalence": 0.004,
+      "prevalence_source": "ACS Cancer Statistics 2024, ~0.4% annual incidence in 50+ adults",
+      "ppv": 0.23715681889152382,
+      "npv": 0.9990844651261043,
+      "fp_per_tp": 3.216619217081853,
+      "nnt": 322.95373665480423
+    },
+    {
+      "operating_point": "Sens@99.0% (5-channel pooled OOF, n=627)",
+      "sens": 0.7741046831955923,
+      "spec": 0.99,
+      "prevalence_label": "US adults 50+, age-adjusted, NHW",
+      "prevalence": 0.005,
+      "prevalence_source": "ACS Cancer Statistics 2024, NHW non-Hispanic white, ~0.5% annual incidence",
+      "ppv": 0.28005621057037766,
+      "npv": 0.9988546946972224,
+      "fp_per_tp": 2.5707117437722444,
+      "nnt": 258.3629893238434
+    },
+    {
+      "operating_point": "Sens@99.0% (5-channel pooled OOF, n=627)",
+      "sens": 0.7741046831955923,
+      "spec": 0.99,
+      "prevalence_label": "Heavy smokers 50-80 (NLST cohort)",
+      "prevalence": 0.015,
+      "prevalence_source": "National Lung Screening Trial, ~1.5% lung cancer per year",
+      "ppv": 0.5410401062826113,
+      "npv": 0.996537254287576,
+      "fp_per_tp": 0.8482918149466199,
+      "nnt": 86.12099644128114
+    },
+    {
+      "operating_point": "Sens@99.0% (5-channel pooled OOF, n=627)",
+      "sens": 0.7741046831955923,
+      "spec": 0.99,
+      "prevalence_label": "High-risk surveillance (post-diagnosis MRD-like)",
+      "prevalence": 0.025,
+      "prevalence_source": "Surveillance cohort (typical MRD program, 2-3%)",
+      "ppv": 0.6649785834299641,
+      "npv": 0.9941833369628365,
+      "fp_per_tp": 0.503807829181495,
+      "nnt": 51.672597864768676
+    },
+    {
+      "operating_point": "Sens@99.0% (5-channel pooled OOF, n=627)",
+      "sens": 0.7741046831955923,
+      "spec": 0.99,
+      "prevalence_label": "High-risk surveillance (upper bound, BRCA carriers)",
+      "prevalence": 0.04,
+      "prevalence_source": "BRCA-carrier surveillance cohorts, ~3-4% annual cancer incidence",
+      "ppv": 0.7633380419428446,
+      "npv": 0.9905821603146018,
+      "fp_per_tp": 0.31003558718861235,
+      "nnt": 32.295373665480426
+    },
+    {
+      "operating_point": "Sens@99.5% (5-channel pooled OOF, n=627)",
+      "sens": 0.7575757575757576,
+      "spec": 0.995,
+      "prevalence_label": "US adults 50+ (general pop, age-adjusted)",
+      "prevalence": 0.004,
+      "prevalence_source": "ACS Cancer Statistics 2024, ~0.4% annual incidence in 50+ adults",
+      "ppv": 0.3783006733751984,
+      "npv": 0.999022472740736,
+      "fp_per_tp": 1.6434000000000015,
+      "nnt": 330.0
+    },
+    {
+      "operating_point": "Sens@99.5% (5-channel pooled OOF, n=627)",
+      "sens": 0.7575757575757576,
+      "spec": 0.995,
+      "prevalence_label": "US adults 50+, age-adjusted, NHW",
+      "prevalence": 0.005,
+      "prevalence_source": "ACS Cancer Statistics 2024, NHW non-Hispanic white, ~0.5% annual incidence",
+      "ppv": 0.43226419987896586,
+      "npv": 0.9987771632173753,
+      "fp_per_tp": 1.3134000000000012,
+      "nnt": 264.0
+    },
+    {
+      "operating_point": "Sens@99.5% (5-channel pooled OOF, n=627)",
+      "sens": 0.7575757575757576,
+      "spec": 0.995,
+      "prevalence_label": "Heavy smokers 50-80 (NLST cohort)",
+      "prevalence": 0.015,
+      "prevalence_source": "National Lung Screening Trial, ~1.5% lung cancer per year",
+      "ppv": 0.6976419701409236,
+      "npv": 0.9963034241843852,
+      "fp_per_tp": 0.43340000000000034,
+      "nnt": 88.0
+    },
+    {
+      "operating_point": "Sens@99.5% (5-channel pooled OOF, n=627)",
+      "sens": 0.7575757575757576,
+      "spec": 0.995,
+      "prevalence_label": "High-risk surveillance (post-diagnosis MRD-like)",
+      "prevalence": 0.025,
+      "prevalence_source": "Surveillance cohort (typical MRD program, 2-3%)",
+      "ppv": 0.7952918721170669,
+      "npv": 0.9937915433059256,
+      "fp_per_tp": 0.25740000000000024,
+      "nnt": 52.8
+    },
+    {
+      "operating_point": "Sens@99.5% (5-channel pooled OOF, n=627)",
+      "sens": 0.7575757575757576,
+      "spec": 0.995,
+      "prevalence_label": "High-risk surveillance (upper bound, BRCA carriers)",
+      "prevalence": 0.04,
+      "prevalence_source": "BRCA-carrier surveillance cohorts, ~3-4% annual cancer incidence",
+      "ppv": 0.8632596685082872,
+      "npv": 0.9899502537560927,
+      "fp_per_tp": 0.15840000000000012,
+      "nnt": 33.0
+    },
+    {
+      "operating_point": "Sens@99.9% (5-channel pooled OOF, n=627)",
+      "sens": 0.6804407713498623,
+      "spec": 0.999,
+      "prevalence_label": "US adults 50+ (general pop, age-adjusted)",
+      "prevalence": 0.004,
+      "prevalence_source": "ACS Cancer Statistics 2024, ~0.4% annual incidence in 50+ adults",
+      "ppv": 0.7320969687628746,
+      "npv": 0.9987169931699684,
+      "fp_per_tp": 0.365939271255061,
+      "nnt": 367.4089068825911
+    },
+    {
+      "operating_point": "Sens@99.9% (5-channel pooled OOF, n=627)",
+      "sens": 0.6804407713498623,
+      "spec": 0.999,
+      "prevalence_label": "US adults 50+, age-adjusted, NHW",
+      "prevalence": 0.005,
+      "prevalence_source": "ACS Cancer Statistics 2024, NHW non-Hispanic white, ~0.5% annual incidence",
+      "ppv": 0.7737198382393017,
+      "npv": 0.9983951469909081,
+      "fp_per_tp": 0.29245748987854275,
+      "nnt": 293.9271255060729
+    },
+    {
+      "operating_point": "Sens@99.9% (5-channel pooled OOF, n=627)",
+      "sens": 0.6804407713498623,
+      "spec": 0.999,
+      "prevalence_label": "Heavy smokers 50-80 (NLST cohort)",
+      "prevalence": 0.015,
+      "prevalence_source": "National Lung Screening Trial, ~1.5% lung cancer per year",
+      "ppv": 0.911987653090235,
+      "npv": 0.9951523586512407,
+      "fp_per_tp": 0.09650607287449402,
+      "nnt": 97.9757085020243
+    },
+    {
+      "operating_point": "Sens@99.9% (5-channel pooled OOF, n=627)",
+      "sens": 0.6804407713498623,
+      "spec": 0.999,
+      "prevalence_label": "High-risk surveillance (post-diagnosis MRD-like)",
+      "prevalence": 0.025,
+      "prevalence_source": "Surveillance cohort (typical MRD program, 2-3%)",
+      "ppv": 0.9457912290308129,
+      "npv": 0.9918646975774963,
+      "fp_per_tp": 0.05731578947368426,
+      "nnt": 58.78542510121458
+    },
+    {
+      "operating_point": "Sens@99.9% (5-channel pooled OOF, n=627)",
+      "sens": 0.6804407713498623,
+      "spec": 0.999,
+      "prevalence_label": "High-risk surveillance (upper bound, BRCA carriers)",
+      "prevalence": 0.04,
+      "prevalence_source": "BRCA-carrier surveillance cohorts, ~3-4% annual cancer incidence",
+      "ppv": 0.96593042172444,
+      "npv": 0.9868470107791014,
+      "fp_per_tp": 0.03527125506072878,
+      "nnt": 36.740890688259114
     }
   ],
+  "sens_at_specificity_source": "results/sens_at_spec.json",
   "interpretation": {
     "at_sens95_spec95_prev04_pct": 6.811377245508976,
     "at_sens95_spec95_prev04_fp_per_tp": 13.681318681318693,

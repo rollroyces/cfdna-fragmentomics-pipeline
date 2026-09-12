@@ -14,7 +14,6 @@ from __future__ import annotations
 import argparse
 import json
 import os
-import sys
 
 
 def ppv(sens: float, spec: float, prev: float) -> float:
@@ -40,6 +39,13 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default="/tmp/ppv_screening.json",
                     help="output JSON path")
+    ap.add_argument("--sens-json",
+                    default="results/sens_at_spec.json",
+                    help="path to sens_at_spec.json produced by "
+                         "scripts/sens_at_specificity.py; if present, "
+                         "the new high-specificity operating points "
+                         "(95/98/99/99.5/99.9%%) are appended to the "
+                         "output JSON and printed as a separate table")
     args = ap.parse_args()
 
     # Operating points from RESULTS.md Section 4 and the headline
@@ -80,6 +86,33 @@ def main():
          "source": "BRCA-carrier surveillance cohorts, ~3-4% annual "
                    "cancer incidence"},
     ]
+
+    # === Optional: load sens@spec from sens_at_specificity.py output ===
+    sens_spec_path = args.sens_json
+    sens_spec_data = None
+    if os.path.exists(sens_spec_path):
+        try:
+            with open(sens_spec_path) as f:
+                sens_spec_data = json.load(f)
+            print(f"\nLoaded sens@spec data from {sens_spec_path} "
+                  f"(N={sens_spec_data.get('pooled_oof', {}).get('n', '?')}, "
+                  f"AUC={sens_spec_data.get('pooled_oof', {}).get('auc_mean', '?'):.4f})"
+                  if isinstance(sens_spec_data.get('pooled_oof', {}).get('auc_mean'), (int, float))
+                  else f"\nLoaded sens@spec data from {sens_spec_path}")
+            # Add each new operating point to the points list so PPV is
+            # computed at the same realistic prevalences as the legacy
+            # operating points.
+            for r in sens_spec_data.get("per_specificity", []):
+                points.append({
+                    "name": f"Sens@{r['specificity']*100:.1f}% "
+                            f"(5-channel pooled OOF, n="
+                            f"{sens_spec_data.get('pooled_oof', {}).get('n', '?')})",
+                    "sens": r["sensitivity"],
+                    "spec": r["specificity"],
+                })
+        except (json.JSONDecodeError, KeyError) as e:
+            print(f"WARNING: could not parse {sens_spec_path}: {e}")
+            sens_spec_data = None
 
     rows = []
     for pt in points:
@@ -140,11 +173,47 @@ def main():
     print("would see. Sensitivity gains have diminishing returns when")
     print("specificity is the limiting factor.")
 
+    # === Print sens@spec table from sens_at_specificity.py (if loaded) ===
+    if sens_spec_data is not None:
+        print("\n" + "=" * 110)
+        print("SENSITIVITY AT HIGH SPECIFICITY (from sens_at_specificity.py, "
+              "pooled 5-seed 5-fold OOF):")
+        print("=" * 110)
+        print(f"{'Specificity':>11} {'Sens':>8} {'CI95 lo':>9} {'CI95 hi':>9} "
+              f"{'Threshold':>11}  {'PPV@0.4%':>10}  {'FPs/TP':>8}")
+        print("-" * 110)
+        for r in sens_spec_data["per_specificity"]:
+            spec = r["specificity"]
+            sens = r["sensitivity"]
+            # PPV at 0.4% prevalence for this operating point
+            new_row = next(
+                (x for x in rows
+                 if x["operating_point"].startswith(f"Sens@{spec*100:.1f}%")
+                 and x["prevalence"] == 0.004),
+                None)
+            if new_row:
+                ppv_str = f"{new_row['ppv']*100:.1f}%"
+                fp_str = f"{new_row['fp_per_tp']:.1f}"
+            else:
+                ppv_str = "n/a"; fp_str = "n/a"
+            print(f"{spec*100:>10.2f}% {sens*100:>7.2f}% "
+                  f"{r['ci95_lo']*100:>8.2f}% {r['ci95_hi']*100:>8.2f}% "
+                  f"{r['operating_threshold']:>11.4f}  {ppv_str:>10}  {fp_str:>8}")
+        print("=" * 110)
+        print(f"Pooled OOF N = {sens_spec_data['pooled_oof']['n']}, "
+              f"AUC = {sens_spec_data['pooled_oof']['auc_mean']:.4f} "
+              f"+/- {sens_spec_data['pooled_oof']['auc_std']:.4f}")
+        print("These numbers are pooled OOF on the SAME cohort -- not "
+              "external validation. See BENCHMARK_published.md for the "
+              "comparison with Galleri / Shield / CancerSEEK.")
+
     # Save JSON
     out = {
         "operating_points": points,
         "prevalences": prevalences,
         "results": rows,
+        "sens_at_specificity_source": (
+            sens_spec_path if sens_spec_data is not None else None),
         "interpretation": {
             "at_sens95_spec95_prev04_pct": r95_04["ppv"] * 100,
             "at_sens95_spec95_prev04_fp_per_tp": r95_04["fp_per_tp"],

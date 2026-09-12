@@ -1,0 +1,89 @@
+{
+  "cohort": {
+    "n_total": 627,
+    "n_cancer": 363,
+    "n_healthy": 264,
+    "studies": [
+      "cristiano",
+      "jiang"
+    ],
+    "features_dir": "data/features",
+    "labels_file": "labels_cross_study.tsv"
+  },
+  "config": {
+    "seeds": [
+      42,
+      13,
+      7,
+      99,
+      1234
+    ],
+    "n_bootstrap": 1000,
+    "bootstrap_seed": 2026,
+    "pca_n": 200,
+    "harmonize": true,
+    "cv_folds": 5,
+    "classifier": "LogisticRegression(max_iter=2000)",
+    "feature_set": "5-channel (5mb_ratio + 5mb_coverage + 100kb_ratio + 100kb_counts + FSD-196)"
+  },
+  "pooled_oof": {
+    "n": 627,
+    "auc_mean": 0.9725895316804408,
+    "auc_std": 0.0021968276556340225,
+    "score_pooling": "mean_across_seeds",
+    "in_sample": false,
+    "external_validation": false
+  },
+  "per_specificity": [
+    {
+      "specificity": 0.95,
+      "sensitivity": 0.8842975206611571,
+      "ci95_lo": 0.8203001829954955,
+      "ci95_hi": 0.9364173825567655,
+      "operating_threshold": 0.6036429530442342,
+      "n_fpr_points_at_or_below": 25,
+      "n_bootstrap": 1000
+    },
+    {
+      "specificity": 0.98,
+      "sensitivity": 0.8154269972451791,
+      "ci95_lo": 0.7646854575163399,
+      "ci95_hi": 0.8888888888888888,
+      "operating_threshold": 0.941158167237778,
+      "n_fpr_points_at_or_below": 11,
+      "n_bootstrap": 1000
+    },
+    {
+      "specificity": 0.99,
+      "sensitivity": 0.8071625344352618,
+      "ci95_lo": 0.6409335106382978,
+      "ci95_hi": 0.847047041455532,
+      "operating_threshold": 0.9662475492158572,
+      "n_fpr_points_at_or_below": 7,
+      "n_bootstrap": 1000
+    },
+    {
+      "specificity": 0.995,
+      "sensitivity": 0.7410468319559229,
+      "ci95_lo": 0.6264187192118226,
+      "ci95_hi": 0.8433454421614258,
+      "operating_threshold": 0.9946293429382536,
+      "n_fpr_points_at_or_below": 5,
+      "n_bootstrap": 1000
+    },
+    {
+      "specificity": 0.999,
+      "sensitivity": 0.6556473829201102,
+      "ci95_lo": 0.6126726486892793,
+      "ci95_hi": 0.826208750103904,
+      "operating_threshold": 0.9989539196963756,
+      "n_fpr_points_at_or_below": 3,
+      "n_bootstrap": 1000
+    }
+  ],
+  "interpretation": {
+    "honest_framing": "All numbers are pooled out-of-fold on the same 627-sample cohort (5-seed x 5-fold CV). This is the standard ML benchmark protocol but does NOT replace external validation on an independent cohort.",
+    "specificity_choice": "spec=0.999 is the most stringent clinically-actionable operating point; spec=0.95 is a relaxed screening operating point. spec=0.99 matches Galleri / CancerSEEK's headline specificity."
+  },
+  "generated_at": "2026-09-12T10:28:38.743805+00:00"
+}
