@@ -43,7 +43,7 @@ the bootstrap CIs already absorb this).
    A 6–10× cohort-size gap means our CIs are wider, and a positive
    result is more likely to be fragile on external validation.
 
-2. **No external validation.** The 79.6% / 85.1% Sens@99% numbers
+2. **No external validation.** The 75.5% / 84.3% Sens@99% numbers
    above are **pooled out-of-fold** predictions on the same 627
    samples the model was trained on (5-seed × 5-fold CV, with
    per-fold harmonization). This is the standard ML benchmark
