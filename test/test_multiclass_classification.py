@@ -106,6 +106,9 @@ def test_script_help():
 def test_script_quick_runs(tmp_path):
     """Run the --quick path; should complete in <120s and emit a valid JSON."""
     out = tmp_path / "smoke.json"
+    feat_dir = os.path.join(REPO_ROOT, "data", "features")
+    if not os.path.isdir(feat_dir):
+        pytest.skip(f"data dir not found: {feat_dir} (gitignored; CI provides synthetic only)")
     r = subprocess.run(
         [sys.executable, SCRIPT, "--quick", "--out", str(out)],
         capture_output=True, text=True, timeout=300,
@@ -126,6 +129,9 @@ def test_script_quick_runs(tmp_path):
 @pytest.fixture(scope="module")
 def smoke_results():
     """Run --quick once, share across tests."""
+    feat_dir = os.path.join(REPO_ROOT, "data", "features")
+    if not os.path.isdir(feat_dir):
+        pytest.skip(f"data dir not found: {feat_dir} (gitignored; CI provides synthetic only)")
     if not os.path.exists(SMOKE_OUT):
         r = subprocess.run(
             [sys.executable, SCRIPT, "--quick", "--out", SMOKE_OUT],

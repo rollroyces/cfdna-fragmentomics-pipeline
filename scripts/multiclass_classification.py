@@ -285,6 +285,11 @@ def main(argv: list[str] | None = None) -> int:
 
     X, y_multi, y_bin, classes, cls_to_int, _sample_ids = load_cohort_5ch(
         labels_multiclass, keep=keep, feat_dir=args.features_dir)
+    if X.shape[0] == 0 or len(X.shape) < 2:
+        print(f"ERROR: No features found in {args.features_dir}")
+        print(f"  Check that data/features/ contains the 627-sample cfDNA feature cache.")
+        print(f"  See USAGE.md for instructions on regenerating features via fetch_finaledb.py")
+        return 2
     print(f"Final cohort: {X.shape[0]} samples × {X.shape[1]} features, "
           f"{len(classes)} classes ({classes})")
 
