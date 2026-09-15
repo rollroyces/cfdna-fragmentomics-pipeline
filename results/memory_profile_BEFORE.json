@@ -1,0 +1,22 @@
+{
+  "honest_benchmark_quick": {
+    "exit_code": 0,
+    "peak_rss_mb": 3244.23,
+    "duration_s": 345.22
+  },
+  "multiclass_classification_quick": {
+    "exit_code": 0,
+    "peak_rss_mb": 1479.69,
+    "duration_s": 23.26
+  },
+  "tissue_of_origin_quick": {
+    "exit_code": 0,
+    "peak_rss_mb": 1000.97,
+    "duration_s": 16.07
+  },
+  "score_single_sample_quick": {
+    "exit_code": 0,
+    "peak_rss_mb": 708.19,
+    "duration_s": 2.42
+  }
+}

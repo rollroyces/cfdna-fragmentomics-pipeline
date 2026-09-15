@@ -1,0 +1,126 @@
+{
+  "n_samples": 336,
+  "n_features": 63246,
+  "n_classes": 6,
+  "classes": [
+    "BRCA",
+    "CRC",
+    "HCC_J",
+    "LUAD",
+    "OV",
+    "PAAD"
+  ],
+  "class_counts": {
+    "BRCA": 53,
+    "CRC": 27,
+    "HCC_J": 89,
+    "LUAD": 79,
+    "OV": 28,
+    "PAAD": 60
+  },
+  "dropped_classes": [],
+  "seeds": [
+    42,
+    13,
+    7,
+    99,
+    1234
+  ],
+  "n_folds": 5,
+  "pca_n": 200,
+  "lr_C": 1.0,
+  "min_class_n": 25,
+  "cancer_only": true,
+  "per_class_auc": {
+    "BRCA": 0.9424628308553904,
+    "CRC": 0.9544528347117344,
+    "HCC_J": 0.9999545103034162,
+    "LUAD": 0.950647687533862,
+    "OV": 0.9272959183673469,
+    "PAAD": 0.9790458937198068
+  },
+  "macro_auc_mean": 0.9532581192068766,
+  "macro_auc_std": 0.002161221708292671,
+  "top1_accuracy_pooled_oof": 0.8482142857142857,
+  "top2_accuracy_pooled_oof": 0.9166666666666666,
+  "top1_accuracy_mean": 0.8339285714285714,
+  "top1_accuracy_std": 0.011040022018447278,
+  "top2_accuracy_mean": 0.9255952380952381,
+  "top2_accuracy_std": 0.007760955244288875,
+  "per_class_auc_mean_across_seeds": {
+    "BRCA": 0.9370891392759517,
+    "CRC": 0.9466858444204723,
+    "HCC_J": 0.9999454123640994,
+    "LUAD": 0.9450475299216865,
+    "OV": 0.913474025974026,
+    "PAAD": 0.9773067632850241
+  },
+  "per_class_auc_std_across_seeds": {
+    "BRCA": 0.008249520274129854,
+    "CRC": 0.012487510488472632,
+    "HCC_J": 6.68559271105181e-05,
+    "LUAD": 0.0037461266681865953,
+    "OV": 0.0056794039018973315,
+    "PAAD": 0.0017980167530383111
+  },
+  "confusion_matrix": [
+    [
+      46,
+      1,
+      0,
+      3,
+      2,
+      1
+    ],
+    [
+      2,
+      16,
+      0,
+      5,
+      2,
+      2
+    ],
+    [
+      0,
+      0,
+      89,
+      0,
+      0,
+      0
+    ],
+    [
+      5,
+      0,
+      0,
+      72,
+      1,
+      1
+    ],
+    [
+      11,
+      2,
+      1,
+      3,
+      10,
+      1
+    ],
+    [
+      4,
+      1,
+      0,
+      3,
+      0,
+      52
+    ]
+  ],
+  "confusion_matrix_labels": [
+    "BRCA",
+    "CRC",
+    "HCC_J",
+    "LUAD",
+    "OV",
+    "PAAD"
+  ],
+  "cristiano_only_ablation": null,
+  "runtime_seconds": 26.99
+}

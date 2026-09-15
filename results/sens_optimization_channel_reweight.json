@@ -1,0 +1,110 @@
+{
+  "cohort": {
+    "n_total": 627,
+    "n_cancer": 363,
+    "n_healthy": 264,
+    "studies": [
+      "cristiano",
+      "jiang"
+    ]
+  },
+  "config": {
+    "seeds": [
+      42,
+      13,
+      7,
+      99,
+      1234
+    ],
+    "n_bootstrap": 1000,
+    "bootstrap_seed": 2026,
+    "pca_n": 200,
+    "specificities": [
+      0.95,
+      0.98,
+      0.99,
+      0.995,
+      0.999
+    ],
+    "techniques": [
+      "channel_reweight"
+    ]
+  },
+  "techniques": {
+    "channel_reweight": {
+      "auc_mean": 0.974513732364972,
+      "auc_std": 0.002912930979264387,
+      "per_specificity": [
+        {
+          "specificity": 0.95,
+          "sensitivity": 0.8898071625344353,
+          "ci95_lo": 0.8313841040847605,
+          "ci95_hi": 0.9398907103825137
+        },
+        {
+          "specificity": 0.98,
+          "sensitivity": 0.8292011019283747,
+          "ci95_lo": 0.7587059824682952,
+          "ci95_hi": 0.8864490265693886
+        },
+        {
+          "specificity": 0.99,
+          "sensitivity": 0.7851239669421488,
+          "ci95_lo": 0.6908999739515499,
+          "ci95_hi": 0.8551835873511938
+        },
+        {
+          "specificity": 0.995,
+          "sensitivity": 0.7851239669421488,
+          "ci95_lo": 0.6685079088776205,
+          "ci95_hi": 0.83760907504363
+        },
+        {
+          "specificity": 0.999,
+          "sensitivity": 0.7024793388429752,
+          "ci95_lo": 0.6610419933990309,
+          "ci95_hi": 0.8247580928923293
+        }
+      ],
+      "per_specificity_optimized": [
+        {
+          "specificity": 0.95,
+          "sensitivity_standard": 0.8898071625344353,
+          "sensitivity_optimized": 0.8898071625344353,
+          "operating_threshold_optimized": 0.6799046467504624,
+          "sensitivity_gain": 0.0
+        },
+        {
+          "specificity": 0.98,
+          "sensitivity_standard": 0.8292011019283747,
+          "sensitivity_optimized": 0.8292011019283747,
+          "operating_threshold_optimized": 0.9172909582462303,
+          "sensitivity_gain": 0.0
+        },
+        {
+          "specificity": 0.99,
+          "sensitivity_standard": 0.7851239669421488,
+          "sensitivity_optimized": 0.7851239669421488,
+          "operating_threshold_optimized": 0.9830078349014846,
+          "sensitivity_gain": 0.0
+        },
+        {
+          "specificity": 0.995,
+          "sensitivity_standard": 0.7851239669421488,
+          "sensitivity_optimized": 0.7851239669421488,
+          "operating_threshold_optimized": 0.9830078349014846,
+          "sensitivity_gain": 0.0
+        },
+        {
+          "specificity": 0.999,
+          "sensitivity_standard": 0.7024793388429752,
+          "sensitivity_optimized": 0.7024793388429752,
+          "operating_threshold_optimized": 0.9978058148986028,
+          "sensitivity_gain": 0.0
+        }
+      ]
+    }
+  },
+  "generated_at": "2026-09-15T15:00:16.598534+00:00",
+  "wall_seconds": 626.0
+}

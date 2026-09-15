@@ -1,0 +1,117 @@
+{
+  "n_samples": 545,
+  "n_features": 63246,
+  "n_classes": 5,
+  "classes": [
+    "BRCA",
+    "HCC_J",
+    "HEALTHY",
+    "LUAD",
+    "PAAD"
+  ],
+  "class_counts": {
+    "BRCA": 53,
+    "HCC_J": 89,
+    "HEALTHY": 264,
+    "LUAD": 79,
+    "PAAD": 60
+  },
+  "dropped_classes": [
+    {
+      "class": "CRC",
+      "n": 27
+    },
+    {
+      "class": "OTHER_C",
+      "n": 27
+    },
+    {
+      "class": "OV",
+      "n": 28
+    }
+  ],
+  "seeds": [
+    42,
+    13,
+    7,
+    99,
+    1234
+  ],
+  "n_folds": 5,
+  "pca_n": 200,
+  "lr_C": 1.0,
+  "min_class_n": 30,
+  "oof_per_class_auc": {
+    "BRCA": 0.9723884031293143,
+    "HCC_J": 0.9960082791247783,
+    "HEALTHY": 0.9759786476868328,
+    "LUAD": 0.9746563807247243,
+    "PAAD": 0.9482474226804124
+  },
+  "per_class_auc_mean_across_seeds": {
+    "BRCA": 0.9712072403742905,
+    "HCC_J": 0.9955401143307707,
+    "HEALTHY": 0.9722204248894639,
+    "LUAD": 0.9675205085022002,
+    "PAAD": 0.9451408934707903
+  },
+  "per_class_auc_std_across_seeds": {
+    "BRCA": 0.002149950468460573,
+    "HCC_J": 0.0006863980030151964,
+    "HEALTHY": 0.0031553027616798117,
+    "LUAD": 0.00484075709542236,
+    "PAAD": 0.00217952871372814
+  },
+  "macro_auc_mean": 0.9703258363135031,
+  "macro_auc_std": 0.0011615858559414695,
+  "top2_accuracy_mean": 0.973211009174312,
+  "top2_accuracy_std": 0.006826082656050721,
+  "binary_cancer_vs_healthy_auc": 0.9711743772241995,
+  "binary_cancer_vs_healthy_auc_std": 0.0018171234184104277,
+  "information_delta_multi_vs_binary": -0.0008485409106964159,
+  "confusion_matrix": [
+    [
+      39,
+      0,
+      7,
+      5,
+      2
+    ],
+    [
+      0,
+      86,
+      1,
+      2,
+      0
+    ],
+    [
+      1,
+      2,
+      258,
+      0,
+      3
+    ],
+    [
+      4,
+      0,
+      10,
+      64,
+      1
+    ],
+    [
+      1,
+      0,
+      20,
+      3,
+      36
+    ]
+  ],
+  "confusion_matrix_labels": [
+    "BRCA",
+    "HCC_J",
+    "HEALTHY",
+    "LUAD",
+    "PAAD"
+  ],
+  "runtime_seconds": 59.63
+}

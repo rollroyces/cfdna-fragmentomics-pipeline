@@ -1,0 +1,17 @@
+{
+  "multiclass_classification_quick": {
+    "exit_code": 0,
+    "peak_rss_mb": 1843.88,
+    "duration_s": 9.9
+  },
+  "tissue_of_origin_quick": {
+    "exit_code": 0,
+    "peak_rss_mb": 999.38,
+    "duration_s": 4.82
+  },
+  "score_single_sample_quick": {
+    "exit_code": 0,
+    "peak_rss_mb": 707.84,
+    "duration_s": 1.74
+  }
+}
