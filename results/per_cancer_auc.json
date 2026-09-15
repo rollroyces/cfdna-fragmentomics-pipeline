@@ -1,0 +1,158 @@
+{
+  "cohort": {
+    "n_total": 627,
+    "n_features": 63246,
+    "classes": [
+      "BRCA",
+      "CRC",
+      "HCC_J",
+      "HEALTHY",
+      "LUAD",
+      "OTHER_C",
+      "OV",
+      "PAAD"
+    ],
+    "class_counts": {
+      "BRCA": 53,
+      "CRC": 27,
+      "HCC_J": 89,
+      "HEALTHY": 264,
+      "LUAD": 79,
+      "OTHER_C": 27,
+      "OV": 28,
+      "PAAD": 60
+    }
+  },
+  "config": {
+    "seeds": [
+      42,
+      13,
+      7,
+      99,
+      1234
+    ],
+    "n_folds": 5,
+    "pca_n": 200,
+    "lr_C": 1.0,
+    "n_bootstrap": 1000,
+    "bootstrap_seed": 2026
+  },
+  "per_cancer": {
+    "BRCA": {
+      "n_samples": 627,
+      "n_positive": 53,
+      "auc_pooled": 0.9532246400631122,
+      "auc_seed_mean": 0.9480770495036486,
+      "auc_seed_std": 0.00998802260242425,
+      "auc_ci95_lo": 0.9302270109988622,
+      "auc_ci95_hi": 0.9728730819331904,
+      "sens_at_99pct_pooled": 0.41509433962264153,
+      "sens_at_99pct_seed_mean": 0.39622641509433965,
+      "sens_at_99pct_ci95_lo": 0.2553087192323738,
+      "sens_at_99pct_ci95_hi": 0.6041787790697674,
+      "small_n_flag": false
+    },
+    "CRC": {
+      "n_samples": 627,
+      "n_positive": 27,
+      "auc_pooled": 0.9742592592592592,
+      "auc_seed_mean": 0.969358024691358,
+      "auc_seed_std": 0.007322517692425937,
+      "auc_ci95_lo": 0.9502556918868381,
+      "auc_ci95_hi": 0.9904029446806762,
+      "sens_at_99pct_pooled": 0.5185185185185185,
+      "sens_at_99pct_seed_mean": 0.5703703703703704,
+      "sens_at_99pct_ci95_lo": 0.32142857142857145,
+      "sens_at_99pct_ci95_hi": 0.7666666666666667,
+      "small_n_flag": true
+    },
+    "HCC_J": {
+      "n_samples": 627,
+      "n_positive": 89,
+      "auc_pooled": 0.9969090681258093,
+      "auc_seed_mean": 0.9958648343845287,
+      "auc_seed_std": 0.0009582402264264029,
+      "auc_ci95_lo": 0.9936173493775782,
+      "auc_ci95_hi": 0.9993158571459657,
+      "sens_at_99pct_pooled": 0.9438202247191011,
+      "sens_at_99pct_seed_mean": 0.9213483146067414,
+      "sens_at_99pct_ci95_lo": 0.8823238206173558,
+      "sens_at_99pct_ci95_hi": 0.9879553930005737,
+      "small_n_flag": false
+    },
+    "HEALTHY": {
+      "n_samples": 627,
+      "n_positive": 264,
+      "auc_pooled": 0.9698013189748727,
+      "auc_seed_mean": 0.9658339594290007,
+      "auc_seed_std": 0.0025627077954401066,
+      "auc_ci95_lo": 0.9576316410423346,
+      "auc_ci95_hi": 0.9807895261586578,
+      "sens_at_99pct_pooled": 0.32196969696969696,
+      "sens_at_99pct_seed_mean": 0.271969696969697,
+      "sens_at_99pct_ci95_lo": 0.14228189066838082,
+      "sens_at_99pct_ci95_hi": 0.6666988416988416,
+      "small_n_flag": false
+    },
+    "LUAD": {
+      "n_samples": 627,
+      "n_positive": 79,
+      "auc_pooled": 0.9606509285780283,
+      "auc_seed_mean": 0.9564376790169085,
+      "auc_seed_std": 0.006792724701391189,
+      "auc_ci95_lo": 0.9354530774606281,
+      "auc_ci95_hi": 0.9805141193436647,
+      "sens_at_99pct_pooled": 0.5063291139240507,
+      "sens_at_99pct_seed_mean": 0.45822784810126577,
+      "sens_at_99pct_ci95_lo": 0.21686746987951808,
+      "sens_at_99pct_ci95_hi": 0.7000287356321838,
+      "small_n_flag": false
+    },
+    "OTHER_C": {
+      "n_samples": 627,
+      "n_positive": 27,
+      "auc_pooled": 0.9541358024691358,
+      "auc_seed_mean": 0.9438148148148148,
+      "auc_seed_std": 0.009123815960453805,
+      "auc_ci95_lo": 0.9161790664371753,
+      "auc_ci95_hi": 0.9819940520246119,
+      "sens_at_99pct_pooled": 0.4074074074074074,
+      "sens_at_99pct_seed_mean": 0.4518518518518519,
+      "sens_at_99pct_ci95_lo": 0.19226190476190477,
+      "sens_at_99pct_ci95_hi": 0.6923076923076923,
+      "small_n_flag": true
+    },
+    "OV": {
+      "n_samples": 627,
+      "n_positive": 28,
+      "auc_pooled": 0.9545671357023611,
+      "auc_seed_mean": 0.9526591938945863,
+      "auc_seed_std": 0.004397426900654182,
+      "auc_ci95_lo": 0.9296528657584836,
+      "auc_ci95_hi": 0.9744471432428986,
+      "sens_at_99pct_pooled": 0.25,
+      "sens_at_99pct_seed_mean": 0.17142857142857143,
+      "sens_at_99pct_ci95_lo": 0.03330645161290323,
+      "sens_at_99pct_ci95_hi": 0.4483592880978865,
+      "small_n_flag": true
+    },
+    "PAAD": {
+      "n_samples": 627,
+      "n_positive": 60,
+      "auc_pooled": 0.9400940623162845,
+      "auc_seed_mean": 0.9394650205761316,
+      "auc_seed_std": 0.00668209775522933,
+      "auc_ci95_lo": 0.9054282296826464,
+      "auc_ci95_hi": 0.9697212684653582,
+      "sens_at_99pct_pooled": 0.45,
+      "sens_at_99pct_seed_mean": 0.4066666666666666,
+      "sens_at_99pct_ci95_lo": 0.19141910879164994,
+      "sens_at_99pct_ci95_hi": 0.6086956521739131,
+      "small_n_flag": false
+    }
+  },
+  "macro_ovr_auc_pooled": 0.9629552769361078,
+  "min_auc_per_cancer": 0.9400940623162845,
+  "wall_seconds": 749.6,
+  "generated_at": "2026-09-15T14:50:31.531763+00:00"
+}

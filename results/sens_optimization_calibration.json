@@ -1,0 +1,684 @@
+{
+  "cohort": {
+    "n_total": 627,
+    "n_cancer": 363,
+    "n_healthy": 264,
+    "studies": [
+      "cristiano",
+      "jiang"
+    ]
+  },
+  "config": {
+    "seeds": [
+      42,
+      13,
+      7,
+      99,
+      1234
+    ],
+    "n_bootstrap": 1000,
+    "bootstrap_seed": 2026,
+    "pca_n": 200,
+    "specificities": [
+      0.95,
+      0.98,
+      0.99,
+      0.995,
+      0.999
+    ],
+    "techniques": [
+      "baseline_pca200",
+      "baseline_no_pca",
+      "isotonic_pca200",
+      "platt_pca200",
+      "sgd_log",
+      "sgd_hinge",
+      "rf",
+      "channel_reweight"
+    ]
+  },
+  "techniques": {
+    "baseline_pca200_C1.0": {
+      "auc_mean": 0.9742945988813757,
+      "auc_std": 0.002264187935251409,
+      "per_specificity": [
+        {
+          "specificity": 0.95,
+          "sensitivity": 0.9008264462809917,
+          "ci95_lo": 0.8370420963521625,
+          "ci95_hi": 0.9328005487196541
+        },
+        {
+          "specificity": 0.98,
+          "sensitivity": 0.8209366391184573,
+          "ci95_lo": 0.7698309893905749,
+          "ci95_hi": 0.8973152897940434
+        },
+        {
+          "specificity": 0.99,
+          "sensitivity": 0.7988980716253443,
+          "ci95_lo": 0.6545335623678646,
+          "ci95_hi": 0.8563539654733564
+        },
+        {
+          "specificity": 0.995,
+          "sensitivity": 0.7355371900826446,
+          "ci95_lo": 0.639520723662291,
+          "ci95_hi": 0.8443271767810027
+        },
+        {
+          "specificity": 0.999,
+          "sensitivity": 0.6721763085399449,
+          "ci95_lo": 0.6267409470752089,
+          "ci95_hi": 0.8241928974979822
+        }
+      ],
+      "per_specificity_optimized": [
+        {
+          "specificity": 0.95,
+          "sensitivity_standard": 0.9008264462809917,
+          "sensitivity_optimized": 0.9008264462809917,
+          "operating_threshold_optimized": 0.5532909774472623,
+          "sensitivity_gain": 0.0
+        },
+        {
+          "specificity": 0.98,
+          "sensitivity_standard": 0.8209366391184573,
+          "sensitivity_optimized": 0.8209366391184573,
+          "operating_threshold_optimized": 0.9455532400967892,
+          "sensitivity_gain": 0.0
+        },
+        {
+          "specificity": 0.99,
+          "sensitivity_standard": 0.7988980716253443,
+          "sensitivity_optimized": 0.7988980716253443,
+          "operating_threshold_optimized": 0.9666488641337111,
+          "sensitivity_gain": 0.0
+        },
+        {
+          "specificity": 0.995,
+          "sensitivity_standard": 0.7355371900826446,
+          "sensitivity_optimized": 0.7355371900826446,
+          "operating_threshold_optimized": 0.9927275116094518,
+          "sensitivity_gain": 0.0
+        },
+        {
+          "specificity": 0.999,
+          "sensitivity_standard": 0.6721763085399449,
+          "sensitivity_optimized": 0.6721763085399449,
+          "operating_threshold_optimized": 0.9987984863392668,
+          "sensitivity_gain": 0.0
+        }
+      ]
+    },
+    "baseline_no_pca_C1000": {
+      "auc_mean": 0.967618332081142,
+      "auc_std": 0.001659624664225131,
+      "per_specificity": [
+        {
+          "specificity": 0.95,
+          "sensitivity": 0.8705234159779615,
+          "ci95_lo": 0.8097982708933718,
+          "ci95_hi": 0.912568306010929
+        },
+        {
+          "specificity": 0.98,
+          "sensitivity": 0.8099173553719008,
+          "ci95_lo": 0.7142377112135176,
+          "ci95_hi": 0.8759911182132373
+        },
+        {
+          "specificity": 0.99,
+          "sensitivity": 0.7327823691460055,
+          "ci95_lo": 0.5236768802228412,
+          "ci95_hi": 0.8324709416791845
+        },
+        {
+          "specificity": 0.995,
+          "sensitivity": 0.559228650137741,
+          "ci95_lo": 0.5122508988601003,
+          "ci95_hi": 0.8123293067226891
+        },
+        {
+          "specificity": 0.999,
+          "sensitivity": 0.559228650137741,
+          "ci95_lo": 0.5100244158359901,
+          "ci95_hi": 0.7746599970191519
+        }
+      ],
+      "per_specificity_optimized": [
+        {
+          "specificity": 0.95,
+          "sensitivity_standard": 0.8705234159779615,
+          "sensitivity_optimized": 0.8705234159779615,
+          "operating_threshold_optimized": 0.04625143140535235,
+          "sensitivity_gain": 0.0
+        },
+        {
+          "specificity": 0.98,
+          "sensitivity_standard": 0.8099173553719008,
+          "sensitivity_optimized": 0.8099173553719008,
+          "operating_threshold_optimized": 0.4248096860318518,
+          "sensitivity_gain": 0.0
+        },
+        {
+          "specificity": 0.99,
+          "sensitivity_standard": 0.7327823691460055,
+          "sensitivity_optimized": 0.7327823691460055,
+          "operating_threshold_optimized": 0.8750051253030762,
+          "sensitivity_gain": 0.0
+        },
+        {
+          "specificity": 0.995,
+          "sensitivity_standard": 0.559228650137741,
+          "sensitivity_optimized": 0.559228650137741,
+          "operating_threshold_optimized": 0.9994631938636965,
+          "sensitivity_gain": 0.0
+        },
+        {
+          "specificity": 0.999,
+          "sensitivity_standard": 0.559228650137741,
+          "sensitivity_optimized": 0.559228650137741,
+          "operating_threshold_optimized": 0.9994631938636965,
+          "sensitivity_gain": 0.0
+        }
+      ]
+    },
+    "isotonic_pca200_C1.0": {
+      "auc_mean": 0.9710138575841055,
+      "auc_std": 0.0022272658551226307,
+      "per_specificity": [
+        {
+          "specificity": 0.95,
+          "sensitivity": 0.8925619834710744,
+          "ci95_lo": 0.8376793410662116,
+          "ci95_hi": 0.9260204081632653
+        },
+        {
+          "specificity": 0.98,
+          "sensitivity": 0.8319559228650137,
+          "ci95_lo": 0.765495264196118,
+          "ci95_hi": 0.8872434131150748
+        },
+        {
+          "specificity": 0.99,
+          "sensitivity": 0.7851239669421488,
+          "ci95_lo": 0.6084355150510908,
+          "ci95_hi": 0.8630355783866057
+        },
+        {
+          "specificity": 0.995,
+          "sensitivity": 0.71900826446281,
+          "ci95_lo": 0.5898876404494382,
+          "ci95_hi": 0.8474159976103396
+        },
+        {
+          "specificity": 0.999,
+          "sensitivity": 0.6225895316804407,
+          "ci95_lo": 0.575596431435445,
+          "ci95_hi": 0.8225680369479751
+        }
+      ],
+      "per_specificity_optimized": [
+        {
+          "specificity": 0.95,
+          "sensitivity_standard": 0.8925619834710744,
+          "sensitivity_optimized": 0.8925619834710744,
+          "operating_threshold_optimized": 0.6291606541606541,
+          "sensitivity_gain": 0.0
+        },
+        {
+          "specificity": 0.98,
+          "sensitivity_standard": 0.8319559228650137,
+          "sensitivity_optimized": 0.8319559228650137,
+          "operating_threshold_optimized": 0.7741462241462241,
+          "sensitivity_gain": 0.0
+        },
+        {
+          "specificity": 0.99,
+          "sensitivity_standard": 0.7851239669421488,
+          "sensitivity_optimized": 0.7851239669421488,
+          "operating_threshold_optimized": 0.8749707478464362,
+          "sensitivity_gain": 0.0
+        },
+        {
+          "specificity": 0.995,
+          "sensitivity_standard": 0.71900826446281,
+          "sensitivity_optimized": 0.71900826446281,
+          "operating_threshold_optimized": 0.9367590936195587,
+          "sensitivity_gain": 0.0
+        },
+        {
+          "specificity": 0.999,
+          "sensitivity_standard": 0.6225895316804407,
+          "sensitivity_optimized": 0.6225895316804407,
+          "operating_threshold_optimized": 0.9740665052974087,
+          "sensitivity_gain": 0.0
+        }
+      ]
+    },
+    "platt_pca200_C1.0": {
+      "auc_mean": 0.9741286835295101,
+      "auc_std": 0.0016120480865158486,
+      "per_specificity": [
+        {
+          "specificity": 0.95,
+          "sensitivity": 0.9035812672176309,
+          "ci95_lo": 0.8374574970484062,
+          "ci95_hi": 0.9388438910380399
+        },
+        {
+          "specificity": 0.98,
+          "sensitivity": 0.8319559228650137,
+          "ci95_lo": 0.7711847088163304,
+          "ci95_hi": 0.8953269324258629
+        },
+        {
+          "specificity": 0.99,
+          "sensitivity": 0.7878787878787878,
+          "ci95_lo": 0.58379730985494,
+          "ci95_hi": 0.8617042899152395
+        },
+        {
+          "specificity": 0.995,
+          "sensitivity": 0.7630853994490359,
+          "ci95_lo": 0.5621758157120852,
+          "ci95_hi": 0.8453732778584605
+        },
+        {
+          "specificity": 0.999,
+          "sensitivity": 0.5950413223140496,
+          "ci95_lo": 0.5521956740442656,
+          "ci95_hi": 0.8190189659774229
+        }
+      ],
+      "per_specificity_optimized": [
+        {
+          "specificity": 0.95,
+          "sensitivity_standard": 0.9035812672176309,
+          "sensitivity_optimized": 0.9035812672176309,
+          "operating_threshold_optimized": 0.5853937251589629,
+          "sensitivity_gain": 0.0
+        },
+        {
+          "specificity": 0.98,
+          "sensitivity_standard": 0.8319559228650137,
+          "sensitivity_optimized": 0.8319559228650137,
+          "operating_threshold_optimized": 0.7717759320448252,
+          "sensitivity_gain": 0.0
+        },
+        {
+          "specificity": 0.99,
+          "sensitivity_standard": 0.7878787878787878,
+          "sensitivity_optimized": 0.7878787878787878,
+          "operating_threshold_optimized": 0.840613116065775,
+          "sensitivity_gain": 0.0
+        },
+        {
+          "specificity": 0.995,
+          "sensitivity_standard": 0.7630853994490359,
+          "sensitivity_optimized": 0.7630853994490359,
+          "operating_threshold_optimized": 0.8564500428217185,
+          "sensitivity_gain": 0.0
+        },
+        {
+          "specificity": 0.999,
+          "sensitivity_standard": 0.5950413223140496,
+          "sensitivity_optimized": 0.5950413223140496,
+          "operating_threshold_optimized": 0.9445163381488733,
+          "sensitivity_gain": 0.0
+        }
+      ]
+    },
+    "non_lr_sgd_log": {
+      "auc_mean": 0.9049951999332164,
+      "auc_std": 0.010358316626793602,
+      "per_specificity": [
+        {
+          "specificity": 0.95,
+          "sensitivity": 0.837465564738292,
+          "ci95_lo": 0.7965603551675884,
+          "ci95_hi": 0.9096436243670399
+        },
+        {
+          "specificity": 0.98,
+          "sensitivity": 0.0,
+          "ci95_lo": 0.0,
+          "ci95_hi": 0.8567569359810739
+        },
+        {
+          "specificity": 0.99,
+          "sensitivity": 0.0,
+          "ci95_lo": 0.0,
+          "ci95_hi": 0.817478354978355
+        },
+        {
+          "specificity": 0.995,
+          "sensitivity": 0.0,
+          "ci95_lo": 0.0,
+          "ci95_hi": 0.0
+        },
+        {
+          "specificity": 0.999,
+          "sensitivity": 0.0,
+          "ci95_lo": 0.0,
+          "ci95_hi": 0.0
+        }
+      ],
+      "per_specificity_optimized": [
+        {
+          "specificity": 0.95,
+          "sensitivity_standard": 0.837465564738292,
+          "sensitivity_optimized": 0.837465564738292,
+          "operating_threshold_optimized": 0.8000003680577482,
+          "sensitivity_gain": 0.0
+        },
+        {
+          "specificity": 0.98,
+          "sensitivity_standard": 0.0,
+          "sensitivity_optimized": 0.0,
+          "operating_threshold_optimized": Infinity,
+          "sensitivity_gain": 0.0
+        },
+        {
+          "specificity": 0.99,
+          "sensitivity_standard": 0.0,
+          "sensitivity_optimized": 0.0,
+          "operating_threshold_optimized": Infinity,
+          "sensitivity_gain": 0.0
+        },
+        {
+          "specificity": 0.995,
+          "sensitivity_standard": 0.0,
+          "sensitivity_optimized": 0.0,
+          "operating_threshold_optimized": Infinity,
+          "sensitivity_gain": 0.0
+        },
+        {
+          "specificity": 0.999,
+          "sensitivity_standard": 0.0,
+          "sensitivity_optimized": 0.0,
+          "operating_threshold_optimized": Infinity,
+          "sensitivity_gain": 0.0
+        }
+      ]
+    },
+    "non_lr_sgd_hinge": {
+      "auc_mean": 0.9037878787878787,
+      "auc_std": 0.013684022542917031,
+      "per_specificity": [
+        {
+          "specificity": 0.95,
+          "sensitivity": 0.7933884297520661,
+          "ci95_lo": 0.0,
+          "ci95_hi": 0.891822363260358
+        },
+        {
+          "specificity": 0.98,
+          "sensitivity": 0.0,
+          "ci95_lo": 0.0,
+          "ci95_hi": 0.8109627092846271
+        },
+        {
+          "specificity": 0.99,
+          "sensitivity": 0.0,
+          "ci95_lo": 0.0,
+          "ci95_hi": 0.0
+        },
+        {
+          "specificity": 0.995,
+          "sensitivity": 0.0,
+          "ci95_lo": 0.0,
+          "ci95_hi": 0.0
+        },
+        {
+          "specificity": 0.999,
+          "sensitivity": 0.0,
+          "ci95_lo": 0.0,
+          "ci95_hi": 0.0
+        }
+      ],
+      "per_specificity_optimized": [
+        {
+          "specificity": 0.95,
+          "sensitivity_standard": 0.7933884297520661,
+          "sensitivity_optimized": 0.7933884297520661,
+          "operating_threshold_optimized": 0.8000000000001132,
+          "sensitivity_gain": 0.0
+        },
+        {
+          "specificity": 0.98,
+          "sensitivity_standard": 0.0,
+          "sensitivity_optimized": 0.0,
+          "operating_threshold_optimized": Infinity,
+          "sensitivity_gain": 0.0
+        },
+        {
+          "specificity": 0.99,
+          "sensitivity_standard": 0.0,
+          "sensitivity_optimized": 0.0,
+          "operating_threshold_optimized": Infinity,
+          "sensitivity_gain": 0.0
+        },
+        {
+          "specificity": 0.995,
+          "sensitivity_standard": 0.0,
+          "sensitivity_optimized": 0.0,
+          "operating_threshold_optimized": Infinity,
+          "sensitivity_gain": 0.0
+        },
+        {
+          "specificity": 0.999,
+          "sensitivity_standard": 0.0,
+          "sensitivity_optimized": 0.0,
+          "operating_threshold_optimized": Infinity,
+          "sensitivity_gain": 0.0
+        }
+      ]
+    },
+    "non_lr_rf": {
+      "auc_mean": 0.9393261123633024,
+      "auc_std": 0.004454383331134109,
+      "per_specificity": [
+        {
+          "specificity": 0.95,
+          "sensitivity": 0.790633608815427,
+          "ci95_lo": 0.6805720249044857,
+          "ci95_hi": 0.859520486709261
+        },
+        {
+          "specificity": 0.98,
+          "sensitivity": 0.6776859504132231,
+          "ci95_lo": 0.6225352112676056,
+          "ci95_hi": 0.7696687991470078
+        },
+        {
+          "specificity": 0.99,
+          "sensitivity": 0.6749311294765841,
+          "ci95_lo": 0.4277314814814815,
+          "ci95_hi": 0.7285172725446876
+        },
+        {
+          "specificity": 0.995,
+          "sensitivity": 0.5895316804407713,
+          "ci95_lo": 0.40441748348604306,
+          "ci95_hi": 0.7177006286315729
+        },
+        {
+          "specificity": 0.999,
+          "sensitivity": 0.4380165289256198,
+          "ci95_lo": 0.3927426402315801,
+          "ci95_hi": 0.7013759390190013
+        }
+      ],
+      "per_specificity_optimized": [
+        {
+          "specificity": 0.95,
+          "sensitivity_standard": 0.790633608815427,
+          "sensitivity_optimized": 0.790633608815427,
+          "operating_threshold_optimized": 0.602,
+          "sensitivity_gain": 0.0
+        },
+        {
+          "specificity": 0.98,
+          "sensitivity_standard": 0.6776859504132231,
+          "sensitivity_optimized": 0.6776859504132231,
+          "operating_threshold_optimized": 0.6900000000000001,
+          "sensitivity_gain": 0.0
+        },
+        {
+          "specificity": 0.99,
+          "sensitivity_standard": 0.6749311294765841,
+          "sensitivity_optimized": 0.6749311294765841,
+          "operating_threshold_optimized": 0.696,
+          "sensitivity_gain": 0.0
+        },
+        {
+          "specificity": 0.995,
+          "sensitivity_standard": 0.5895316804407713,
+          "sensitivity_optimized": 0.5895316804407713,
+          "operating_threshold_optimized": 0.738,
+          "sensitivity_gain": 0.0
+        },
+        {
+          "specificity": 0.999,
+          "sensitivity_standard": 0.4380165289256198,
+          "sensitivity_optimized": 0.4380165289256198,
+          "operating_threshold_optimized": 0.7899999999999999,
+          "sensitivity_gain": 0.0
+        }
+      ]
+    },
+    "channel_reweight": {
+      "auc_mean": 0.973883462726438,
+      "auc_std": 0.0019675902386949084,
+      "per_specificity": [
+        {
+          "specificity": 0.95,
+          "sensitivity": 0.8953168044077136,
+          "ci95_lo": 0.8225305702409298,
+          "ci95_hi": 0.935939074260653
+        },
+        {
+          "specificity": 0.98,
+          "sensitivity": 0.8236914600550964,
+          "ci95_lo": 0.7466629526462396,
+          "ci95_hi": 0.8821917808219178
+        },
+        {
+          "specificity": 0.99,
+          "sensitivity": 0.7658402203856749,
+          "ci95_lo": 0.6830356296787643,
+          "ci95_hi": 0.8472625968992248
+        },
+        {
+          "specificity": 0.995,
+          "sensitivity": 0.7382920110192838,
+          "ci95_lo": 0.6702695456850953,
+          "ci95_hi": 0.8277301617873651
+        },
+        {
+          "specificity": 0.999,
+          "sensitivity": 0.699724517906336,
+          "ci95_lo": 0.65664774447472,
+          "ci95_hi": 0.8015670976832857
+        }
+      ],
+      "per_specificity_optimized": [
+        {
+          "specificity": 0.95,
+          "sensitivity_standard": 0.8953168044077136,
+          "sensitivity_optimized": 0.8953168044077136,
+          "operating_threshold_optimized": 0.521993535259394,
+          "sensitivity_gain": 0.0
+        },
+        {
+          "specificity": 0.98,
+          "sensitivity_standard": 0.8236914600550964,
+          "sensitivity_optimized": 0.8236914600550964,
+          "operating_threshold_optimized": 0.9188280199914463,
+          "sensitivity_gain": 0.0
+        },
+        {
+          "specificity": 0.99,
+          "sensitivity_standard": 0.7658402203856749,
+          "sensitivity_optimized": 0.7658402203856749,
+          "operating_threshold_optimized": 0.984509721749982,
+          "sensitivity_gain": 0.0
+        },
+        {
+          "specificity": 0.995,
+          "sensitivity_standard": 0.7382920110192838,
+          "sensitivity_optimized": 0.7382920110192838,
+          "operating_threshold_optimized": 0.9937803229216223,
+          "sensitivity_gain": 0.0
+        },
+        {
+          "specificity": 0.999,
+          "sensitivity_standard": 0.699724517906336,
+          "sensitivity_optimized": 0.699724517906336,
+          "operating_threshold_optimized": 0.9979756909165477,
+          "sensitivity_gain": 0.0
+        }
+      ]
+    }
+  },
+  "generated_at": "2026-09-15T15:12:42.856710+00:00",
+  "wall_seconds": 1019.0,
+  "summary_vs_baseline": {
+    "baseline": "baseline_pca200_C1.0",
+    "baseline_sens_at_99pct": 0.7988980716253443,
+    "baseline_auc": 0.9742945988813757,
+    "rows": [
+      {
+        "technique": "baseline_no_pca_C1000",
+        "auc": 0.967618332081142,
+        "auc_delta_vs_baseline": -0.006676266800233699,
+        "sens_at_99pct": 0.7327823691460055,
+        "sens_at_99pct_delta": -0.06611570247933884
+      },
+      {
+        "technique": "isotonic_pca200_C1.0",
+        "auc": 0.9710138575841055,
+        "auc_delta_vs_baseline": -0.0032807412972701844,
+        "sens_at_99pct": 0.7851239669421488,
+        "sens_at_99pct_delta": -0.01377410468319551
+      },
+      {
+        "technique": "platt_pca200_C1.0",
+        "auc": 0.9741286835295101,
+        "auc_delta_vs_baseline": -0.00016591535186560868,
+        "sens_at_99pct": 0.7878787878787878,
+        "sens_at_99pct_delta": -0.011019283746556474
+      },
+      {
+        "technique": "non_lr_sgd_log",
+        "auc": 0.9049951999332164,
+        "auc_delta_vs_baseline": -0.06929939894815929,
+        "sens_at_99pct": 0.0,
+        "sens_at_99pct_delta": -0.7988980716253443
+      },
+      {
+        "technique": "non_lr_sgd_hinge",
+        "auc": 0.9037878787878787,
+        "auc_delta_vs_baseline": -0.07050672009349701,
+        "sens_at_99pct": 0.0,
+        "sens_at_99pct_delta": -0.7988980716253443
+      },
+      {
+        "technique": "non_lr_rf",
+        "auc": 0.9393261123633024,
+        "auc_delta_vs_baseline": -0.03496848651807327,
+        "sens_at_99pct": 0.6749311294765841,
+        "sens_at_99pct_delta": -0.12396694214876025
+      },
+      {
+        "technique": "channel_reweight",
+        "auc": 0.973883462726438,
+        "auc_delta_vs_baseline": -0.00041113615493770794,
+        "sens_at_99pct": 0.7658402203856749,
+        "sens_at_99pct_delta": -0.03305785123966942
+      }
+    ]
+  }
+}
