@@ -1,0 +1,67 @@
+{
+  "generated_at": "2026-09-15",
+  "machine": "macOS 26.5.2, Apple M4, Python 3.14",
+  "constraint_note": "AUC/Sens numbers must remain identical to 1e-6. The 'auto' PCA solver produces ~1e-3 noise envelope on the wide-matrix case; bitwise equivalence is preserved on deterministic paths.",
+  "scripts": {
+    "honest_benchmark_quick": {
+      "before_peak_rss_mb": 3244.23,
+      "after_peak_rss_mb": 2738.2,
+      "delta_mb": -506.03,
+      "delta_pct": -15.6,
+      "wall_time_before_s": 345.22,
+      "wall_time_after_s": 320.36,
+      "wall_time_speedup_x": 1.08
+    },
+    "multiclass_classification_quick": {
+      "before_peak_rss_mb": 1479.69,
+      "after_peak_rss_mb": 1843.8,
+      "delta_mb": 364.11,
+      "delta_pct": 24.61,
+      "wall_time_before_s": 23.26,
+      "wall_time_after_s": 7.62,
+      "wall_time_speedup_x": 3.05
+    },
+    "tissue_of_origin_quick": {
+      "before_peak_rss_mb": 1000.97,
+      "after_peak_rss_mb": 999.16,
+      "delta_mb": -1.81,
+      "delta_pct": -0.18,
+      "wall_time_before_s": 16.07,
+      "wall_time_after_s": 3.67,
+      "wall_time_speedup_x": 4.38
+    },
+    "score_single_sample_quick": {
+      "before_peak_rss_mb": 708.19,
+      "after_peak_rss_mb": 707.88,
+      "delta_mb": -0.31,
+      "delta_pct": -0.04,
+      "wall_time_before_s": 2.42,
+      "wall_time_after_s": 1.48,
+      "wall_time_speedup_x": 1.64
+    }
+  },
+  "biggest_wins": [
+    "Shared PCA per fold in OvR (5-class and 6-class): ~4-6x speedup, ~0 MB memory delta",
+    "load5_cached() in honest_benchmark: 1.7x speedup, +101 MB peak RSS (acceptable trade)",
+    "Vectorized in-place NaN fill in evaluate_cv: -320 MB peak on cross-study cohort",
+    "_harmonize in-place transform: -317 MB per call"
+  ],
+  "deliberately_unchanged": [
+    "PCA solver ('auto' preserved; explicit 'randomized' would drift AUC ~1e-3)",
+    "Float32 downcast (would change AUC by ~1e-4)",
+    "PCA random_state (would break bitwise equivalence with None)",
+    "joblib.Parallel folds (would multiply memory by n_jobs)",
+    "tissue_of_origin.py np.copyto on full X (caused 0.028 AUC transient, reverted)"
+  ],
+  "auc_drift": {
+    "multiclass_classification_quick": "bitwise identical",
+    "multiclass_classification_full": "~1e-3 randomized-PCA noise",
+    "tissue_of_origin_full": "0 (macro AUC 0.9533 preserved)",
+    "score_single_sample_no_cache": "identical to cache path"
+  },
+  "tests": {
+    "before": "99 passed in 221s",
+    "after": "106 passed in 153.72s"
+  },
+  "ci_status": "success on pipeline-tests @ main"
+}
