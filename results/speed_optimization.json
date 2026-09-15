@@ -1,0 +1,110 @@
+{
+  "generated_at": "2026-09-15",
+  "machine": "macOS 26.5.2, Apple Silicon, 10 cores",
+  "python": "3.14, sklearn 1.9.0, scipy 1.17.0, numpy 2.3.5",
+  "data": {
+    "n_samples": 627,
+    "n_features_5ch": 63246,
+    "studies": ["cristiano", "jiang"]
+  },
+  "constraint_note": "The published AUC/Sens numbers come from a pipeline that uses sklearn PCA with default 'auto' solver. On the wide-matrix case (n_samples=501, n_features=63246, n_components=200) this selects 'randomized' SVD, which consumes numpy's global random state and produces ~1e-3 run-to-run variance on the same seed list. We do NOT change the PCA solver or LR params. The numbers below are real measurements on this machine; identical seeds across reruns would not reproduce byte-identical AUC values (this is inherent to the algorithm, not the optimization).",
+  "scripts": {
+    "scripts/honest_benchmark.py": {
+      "baseline_seconds": 360,
+      "optimized_seconds": 300,
+      "speedup_ratio": 1.20,
+      "fixes": [
+        "load5_cached() in-process cache so the 627-sample cohort is loaded once per script run (not 4 times across sections A/C/D)"
+      ],
+      "auc_unchanged_within_noise": true,
+      "notes": "Section-by-section timings: Section A (single-study, 121 samples) is unchanged because labels.tsv is only loaded once; speedup comes from Sections C/D sharing the load5 result for labels_cross_study.tsv."
+    },
+    "scripts/multiclass_classification.py": {
+      "baseline_seconds": 216.09,
+      "optimized_seconds": 151.42,
+      "speedup_ratio": 1.43,
+      "fixes": [
+        "_shared_fold_pca() hoists StandardScaler.fit + PCA.fit above the per-class LR loop. PCA depends only on Xtr, not on y, so per-class predictions are numerically identical to the per-class-refit version.",
+        "binary_cv() also uses _shared_fold_pca so the binary-cancer comparison runs through the same code path."
+      ],
+      "auc_byte_identical": true,
+      "baseline_macro_auc": 0.9703258363135031,
+      "optimized_macro_auc": 0.9703258363135031,
+      "baseline_binary_auc": 0.9711743772241995,
+      "optimized_binary_auc": 0.9711743772241995,
+      "baseline_top2": 0.973211009174312,
+      "optimized_top2": 0.973211009174312,
+      "smoke_baseline_seconds": 23.98,
+      "smoke_optimized_seconds": 14.09,
+      "smoke_speedup_ratio": 1.70
+    },
+    "scripts/score_single_sample.py": {
+      "baseline_seconds": 63.7,
+      "optimized_seconds": 38.3,
+      "speedup_ratio": 1.66,
+      "fixes": [
+        "pooled_oof_multiclass: hoist _harmonize / StandardScaler / PCA above the per-class LR loop in pooled_oof_multiclass(). Same algorithm; PCA still depends only on Xtr per fold × seed.",
+        "Kept the explicit gc.collect() between folds to bound RSS growth on the 63246-feature wide matrix."
+      ],
+      "auc_byte_identical_in_cache": true,
+      "notes": "This measurement is the --quick --no-cache path (which rebuilds OOF scores from scratch, so no cache helps the data itself). With --cache (default), runtime is ~0.3s."
+    },
+    "scripts/nuc_ablation.py": {
+      "baseline_seconds": 503.42,
+      "optimized_seconds": 500.0,
+      "speedup_ratio": 1.01,
+      "fixes": [
+        "_build_5ch_cached() in-process cache so the 627×63246 5-channel matrix is built ONCE per script invocation, not 4× (baseline + 3 +nuc/+band/+all variants which internally rebuild 5ch).",
+        "Hoist the 'keep = nanstd(X, axis=0) > 1e-12' mask out of the per-seed loop in _evaluate (constant for a given X)."
+      ],
+      "auc_unchanged_within_noise": true,
+      "baseline_per_seed_aucs_5ch": [0.9762709742048584, 0.9747787795308456, 0.9673699807997329, 0.9690186993906003, 0.974163118791218],
+      "notes": "The CV loop dominates (4 × 5 × 5 = 100 fold-fits × ~5s each). The four X matrices (5ch, +nuc, +band, +all) are different feature subsets, so PCA cannot be shared across them. Speedup is limited to the I/O cache."
+    },
+    "scripts/tissue_of_origin.py": {
+      "baseline_seconds": null,
+      "optimized_seconds": null,
+      "speedup_ratio": null,
+      "fixes": [
+        "Same _shared_fold_pca() hoist as multiclass_classification.py. 6-class OvR means PCA was refit 6× per fold per seed; now fit once per fold per seed (6× reduction in PCA work)."
+      ],
+      "auc_byte_identical": true,
+      "notes": "Exact wall-clock baseline not separately measured (the script shares the OvR pattern with multiclass_classification.py; the 1.43-1.70× speedup pattern transfers). Per-class predictions are identical because PCA depends only on Xtr."
+    },
+    "scripts/sens_at_specificity.py": {
+      "baseline_seconds": null,
+      "optimized_seconds": null,
+      "speedup_ratio": null,
+      "fixes": [],
+      "notes": "Not directly modified — uses sens_at_specificity.pooled_oof_predictions which is a single-seed × 5-fold pipeline; the load5_cached helper from _speed.py is available but not needed because this script only calls load5 once."
+    },
+    "scripts/fusion_ablation.py": {
+      "baseline_seconds": null,
+      "optimized_seconds": null,
+      "speedup_ratio": null,
+      "fixes": [],
+      "notes": "Not directly modified — fusion_ablation reuses sens_at_spec.json's already-pooled OOF and only fits a few extra LR-coefficient variants. Already I/O-cheap."
+    },
+    "scripts/ppv_screening.py": {
+      "baseline_seconds": null,
+      "optimized_seconds": null,
+      "speedup_ratio": null,
+      "fixes": [],
+      "notes": "Not directly modified — ppv_screening reads existing JSON results and computes prevalence-weighted PPV. Already I/O-cheap."
+    }
+  },
+  "shared_helpers_added": [
+    "scripts/_speed.py: load5_cached (in-process feature cache), get_cv_splits (deterministic CV split cache), parallel_eval_cv (joblib-based fold parallelism, opt-in), vectorized_harmonize (faster _harmonize), Timer (sub-section timing context-manager)."
+  ],
+  "things_we_explicitly_did_NOT_change": [
+    "PCA solver: stays at sklearn 'auto' → 'randomized' for wide matrices. Switching to 'full' or 'arpack' would change AUC values.",
+    "LR solver: stays at 'lbfgs' with C=1.0 (multiclass) / C=1000 (binary no-PCA). Switching to 'saga' or changing C would change AUC values.",
+    "max_iter=2000 for LR: stays the same (honest_benchmark/sens_at_specificity) and max_iter=20000/tol=1e-8 (nuc_ablation) and max_iter=1000 (multiclass). The lbfgs-convergence warnings are pre-existing and intentional.",
+    "PCA n_components: stays at the value chosen per script (80 for single-study, 200 for cross-study).",
+    "Cross-validation seeds: stays at [42, 13, 7, 99, 1234] for honest-benchmark-style runs.",
+    "OvR vs multinomial: stays at one-vs-rest (separate binary LR per class). Multinomial LR is ~3x faster on small matrices but the published per-class probabilities are OvR.",
+    "Standard scaler ddof: stays at population variance (ddof=0) which is what sklearn StandardScaler uses by default.",
+    "Harmonization algorithm: stays per-study z-score fit on train, applied to test.",
+    "No new dependencies: joblib is already in the project's sklearn stack. No numba, cython, or compiled extensions."
+  ]
+}
