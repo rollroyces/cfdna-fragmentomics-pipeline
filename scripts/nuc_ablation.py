@@ -80,9 +80,23 @@ def _build_5ch(samples: list[str], y_arr: np.ndarray) -> np.ndarray:
     return X
 
 
+# In-process cache so _build_5ch is computed ONCE per script invocation,
+# not 4 times (1 baseline + 3 from the +nuc/+band/+all variants which
+# internally call _build_5ch). Saves ~7s of redundant I/O per run.
+_5CH_CACHE: dict[int, np.ndarray] = {}
+
+
+def _build_5ch_cached(samples: list[str], y_arr: np.ndarray) -> np.ndarray:
+    """Return the cached 5-channel matrix, building it on first call."""
+    key = id(tuple(samples))
+    if key not in _5CH_CACHE:
+        _5CH_CACHE[key] = _build_5ch(samples, y_arr)
+    return _5CH_CACHE[key]
+
+
 def _build_5ch_plus_nuc(samples: list[str], y_arr: np.ndarray) -> np.ndarray:
     """5-channel + 3 original (band-sum) ratio features."""
-    X_5ch = _build_5ch(samples, y_arr)
+    X_5ch = _build_5ch_cached(samples, y_arr)
     nuc_rows = []
     for s in samples:
         nuc_rows.append(compute_nuc_features_from_path(
@@ -94,7 +108,7 @@ def _build_5ch_plus_nuc(samples: list[str], y_arr: np.ndarray) -> np.ndarray:
 def _build_5ch_plus_band(samples: list[str], y_arr: np.ndarray) -> np.ndarray:
     """5-channel + 3 new band-boundary features (v2 design)."""
     from nuc_features import compute_band_features_from_path
-    X_5ch = _build_5ch(samples, y_arr)
+    X_5ch = _build_5ch_cached(samples, y_arr)
     band_rows = []
     for s in samples:
         band_rows.append(compute_band_features_from_path(
@@ -105,8 +119,8 @@ def _build_5ch_plus_band(samples: list[str], y_arr: np.ndarray) -> np.ndarray:
 
 def _build_5ch_plus_all_nuc(samples: list[str], y_arr: np.ndarray) -> np.ndarray:
     """5-channel + all 6 nucleosome features (3 original + 3 band)."""
-    from nuc_features import load_fsd, compute_all_features
-    X_5ch = _build_5ch(samples, y_arr)
+    from nuc_features import compute_all_features, load_fsd
+    X_5ch = _build_5ch_cached(samples, y_arr)
     nuc_rows = []
     for s in samples:
         nuc_rows.append(compute_all_features(load_fsd(
@@ -120,11 +134,12 @@ def _evaluate(X: np.ndarray, y: np.ndarray, study_arr: np.ndarray,
     """Use the pipeline's evaluate_cv with full 5-channel hygiene."""
     from train_classifier import evaluate_cv
     aucs = []
+    # keep-mask is constant for a given X; compute once per call (not per
+    # seed) — saves 4 × 5 × 0.1s ≈ 2s of nanstd over 5 seeds.
+    keep = np.nanstd(X, axis=0) > 1e-12
+    Xk = X[:, keep]
     for s in range(n_seeds):
         cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=s)
-        # Drop constant columns (mirrors train_classifier)
-        keep = np.nanstd(X, axis=0) > 1e-12
-        Xk = X[:, keep]
         result = evaluate_cv(Xk, y,
                               LogisticRegression(max_iter=20000, tol=1e-8,
                                                  random_state=0),
@@ -161,7 +176,7 @@ def main() -> int:
           f"{(y == 0).sum()} healthy")
 
     print("[ablation] Building feature matrices...")
-    X_5ch = _build_5ch(samples, y)
+    X_5ch = _build_5ch_cached(samples, y)
     X_5nuc = _build_5ch_plus_nuc(samples, y)
     X_5band = _build_5ch_plus_band(samples, y)
     X_5all = _build_5ch_plus_all_nuc(samples, y)

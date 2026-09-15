@@ -51,6 +51,7 @@ not generalise to new cohorts.
 from __future__ import annotations
 
 import argparse
+import gc
 import json
 import math
 import os
@@ -228,6 +229,9 @@ def pooled_oof_predictions(X: np.ndarray, y: np.ndarray, study: np.ndarray,
     Each sample is predicted only on data it never saw during training.
 
     Uses the BINARY_* protocol (LR-no-PCA, C=BINARY_C) per the task spec.
+
+    Memory: gc.collect() between folds releases the previous fold's
+    PCA / scaler / model buffers before the next fold allocates.
     """
     score_acc = np.zeros(len(y), dtype=float)
     for sd in seeds:
@@ -241,6 +245,7 @@ def pooled_oof_predictions(X: np.ndarray, y: np.ndarray, study: np.ndarray,
                 sc = StandardScaler().fit(X[tr])
                 Xtr = sc.transform(X[tr])
                 Xte = sc.transform(X[te])
+                del sc
             if BINARY_NO_PCA or pca_n == 0:
                 Xtr_in, Xte_in = Xtr, Xte
             else:
@@ -248,11 +253,14 @@ def pooled_oof_predictions(X: np.ndarray, y: np.ndarray, study: np.ndarray,
                 pca = PCA(n_components=n_comp, random_state=0).fit(Xtr)
                 Xtr_in = pca.transform(Xtr)
                 Xte_in = pca.transform(Xte)
+                del pca
             clf = LogisticRegression(
                 C=BINARY_C, max_iter=LR_MAX_ITER, tol=1e-4, random_state=0,
                 solver="lbfgs")
             clf.fit(Xtr_in, y[tr])
             oof[te] = clf.predict_proba(Xte_in)[:, 1]
+            del Xtr, Xte, Xtr_in, Xte_in, clf
+            gc.collect()
         score_acc += oof
     return y.astype(int), score_acc / len(seeds)
 
@@ -264,7 +272,8 @@ def pooled_oof_multiclass(X: np.ndarray, y_multi: np.ndarray,
     """Pooled 5-seed × 5-fold OvR multiclass OOF probabilities.
 
     Uses the multiclass protocol (LR+PCA(200), C=1.0) which matches
-    scripts/multiclass_classification.py.
+    scripts/multiclass_classification.py. Memory: gc.collect() between
+    folds + within-fold classes.
     """
     n = len(X)
     score_acc = np.zeros((n, n_classes), dtype=float)
@@ -272,29 +281,40 @@ def pooled_oof_multiclass(X: np.ndarray, y_multi: np.ndarray,
         cv = StratifiedKFold(5, shuffle=True, random_state=sd)
         oof = np.zeros((n, n_classes), dtype=float)
         for tr, te in cv.split(X, y_multi):
+            # Standardise + (optional) PCA once per fold, shared across
+            # all OvR classes — same algorithm as the per-class refit,
+            # but PCA depends only on Xtr so per-class results are
+            # numerically identical.
+            if harmonize:
+                Xtr, sc = _harmonize(X[tr], study[tr], None)
+                Xte, _ = _harmonize(X[te], study[te], sc)
+            else:
+                sc = StandardScaler().fit(X[tr])
+                Xtr = sc.transform(X[tr])
+                Xte = sc.transform(X[te])
+                del sc
+            if LR_NO_PCA or pca_n == 0:
+                Xtr_in, Xte_in = Xtr, Xte
+                pca = None
+            else:
+                n_comp = min(pca_n, Xtr.shape[0], Xtr.shape[1])
+                pca = PCA(n_components=n_comp, random_state=sd).fit(Xtr)
+                Xtr_in = pca.transform(Xtr)
+                Xte_in = pca.transform(Xte)
             for ci in range(n_classes):
                 ytr_bin = (y_multi[tr] == ci).astype(int)
                 if ytr_bin.sum() == 0 or ytr_bin.sum() == len(ytr_bin):
                     continue
-                if harmonize:
-                    Xtr, sc = _harmonize(X[tr], study[tr], None)
-                    Xte, _ = _harmonize(X[te], study[te], sc)
-                else:
-                    sc = StandardScaler().fit(X[tr])
-                    Xtr = sc.transform(X[tr])
-                    Xte = sc.transform(X[te])
-                if LR_NO_PCA or pca_n == 0:
-                    Xtr_in, Xte_in = Xtr, Xte
-                else:
-                    n_comp = min(pca_n, Xtr.shape[0], Xtr.shape[1])
-                    pca = PCA(n_components=n_comp, random_state=sd).fit(Xtr)
-                    Xtr_in = pca.transform(Xtr)
-                    Xte_in = pca.transform(Xte)
                 clf = LogisticRegression(
                     C=LR_C, max_iter=LR_MAX_ITER, tol=1e-4,
                     random_state=sd, solver="lbfgs")
                 clf.fit(Xtr_in, ytr_bin)
                 oof[te, ci] = clf.predict_proba(Xte_in)[:, 1]
+                del clf
+            del Xtr, Xte, Xtr_in, Xte_in
+            if pca is not None:
+                del pca
+            gc.collect()
         score_acc += oof
     return score_acc / len(seeds)
 

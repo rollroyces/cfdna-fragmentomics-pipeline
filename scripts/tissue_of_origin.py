@@ -50,6 +50,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import gc
 import json
 import os
 import sys
@@ -133,30 +134,20 @@ def load_cohort_cancer_only(labels_multiclass: dict[str, str],
 # --------------------------------------------------------------------------- #
 # Modelling
 # --------------------------------------------------------------------------- #
-def _lr_pipeline(Xtr, ytr_bin, Xte, seed: int, pca_n: int) -> np.ndarray:
-    """Train one OvR LR on (Xtr, ytr_bin) → predict_proba on Xte.
-
-    Identical to the multi-cancer pipeline so the TOO comparison is
-    apples-to-apples.
-    """
-    sc = StandardScaler().fit(Xtr)
-    Xtr = sc.transform(Xtr); Xte = sc.transform(Xte)
-    if pca_n and pca_n < Xtr.shape[1]:
-        pca = PCA(n_components=min(pca_n, Xtr.shape[0] - 1),
-                  random_state=seed).fit(Xtr)
-        Xtr = pca.transform(Xtr); Xte = pca.transform(Xte)
-    clf = LogisticRegression(C=LR_C, max_iter=1000,
-                             solver="lbfgs", random_state=seed)
-    clf.fit(Xtr, ytr_bin)
-    return clf.predict_proba(Xte)[:, 1]
-
-
 def ovr_logreg_cv(X: np.ndarray, y: np.ndarray, classes: list[str],
                   seeds: list[int], n_folds: int, pca_n: int):
     """One-vs-rest logistic regression, pooled OOF across seeds.
 
     Returns (oof_proba, per_class_aucs_seed, macro_aucs, top1_accs,
              top2_accs).
+
+    Speed note (Sept 2026): The PCA fit on the training fold is shared
+    across all OvR classes — previously it was refit per class (5-class
+    OvR = 5× wasted PCA work; 6-class TOO = 6× wasted). Pre-fitting PCA
+    once per fold and projecting the train/test matrices before the
+    per-class LR loop preserves the exact algorithm and identical
+    numerical results (PCA is identical because it depends only on Xtr,
+    not on y).
     """
     n, n_classes = X.shape[0], len(classes)
     oof_proba = np.zeros((n, n_classes), dtype=float)
@@ -170,12 +161,33 @@ def ovr_logreg_cv(X: np.ndarray, y: np.ndarray, classes: list[str],
                              random_state=seed)
         oof_seed = np.zeros((n, n_classes), dtype=float)
         for tr, te in cv.split(X, y):
+            # Standardize once per fold
+            sc = StandardScaler().fit(X[tr])
+            Xtr_s = sc.transform(X[tr])
+            Xte_s = sc.transform(X[te])
+            del sc
+            # PCA once per fold (shared across all OvR classes)
+            if pca_n and pca_n < Xtr_s.shape[1]:
+                pca = PCA(n_components=min(pca_n, Xtr_s.shape[0] - 1),
+                          random_state=seed).fit(Xtr_s)
+                Xtr_p = pca.transform(Xtr_s)
+                Xte_p = pca.transform(Xte_s)
+                del pca
+            else:
+                Xtr_p, Xte_p = Xtr_s, Xte_s
             for ci in range(n_classes):
                 ytr_bin = (y[tr] == ci).astype(int)
                 if ytr_bin.sum() == 0 or ytr_bin.sum() == len(ytr_bin):
                     continue
-                oof_seed[te, ci] = _lr_pipeline(X[tr], ytr_bin, X[te],
-                                                seed=seed, pca_n=pca_n)
+                clf = LogisticRegression(C=LR_C, max_iter=1000,
+                                         solver="lbfgs", random_state=seed)
+                clf.fit(Xtr_p, ytr_bin)
+                oof_seed[te, ci] = clf.predict_proba(Xte_p)[:, 1]
+                del clf
+            # Release per-fold intermediates (LR coefs, PCA internal cov,
+            # StandardScaler buffers) before the next fold allocates.
+            del Xtr_s, Xte_s, Xtr_p, Xte_p
+            gc.collect()
 
         seed_class_aucs = []
         for ci, cls in enumerate(classes):

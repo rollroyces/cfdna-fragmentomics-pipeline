@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""HONEST benchmark — no optimization, no cherry-picking.
+"""
+HONEST benchmark — no optimization, no cherry-picking.
 
 - 5 different random seeds for CV split
 - Report mean +/- std across seeds
@@ -13,6 +14,11 @@ CLI:
 By default reads from data/features/. With --features-dir you can
 point at a different cohort root (e.g. /tmp/cristiano_only/ for
 single-study debugging).
+
+Speed note (Sept 2026): the load5() loader re-reads ~660 .npy + .fsd.json
+files per call (~2s each). Five benchmark sections call load5 on the same
+labels/studies dicts; caching avoids redundant I/O. Same algorithm —
+no change to PCA/LR/scaler behaviour, no change to published numbers.
 """
 import argparse
 import json
@@ -28,6 +34,7 @@ from sklearn.preprocessing import StandardScaler
 
 sys.path.insert(0, "scripts")
 from train_classifier import _harmonize
+from _speed import load5_cached  # in-process feature cache
 
 FEAT = "data/features"
 SEEDS = [42, 13, 7, 99, 1234]
@@ -155,7 +162,7 @@ def run_honest_benchmark(feat_dir=FEAT):
     # Older labels.tsv has no study column; force study='6' (Jiang)
     for s in list(studies):
         studies[s] = "6"
-    X, y, st = load5(labels, studies, feat_dir)
+    X, y, st = load5_cached(labels, studies, feat_dir)
     print(f"\n=== A: SINGLE-STUDY (Jiang 2015), 5-channel (PCA n=80) ===")
     print(f"  Cohort: {(y==1).sum()} cancer + {(y==0).sum()} healthy = {len(y)} total")
     run("5-channel (PCA n=80, harmonized)", X, y, st, 80, True)
@@ -170,7 +177,7 @@ def run_honest_benchmark(feat_dir=FEAT):
 
     # === C: CROSS-STUDY (pan-cancer), 5-channel, all 627 ===
     labels, studies = _load_labels(os.path.join(feat_dir, "labels_cross_study.tsv"))
-    X, y, st = load5(labels, studies, feat_dir)
+    X, y, st = load5_cached(labels, studies, feat_dir)
     print(f"\n=== C: CROSS-STUDY (pan-cancer), 5-channel (PCA n=200) ===")
     print(f"  Cohort: {(y==1).sum()} cancer + {(y==0).sum()} healthy = {len(y)} total, studies={set(st)}")
     run("5-channel (PCA n=200, harmonized)", X, y, st, 200, True)
@@ -187,7 +194,7 @@ def run_honest_benchmark(feat_dir=FEAT):
                 labels_hcc[s] = 1; studies_hcc[s] = st_
             elif l == "healthy":
                 labels_hcc[s] = 0; studies_hcc[s] = st_
-    X, y, st = load5(labels_hcc, studies_hcc, feat_dir)
+    X, y, st = load5_cached(labels_hcc, studies_hcc, feat_dir)
     print(f"\n=== D: NAIVE 'HCC vs all healthy' (negative control, PCA n=200) ===")
     print(f"  Cohort: {(y==1).sum()} cancer + {(y==0).sum()} healthy = {len(y)} total")
     run("5-channel (PCA n=200, harmonized)", X, y, st, 200, True)
