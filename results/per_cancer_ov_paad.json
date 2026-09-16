@@ -1,0 +1,381 @@
+{
+  "generated_at": "2026-09-16T15:26:27.327371+00:00",
+  "config": {
+    "seeds": [
+      42,
+      13,
+      7,
+      99,
+      1234
+    ],
+    "n_folds": 5,
+    "pca_n": 200,
+    "lr_C": 1.0,
+    "feature_set": "5-channel (5mb_ratio + 5mb_coverage + 100kb_ratio + 100kb_counts + FSD-196)"
+  },
+  "constraints": {
+    "floor_binary_sens99": 0.755,
+    "floor_ov_auc": 0.94,
+    "floor_paad_auc": 0.94,
+    "floor_pooled_auc": 0.9755
+  },
+  "targets": {
+    "ov_target": 0.4,
+    "paad_target": 0.6
+  },
+  "baseline": {
+    "n_samples": 627,
+    "n_features": 63246,
+    "classes": [
+      "BRCA",
+      "CRC",
+      "HCC_J",
+      "HEALTHY",
+      "LUAD",
+      "OTHER_C",
+      "OV",
+      "PAAD"
+    ],
+    "class_counts": {
+      "BRCA": 53,
+      "CRC": 27,
+      "HCC_J": 89,
+      "HEALTHY": 264,
+      "LUAD": 79,
+      "OTHER_C": 27,
+      "OV": 28,
+      "PAAD": 60
+    },
+    "binary_pooled_auc": 0.9660363970281326,
+    "binary_auc_std": 0.000888707948738491,
+    "binary_sens99": 0.7355371900826446,
+    "per_class": {
+      "BRCA": {
+        "n_positive": 53,
+        "auc_pooled": 0.9532246400631122,
+        "sens_at_99pct_pooled": 0.41509433962264153
+      },
+      "CRC": {
+        "n_positive": 27,
+        "auc_pooled": 0.9742592592592592,
+        "sens_at_99pct_pooled": 0.5185185185185185
+      },
+      "HCC_J": {
+        "n_positive": 89,
+        "auc_pooled": 0.9969090681258093,
+        "sens_at_99pct_pooled": 0.9438202247191011
+      },
+      "HEALTHY": {
+        "n_positive": 264,
+        "auc_pooled": 0.9698013189748727,
+        "sens_at_99pct_pooled": 0.32196969696969696
+      },
+      "LUAD": {
+        "n_positive": 79,
+        "auc_pooled": 0.9606509285780283,
+        "sens_at_99pct_pooled": 0.5063291139240507
+      },
+      "OTHER_C": {
+        "n_positive": 27,
+        "auc_pooled": 0.9541358024691358,
+        "sens_at_99pct_pooled": 0.4074074074074074
+      },
+      "OV": {
+        "n_positive": 28,
+        "auc_pooled": 0.9545671357023611,
+        "sens_at_99pct_pooled": 0.25
+      },
+      "PAAD": {
+        "n_positive": 60,
+        "auc_pooled": 0.9400940623162845,
+        "sens_at_99pct_pooled": 0.45
+      }
+    }
+  },
+  "score_distributions": {
+    "BRCA": {
+      "n_pos": 53,
+      "n_neg": 574,
+      "score_on_positives_mean": 0.4118753274216916,
+      "score_on_positives_std": 0.41386271171538425,
+      "score_on_positives_skew": 0.40554655033412246,
+      "score_on_positives_kurt": -1.6015509920875195,
+      "score_on_negatives_mean": 0.012917921971113407,
+      "score_on_negatives_std": 0.07550495624269804,
+      "operating_threshold_at_99pct_spec": 0.42729165437373184,
+      "positives_above_threshold": 22
+    },
+    "CRC": {
+      "n_pos": 27,
+      "n_neg": 600,
+      "score_on_positives_mean": 0.47356726084073764,
+      "score_on_positives_std": 0.43797460423995804,
+      "score_on_positives_skew": 0.010364834122501705,
+      "score_on_positives_kurt": -1.8878954147298959,
+      "score_on_negatives_mean": 0.006848361019058433,
+      "score_on_negatives_std": 0.06442347177538343,
+      "operating_threshold_at_99pct_spec": 0.6586341811379397,
+      "positives_above_threshold": 14
+    },
+    "HCC_J": {
+      "n_pos": 89,
+      "n_neg": 538,
+      "score_on_positives_mean": 0.9335705952581462,
+      "score_on_positives_std": 0.21162090046084486,
+      "score_on_positives_skew": -3.6233656947435495,
+      "score_on_positives_kurt": 11.947733761676604,
+      "score_on_negatives_mean": 0.017429482334149562,
+      "score_on_negatives_std": 0.09698117682622634,
+      "operating_threshold_at_99pct_spec": 0.566288345793256,
+      "positives_above_threshold": 84
+    },
+    "HEALTHY": {
+      "n_pos": 264,
+      "n_neg": 363,
+      "score_on_positives_mean": 0.9080654804310786,
+      "score_on_positives_std": 0.21711808790638987,
+      "score_on_positives_skew": -2.862469416888484,
+      "score_on_positives_kurt": 7.475524528127025,
+      "score_on_negatives_mean": 0.09899227907924278,
+      "score_on_negatives_std": 0.25086761800548607,
+      "operating_threshold_at_99pct_spec": 0.9997270009048516,
+      "positives_above_threshold": 85
+    },
+    "LUAD": {
+      "n_pos": 79,
+      "n_neg": 548,
+      "score_on_positives_mean": 0.5579384427348715,
+      "score_on_positives_std": 0.393170086831877,
+      "score_on_positives_skew": -0.17633888847285753,
+      "score_on_positives_kurt": -1.6502303709713109,
+      "score_on_negatives_mean": 0.017187027503421437,
+      "score_on_negatives_std": 0.0985022426701155,
+      "operating_threshold_at_99pct_spec": 0.6158533422745922,
+      "positives_above_threshold": 40
+    },
+    "OTHER_C": {
+      "n_pos": 27,
+      "n_neg": 600,
+      "score_on_positives_mean": 0.28583437968575387,
+      "score_on_positives_std": 0.3506756482386919,
+      "score_on_positives_skew": 0.9708691404358213,
+      "score_on_positives_kurt": -0.5157816620514546,
+      "score_on_negatives_mean": 0.006122838459310955,
+      "score_on_negatives_std": 0.05307652585610861,
+      "operating_threshold_at_99pct_spec": 0.25485497829194925,
+      "positives_above_threshold": 11
+    },
+    "OV": {
+      "n_pos": 28,
+      "n_neg": 599,
+      "score_on_positives_mean": 0.16755368978898316,
+      "score_on_positives_std": 0.25008815224261793,
+      "score_on_positives_skew": 1.6955988495200147,
+      "score_on_positives_kurt": 2.086128010939711,
+      "score_on_negatives_mean": 0.008465065965512445,
+      "score_on_negatives_std": 0.05931436434634279,
+      "operating_threshold_at_99pct_spec": 0.35508716394215833,
+      "positives_above_threshold": 7
+    },
+    "PAAD": {
+      "n_pos": 60,
+      "n_neg": 567,
+      "score_on_positives_mean": 0.4294506090562732,
+      "score_on_positives_std": 0.40898177132385766,
+      "score_on_positives_skew": 0.3170277107175869,
+      "score_on_positives_kurt": -1.6452447496743983,
+      "score_on_negatives_mean": 0.011403407395882269,
+      "score_on_negatives_std": 0.08086342525609466,
+      "operating_threshold_at_99pct_spec": 0.3891327738441972,
+      "positives_above_threshold": 27
+    }
+  },
+  "techniques": {
+    "A_score_distribution": {
+      "ov_auc": 0.9545671357023611,
+      "ov_sens99": 0.25,
+      "paad_auc": 0.9400940623162845,
+      "paad_sens99": 0.45,
+      "binary_sens99": 0.7355371900826446,
+      "ov_dist": {
+        "n_pos": 28,
+        "n_neg": 599,
+        "score_on_positives_mean": 0.16755368978898316,
+        "score_on_positives_std": 0.25008815224261793,
+        "score_on_positives_skew": 1.6955988495200147,
+        "score_on_positives_kurt": 2.086128010939711,
+        "score_on_negatives_mean": 0.008465065965512445,
+        "score_on_negatives_std": 0.05931436434634279,
+        "operating_threshold_at_99pct_spec": 0.35508716394215833,
+        "positives_above_threshold": 7
+      },
+      "paad_dist": {
+        "n_pos": 60,
+        "n_neg": 567,
+        "score_on_positives_mean": 0.4294506090562732,
+        "score_on_positives_std": 0.40898177132385766,
+        "score_on_positives_skew": 0.3170277107175869,
+        "score_on_positives_kurt": -1.6452447496743983,
+        "score_on_negatives_mean": 0.011403407395882269,
+        "score_on_negatives_std": 0.08086342525609466,
+        "operating_threshold_at_99pct_spec": 0.3891327738441972,
+        "positives_above_threshold": 27
+      }
+    },
+    "B_cancer_specific_pca": {
+      "ov_auc": 0.9483663248270927,
+      "ov_sens99": 0.35714285714285715,
+      "paad_auc": 0.9195767195767196,
+      "paad_sens99": 0.3333333333333333,
+      "binary_sens99": 0.7355371900826446,
+      "per_target": {
+        "OV": {
+          "auc_pooled": 0.9483663248270927,
+          "sens99_pooled": 0.35714285714285715
+        },
+        "PAAD": {
+          "auc_pooled": 0.9195767195767196,
+          "sens99_pooled": 0.3333333333333333
+        }
+      }
+    },
+    "C_threshold_calibration_c2": {
+      "ov_auc": 0.5888981636060099,
+      "ov_sens99": 0.25,
+      "paad_auc": 0.9278953556731334,
+      "paad_sens99": 0.43333333333333335,
+      "binary_sens99": 0.7355371900826446,
+      "per_target": {
+        "OV": {
+          "most_confusable_cancer": "BRCA",
+          "s_neg_mean": 0.008465065965512445,
+          "c1_sens99": 0.25,
+          "c1_auc": 0.9545671357023611,
+          "c2_sens99": 0.25,
+          "c2_auc": 0.5888981636060099,
+          "baseline_ovr_sens99": 0.25,
+          "baseline_ovr_auc": 0.9545671357023611
+        },
+        "PAAD": {
+          "most_confusable_cancer": "CRC",
+          "s_neg_mean": 0.011403407395882269,
+          "c1_sens99": 0.45,
+          "c1_auc": 0.9400940623162846,
+          "c2_sens99": 0.43333333333333335,
+          "c2_auc": 0.9278953556731334,
+          "baseline_ovr_sens99": 0.45,
+          "baseline_ovr_auc": 0.9400940623162845
+        }
+      }
+    },
+    "C_threshold_calibration_c1": {
+      "ov_auc": 0.9545671357023611,
+      "ov_sens99": 0.25,
+      "paad_auc": 0.9400940623162846,
+      "paad_sens99": 0.45,
+      "binary_sens99": 0.7355371900826446,
+      "per_target": {
+        "OV": {
+          "most_confusable_cancer": "BRCA",
+          "s_neg_mean": 0.008465065965512445,
+          "c1_sens99": 0.25,
+          "c1_auc": 0.9545671357023611,
+          "c2_sens99": 0.25,
+          "c2_auc": 0.5888981636060099,
+          "baseline_ovr_sens99": 0.25,
+          "baseline_ovr_auc": 0.9545671357023611
+        },
+        "PAAD": {
+          "most_confusable_cancer": "CRC",
+          "s_neg_mean": 0.011403407395882269,
+          "c1_sens99": 0.45,
+          "c1_auc": 0.9400940623162846,
+          "c2_sens99": 0.43333333333333335,
+          "c2_auc": 0.9278953556731334,
+          "baseline_ovr_sens99": 0.45,
+          "baseline_ovr_auc": 0.9400940623162845
+        }
+      }
+    },
+    "D_engineered_features": {
+      "ov_auc": 0.9527784402575721,
+      "ov_sens99": 0.25,
+      "paad_auc": 0.9396237507348618,
+      "paad_sens99": 0.45,
+      "binary_sens99": 0.7355371900826446,
+      "n_features": 63266
+    },
+    "E_class_weight_5x": {
+      "ov_auc": 0.9520033388981636,
+      "ov_sens99": 0.25,
+      "paad_auc": 0.9391534391534392,
+      "paad_sens99": 0.4666666666666667,
+      "binary_sens99": 0.7355371900826446,
+      "weight": 5.0
+    },
+    "E_class_weight_10x": {
+      "ov_auc": 0.953076556165037,
+      "ov_sens99": 0.25,
+      "paad_auc": 0.9407701352145796,
+      "paad_sens99": 0.4666666666666667,
+      "binary_sens99": 0.7355371900826446,
+      "weight": 10.0
+    },
+    "F_margin_features": {
+      "ov_auc": 0.9545671357023612,
+      "ov_sens99": 0.25,
+      "paad_auc": 0.9398001175778954,
+      "paad_sens99": 0.45,
+      "binary_sens99": 0.7355371900826446
+    },
+    "G_B_avg_E5": {
+      "ov_auc": 0.9580252802289531,
+      "ov_sens99": 0.35714285714285715,
+      "paad_auc": 0.9346413874191652,
+      "paad_sens99": 0.4166666666666667,
+      "binary_sens99": 0.7355371900826446,
+      "members": "B_avg_E5"
+    },
+    "G_B_avg_E10": {
+      "ov_auc": 0.9584724540901502,
+      "ov_sens99": 0.35714285714285715,
+      "paad_auc": 0.9355526161081716,
+      "paad_sens99": 0.4166666666666667,
+      "binary_sens99": 0.7355371900826446,
+      "members": "B_avg_E10"
+    },
+    "G_B_avg_base": {
+      "ov_auc": 0.9587109468161221,
+      "ov_sens99": 0.35714285714285715,
+      "paad_auc": 0.9352733686067018,
+      "paad_sens99": 0.4,
+      "binary_sens99": 0.7355371900826446,
+      "members": "B_avg_base"
+    },
+    "G_B_avg_E5_avg_E10": {
+      "ov_auc": 0.9585320772716432,
+      "ov_sens99": 0.32142857142857145,
+      "paad_auc": 0.9379335684891241,
+      "paad_sens99": 0.4166666666666667,
+      "binary_sens99": 0.7355371900826446,
+      "members": "B_avg_E5_avg_E10"
+    },
+    "G_all_four_avg": {
+      "ov_auc": 0.9591879322680658,
+      "ov_sens99": 0.2857142857142857,
+      "paad_auc": 0.9394473838918284,
+      "paad_sens99": 0.43333333333333335,
+      "binary_sens99": 0.7355371900826446,
+      "members": "all_four_avg"
+    }
+  },
+  "best": {
+    "best_ov_sens99": 0.35714285714285715,
+    "best_ov_technique": "B_cancer_specific_pca",
+    "best_paad_sens99": 0.4666666666666667,
+    "best_paad_technique": "E_class_weight_5x",
+    "ov_target_met": false,
+    "paad_target_met": false
+  },
+  "wall_seconds": 409.6
+}
