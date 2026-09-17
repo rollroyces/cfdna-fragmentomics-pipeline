@@ -37,12 +37,26 @@
   "pca_n": 200,
   "lr_C": 1.0,
   "min_class_n": 30,
+  "ov_topk_channels": {
+    "applied": false,
+    "source_path": null,
+    "K": null,
+    "n_channels": 0,
+    "documented_ov_sens_at_99pct_pooled": null
+  },
   "oof_per_class_auc": {
     "BRCA": 0.9631845375057525,
     "HCC_J": 0.9957372363493002,
     "HEALTHY": 0.9671357705165534,
     "LUAD": 0.9527625359917422,
     "PAAD": 0.927319587628866
+  },
+  "oof_per_class_sens_at_99pct": {
+    "BRCA": 0.32075471698113206,
+    "HCC_J": 0.8876404494382022,
+    "HEALTHY": 0.5946969696969697,
+    "LUAD": 0.5822784810126582,
+    "PAAD": 0.38333333333333336
   },
   "per_class_auc_mean_across_seeds": {
     "BRCA": 0.9631845375057525,
@@ -109,5 +123,5 @@
     "LUAD",
     "PAAD"
   ],
-  "runtime_seconds": 23.98
+  "runtime_seconds": 4.29
 }

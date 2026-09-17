@@ -137,6 +137,14 @@ the stratified folds, so a small drop is expected and benign.
    prevents robust stratified CV. A leave-one-out or 3-fold CV would
    give a number, but with very wide confidence intervals.
 
+   **Sept 2026 follow-up:** the OV-specific K=10000 channel-set
+   pre-filter (`--ov-topk-channels results/ov_topk_channels.json`)
+   lifts OV Sens@99% from 0.25 to **0.3571** when the script is run
+   with `--min-class-n 0` (i.e. when OV is kept in the cohort). See
+   `docs/PER_CANCER_TOPK.md` for the full result table and
+   `test/test_multiclass_classification.py` for the byte-identical
+   regression guard.
+
 2. **Prefix decoding is inferred, not validated against ground truth.**
    FinaleDB's seqrun API was unreachable during this analysis
    (2026-09-12, HTTP 500). The mapping is consistent with the audit's
@@ -190,9 +198,15 @@ the stratified folds, so a small drop is expected and benign.
 - `results/multiclass_classification.json` — full results including
   per-class AUCs, macro AUC, top-2 accuracy, confusion matrix, and
   binary-vs-multi information delta.
-- `test/test_multiclass_classification.py` — 18 tests (10 spot-checks
+- `test/test_multiclass_classification.py` — 21 tests (10 spot-checks
   of `labels_multiclass.tsv`, 1 schema test, 4 sanity tests on AUCs,
-  1 CLI test, 2 end-to-end smoke tests). All pass.
+  1 CLI test, 2 end-to-end smoke tests, 3 OV K=10000 pre-filter tests
+  with byte-identical regression guards). All pass.
+- `results/ov_topk_channels.json` — 10,000 OV channel indices (with
+  provenance metadata) committed to the repo for the optional OV
+  pre-filter.
+- `docs/PER_CANCER_TOPK.md` — full report on the per-cancer top-K
+  sweep, including the integration as an optional pre-filter.
 - `docs/MULTICANCER_RESULTS.md` — this file.
 
 ## 6. Reproduce
@@ -205,6 +219,14 @@ python scripts/multiclass_classification.py \
 # smoke (~25 seconds)
 python scripts/multiclass_classification.py --quick \
     --out results/multiclass_smoke.json
+
+# OV K=10000 channel-set pre-filter (~4 minutes; uses --min-class-n 0
+# so OV (n=28) is kept in the cohort; without this flag OV/CRC/OTHER_C
+# are dropped by the n>=30 class filter)
+python scripts/multiclass_classification.py \
+    --min-class-n 0 \
+    --ov-topk-channels results/ov_topk_channels.json \
+    --out results/multiclass_with_ov_prefilter.json
 
 # tests
 pytest test/test_multiclass_classification.py -v

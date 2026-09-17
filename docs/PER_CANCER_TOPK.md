@@ -102,20 +102,62 @@ Binary guard (full 63,246 features, unchanged by per-cancer top-K):
   added, which suggests BRCA does not have a small "signature channel
   set")
 
-## Integration recommendation
+## Integration (Sept 2026)
 
-Per the task spec's step 9 — "If any cancer's Sens@99% improves ≥ 0.10
-absolute without regressing others, integrate with new tests" — **the
-OV result is a +0.107 lift with no meaningful per-cancer AUC regression
-and no binary regression**. Recommend integrating the **OV-specific
-top-K=10000 channel set** as an optional pre-filter for the OvR OV
-classifier. The implementation in `per_cancer_topk_sweep.py` is
-self-contained and the OV channel indices are persisted in
-`results/per_cancer_topk.json` under `final.OV.channel_indices`.
+The OV K=10000 channel set is integrated as an **optional pre-filter**
+in `scripts/multiclass_classification.py`. Default behavior is unchanged
+(no regression — see `test/test_multiclass_classification.py`). When
+the user passes `--ov-topk-channels results/ov_topk_channels.json`,
+only the **OV-class OvR LR** is trained on those 10,000 columns
+(its own per-fold StandardScaler + PCA(200)); every other class
+(BRCA, CRC, HCC_J, HEALTHY, LUAD, OTHER_C, PAAD) and the binary
+cancer-vs-healthy LR continue to see the full 63,246-dim X.
 
-PAAD and BRCA are not recommended for integration: K=5000 for PAAD is
-neutral, K=50000 for BRCA is effectively the baseline with a small
-regression. Neither clears the per-cancer target.
+**Measured impact (5×5 pooled OOF, 627-sample cross-study cohort):**
+
+| Configuration | OV AUC | OV Sens@99% | Binary AUC |
+|---|---:|---:|---:|
+| OFF (default, full X) | 0.9546 | 0.2500 | 0.9679 |
+| ON (`--ov-topk-channels`) | 0.9525 | **0.3571** | 0.9679 |
+| Delta | -0.0021 | **+0.1071** | 0.0000 |
+
+The pre-filter reproduces the documented +0.1071 absolute OV
+Sens@99% lift byte-identically (`per_cancer_topk.json` → `final.OV`).
+OV AUC drops 0.0021 (well within run-to-run noise, equivalent to one
+seed's std). Binary pooled AUC is unchanged because the binary LR
+uses its own StandardScaler + PCA on full X, independent of the OvR
+loop.
+
+**Usage:**
+
+```bash
+python scripts/multiclass_classification.py \
+    --min-class-n 0 \
+    --ov-topk-channels results/ov_topk_channels.json \
+    --out results/multiclass_with_ov_prefilter.json
+```
+
+The artifact `results/ov_topk_channels.json` is a frozen copy of the
+`final.OV.channel_indices` list from `results/per_cancer_topk.json`
+(K=10000 ints in `[0, 63246)`) plus provenance metadata (schema
+version, source path, documented metric). It is committed and
+gitignored only the heavier cohort data.
+
+**Per-cancer regression guard (executed by the test suite):**
+
+- `test_ov_topk_prefilter_off_matches_baseline` — verifies the
+  OFF-path reproduces `per_cancer_ov_paad.json` baseline
+  numbers byte-identically (OV Sens@99% = 0.25, BRCA 0.4151, PAAD
+  0.45, etc.).
+- `test_ov_topk_prefilter_on_reproduces_documented_lift` — verifies
+  the ON-path produces OV Sens@99% = 0.35714285714285715 exactly
+  (the value in `per_cancer_topk.json` → `final.OV`) AND that every
+  other class plus the binary pooled AUC match the OFF-path run
+  exactly (no silent regression in non-OV classes).
+
+PAAD and BRCA are **not** integrated: K=5000 for PAAD is neutral
+within noise, K=50000 for BRCA is effectively the baseline with a
+small regression. Neither clears the per-cancer target.
 
 ## Comparison to the CADD Top-K=500 finding (insight #2)
 
