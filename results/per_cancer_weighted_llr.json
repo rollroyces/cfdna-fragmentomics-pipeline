@@ -1,0 +1,661 @@
+{
+  "generated_at": "2026-09-17T10:20:22.886490+00:00",
+  "config": {
+    "inner_seed": 42,
+    "inner_folds": 3,
+    "seeds": [
+      42,
+      13,
+      7,
+      99,
+      1234
+    ],
+    "n_folds": 5,
+    "lr_C": 1.0,
+    "targets": [
+      "OV",
+      "PAAD",
+      "BRCA"
+    ],
+    "weight_scheme_primary": "linear",
+    "schemes_evaluated": [
+      "linear",
+      "sigmoid_10"
+    ],
+    "weight_application": "column-wise feature scaling (X_weighted = X * w)"
+  },
+  "cohort": {
+    "n_total": 627,
+    "n_features": 63246,
+    "classes": [
+      "BRCA",
+      "CRC",
+      "HCC_J",
+      "HEALTHY",
+      "LUAD",
+      "OTHER_C",
+      "OV",
+      "PAAD"
+    ]
+  },
+  "per_scheme": {
+    "linear": {
+      "OV": {
+        "auc_pooled": 0.9438349630336276,
+        "sens_at_99pct_pooled": 0.07142857142857142,
+        "n_positive": 28,
+        "weights_meta": {
+          "n_folds_total": 25,
+          "n_active_channels_mean": 47651.4,
+          "n_active_channels_std": 415.4279720962468,
+          "n_active_channels_min": 46821,
+          "n_active_channels_max": 48441,
+          "mean_w_active_mean": 0.12576137064597012,
+          "mean_w_active_std": 0.013114271908507153,
+          "max_w_mean": 0.3447582322316952,
+          "max_w_std": 0.014980636221352709,
+          "median_w_mean": 0.12116811334133228,
+          "n_features_total": 63246
+        },
+        "stability": {
+          "per_seed": [
+            {
+              "seed": 42,
+              "auc": 0.9518244693536847,
+              "sens99": 0.07142857142857142
+            },
+            {
+              "seed": 13,
+              "auc": 0.9374552826138802,
+              "sens99": 0.0
+            },
+            {
+              "seed": 7,
+              "auc": 0.9332220367278798,
+              "sens99": 0.14285714285714285
+            },
+            {
+              "seed": 99,
+              "auc": 0.9401383257810637,
+              "sens99": 0.03571428571428571
+            },
+            {
+              "seed": 1234,
+              "auc": 0.9276174576675411,
+              "sens99": 0.03571428571428571
+            }
+          ],
+          "auc_mean": 0.9380515144288099,
+          "auc_std": 0.008082053658827344,
+          "auc_min": 0.9276174576675411,
+          "auc_max": 0.9518244693536847,
+          "sens99_mean": 0.05714285714285714,
+          "sens99_std": 0.04844521416518049,
+          "sens99_min": 0.0,
+          "sens99_max": 0.14285714285714285
+        },
+        "runtime_seconds": 206.4
+      },
+      "PAAD": {
+        "auc_pooled": 0.9390652557319223,
+        "sens_at_99pct_pooled": 0.38333333333333336,
+        "n_positive": 60,
+        "weights_meta": {
+          "n_folds_total": 25,
+          "n_active_channels_mean": 49619.0,
+          "n_active_channels_std": 154.83152133851814,
+          "n_active_channels_min": 49213,
+          "n_active_channels_max": 49905,
+          "mean_w_active_mean": 0.11581252499406101,
+          "mean_w_active_std": 0.00858413002228208,
+          "max_w_mean": 0.3541749402589266,
+          "max_w_std": 0.008912893415061731,
+          "median_w_mean": 0.08444118190792588,
+          "n_features_total": 63246
+        },
+        "stability": {
+          "per_seed": [
+            {
+              "seed": 42,
+              "auc": 0.9383009994121105,
+              "sens99": 0.4666666666666667
+            },
+            {
+              "seed": 13,
+              "auc": 0.9308935920047031,
+              "sens99": 0.35
+            },
+            {
+              "seed": 7,
+              "auc": 0.9461199294532628,
+              "sens99": 0.43333333333333335
+            },
+            {
+              "seed": 99,
+              "auc": 0.9307466196355085,
+              "sens99": 0.35
+            },
+            {
+              "seed": 1234,
+              "auc": 0.9323927101704881,
+              "sens99": 0.2833333333333333
+            }
+          ],
+          "auc_mean": 0.9356907701352146,
+          "auc_std": 0.005897718248097826,
+          "auc_min": 0.9307466196355085,
+          "auc_max": 0.9461199294532628,
+          "sens99_mean": 0.37666666666666665,
+          "sens99_std": 0.06548960901462834,
+          "sens99_min": 0.2833333333333333,
+          "sens99_max": 0.4666666666666667
+        },
+        "runtime_seconds": 206.1
+      },
+      "BRCA": {
+        "auc_pooled": 0.9543422523174019,
+        "sens_at_99pct_pooled": 0.33962264150943394,
+        "n_positive": 53,
+        "weights_meta": {
+          "n_folds_total": 25,
+          "n_active_channels_mean": 44609.12,
+          "n_active_channels_std": 589.7517660846808,
+          "n_active_channels_min": 42802,
+          "n_active_channels_max": 45482,
+          "mean_w_active_mean": 0.09164091643857152,
+          "mean_w_active_std": 0.012188058286727548,
+          "max_w_mean": 0.3429163508934755,
+          "max_w_std": 0.0066909574432424705,
+          "median_w_mean": 0.08101392292909228,
+          "n_features_total": 63246
+        },
+        "stability": {
+          "per_seed": [
+            {
+              "seed": 42,
+              "auc": 0.9578265728748931,
+              "sens99": 0.33962264150943394
+            },
+            {
+              "seed": 13,
+              "auc": 0.9484583525080533,
+              "sens99": 0.3584905660377358
+            },
+            {
+              "seed": 7,
+              "auc": 0.9410623890605483,
+              "sens99": 0.32075471698113206
+            },
+            {
+              "seed": 99,
+              "auc": 0.9597330878969168,
+              "sens99": 0.2830188679245283
+            },
+            {
+              "seed": 1234,
+              "auc": 0.9526658339359674,
+              "sens99": 0.2641509433962264
+            }
+          ],
+          "auc_mean": 0.9519492472552757,
+          "auc_std": 0.006728367640560499,
+          "auc_min": 0.9410623890605483,
+          "auc_max": 0.9597330878969168,
+          "sens99_mean": 0.3132075471698113,
+          "sens99_std": 0.03499478677545548,
+          "sens99_min": 0.2641509433962264,
+          "sens99_max": 0.3584905660377358
+        },
+        "runtime_seconds": 209.7
+      }
+    },
+    "sigmoid_10": {
+      "OV": {
+        "auc_pooled": 0.953016932983544,
+        "sens_at_99pct_pooled": 0.25,
+        "n_positive": 28,
+        "weights_meta": {
+          "n_folds_total": 25,
+          "n_active_channels_mean": 63246.0,
+          "n_active_channels_std": 0.0,
+          "n_active_channels_min": 63246,
+          "n_active_channels_max": 63246,
+          "mean_w_active_mean": 0.6594733174933247,
+          "mean_w_active_std": 0.015146069327940935,
+          "max_w_mean": 0.9688563043540662,
+          "max_w_std": 0.004240957548468852,
+          "median_w_mean": 0.7688855839979435,
+          "n_features_total": 63246
+        },
+        "stability": {
+          "per_seed": [
+            {
+              "seed": 42,
+              "auc": 0.9568924397805867,
+              "sens99": 0.25
+            },
+            {
+              "seed": 13,
+              "auc": 0.9508704984497972,
+              "sens99": 0.17857142857142858
+            },
+            {
+              "seed": 7,
+              "auc": 0.9432983544001908,
+              "sens99": 0.14285714285714285
+            },
+            {
+              "seed": 99,
+              "auc": 0.9556403529692344,
+              "sens99": 0.21428571428571427
+            },
+            {
+              "seed": 1234,
+              "auc": 0.9525995707130932,
+              "sens99": 0.10714285714285714
+            }
+          ],
+          "auc_mean": 0.9518602432625805,
+          "auc_std": 0.004784231849641033,
+          "auc_min": 0.9432983544001908,
+          "auc_max": 0.9568924397805867,
+          "sens99_mean": 0.17857142857142855,
+          "sens99_std": 0.05050762722761054,
+          "sens99_min": 0.10714285714285714,
+          "sens99_max": 0.25
+        },
+        "runtime_seconds": 156.9
+      },
+      "PAAD": {
+        "auc_pooled": 0.9400352733686066,
+        "sens_at_99pct_pooled": 0.45,
+        "n_positive": 60,
+        "weights_meta": {
+          "n_folds_total": 25,
+          "n_active_channels_mean": 63246.0,
+          "n_active_channels_std": 0.0,
+          "n_active_channels_min": 63246,
+          "n_active_channels_max": 63246,
+          "mean_w_active_mean": 0.6347281649098161,
+          "mean_w_active_std": 0.012012503468023364,
+          "max_w_mean": 0.9717502676457856,
+          "max_w_std": 0.0024359018477301017,
+          "median_w_mean": 0.698890027880717,
+          "n_features_total": 63246
+        },
+        "stability": {
+          "per_seed": [
+            {
+              "seed": 42,
+              "auc": 0.9407407407407408,
+              "sens99": 0.45
+            },
+            {
+              "seed": 13,
+              "auc": 0.9318930041152264,
+              "sens99": 0.38333333333333336
+            },
+            {
+              "seed": 7,
+              "auc": 0.9494121105232217,
+              "sens99": 0.4666666666666667
+            },
+            {
+              "seed": 99,
+              "auc": 0.9362139917695473,
+              "sens99": 0.36666666666666664
+            },
+            {
+              "seed": 1234,
+              "auc": 0.9386537330981776,
+              "sens99": 0.36666666666666664
+            }
+          ],
+          "auc_mean": 0.9393827160493828,
+          "auc_std": 0.005815513719966977,
+          "auc_min": 0.9318930041152264,
+          "auc_max": 0.9494121105232217,
+          "sens99_mean": 0.4066666666666666,
+          "sens99_std": 0.04294699575575043,
+          "sens99_min": 0.36666666666666664,
+          "sens99_max": 0.4666666666666667
+        },
+        "runtime_seconds": 148.5
+      },
+      "BRCA": {
+        "auc_pooled": 0.9552955098284137,
+        "sens_at_99pct_pooled": 0.41509433962264153,
+        "n_positive": 53,
+        "weights_meta": {
+          "n_folds_total": 25,
+          "n_active_channels_mean": 63246.0,
+          "n_active_channels_std": 0.0,
+          "n_active_channels_min": 63246,
+          "n_active_channels_max": 63246,
+          "mean_w_active_mean": 0.5748494183996258,
+          "mean_w_active_std": 0.017017169000688392,
+          "max_w_mean": 0.9685400988597364,
+          "max_w_std": 0.0020237475448949536,
+          "median_w_mean": 0.6911859200839804,
+          "n_features_total": 63246
+        },
+        "stability": {
+          "per_seed": [
+            {
+              "seed": 42,
+              "auc": 0.9622312799947406,
+              "sens99": 0.4716981132075472
+            },
+            {
+              "seed": 13,
+              "auc": 0.9549339293932023,
+              "sens99": 0.41509433962264153
+            },
+            {
+              "seed": 7,
+              "auc": 0.9296890408257181,
+              "sens99": 0.2830188679245283
+            },
+            {
+              "seed": 99,
+              "auc": 0.9496417066596541,
+              "sens99": 0.4528301886792453
+            },
+            {
+              "seed": 1234,
+              "auc": 0.9518769311682336,
+              "sens99": 0.37735849056603776
+            }
+          ],
+          "auc_mean": 0.9496745776083098,
+          "auc_std": 0.010859140649325316,
+          "auc_min": 0.9296890408257181,
+          "auc_max": 0.9622312799947406,
+          "sens99_mean": 0.4,
+          "sens99_std": 0.0668680948930919,
+          "sens99_min": 0.2830188679245283,
+          "sens99_max": 0.4716981132075472
+        },
+        "runtime_seconds": 148.4
+      }
+    }
+  },
+  "final": {
+    "OV": {
+      "auc_pooled": 0.9438349630336276,
+      "sens_at_99pct_pooled": 0.07142857142857142,
+      "n_positive": 28,
+      "weights_meta": {
+        "n_folds_total": 25,
+        "n_active_channels_mean": 47651.4,
+        "n_active_channels_std": 415.4279720962468,
+        "n_active_channels_min": 46821,
+        "n_active_channels_max": 48441,
+        "mean_w_active_mean": 0.12576137064597012,
+        "mean_w_active_std": 0.013114271908507153,
+        "max_w_mean": 0.3447582322316952,
+        "max_w_std": 0.014980636221352709,
+        "median_w_mean": 0.12116811334133228,
+        "n_features_total": 63246
+      },
+      "stability": {
+        "per_seed": [
+          {
+            "seed": 42,
+            "auc": 0.9518244693536847,
+            "sens99": 0.07142857142857142
+          },
+          {
+            "seed": 13,
+            "auc": 0.9374552826138802,
+            "sens99": 0.0
+          },
+          {
+            "seed": 7,
+            "auc": 0.9332220367278798,
+            "sens99": 0.14285714285714285
+          },
+          {
+            "seed": 99,
+            "auc": 0.9401383257810637,
+            "sens99": 0.03571428571428571
+          },
+          {
+            "seed": 1234,
+            "auc": 0.9276174576675411,
+            "sens99": 0.03571428571428571
+          }
+        ],
+        "auc_mean": 0.9380515144288099,
+        "auc_std": 0.008082053658827344,
+        "auc_min": 0.9276174576675411,
+        "auc_max": 0.9518244693536847,
+        "sens99_mean": 0.05714285714285714,
+        "sens99_std": 0.04844521416518049,
+        "sens99_min": 0.0,
+        "sens99_max": 0.14285714285714285
+      },
+      "runtime_seconds": 206.4
+    },
+    "PAAD": {
+      "auc_pooled": 0.9390652557319223,
+      "sens_at_99pct_pooled": 0.38333333333333336,
+      "n_positive": 60,
+      "weights_meta": {
+        "n_folds_total": 25,
+        "n_active_channels_mean": 49619.0,
+        "n_active_channels_std": 154.83152133851814,
+        "n_active_channels_min": 49213,
+        "n_active_channels_max": 49905,
+        "mean_w_active_mean": 0.11581252499406101,
+        "mean_w_active_std": 0.00858413002228208,
+        "max_w_mean": 0.3541749402589266,
+        "max_w_std": 0.008912893415061731,
+        "median_w_mean": 0.08444118190792588,
+        "n_features_total": 63246
+      },
+      "stability": {
+        "per_seed": [
+          {
+            "seed": 42,
+            "auc": 0.9383009994121105,
+            "sens99": 0.4666666666666667
+          },
+          {
+            "seed": 13,
+            "auc": 0.9308935920047031,
+            "sens99": 0.35
+          },
+          {
+            "seed": 7,
+            "auc": 0.9461199294532628,
+            "sens99": 0.43333333333333335
+          },
+          {
+            "seed": 99,
+            "auc": 0.9307466196355085,
+            "sens99": 0.35
+          },
+          {
+            "seed": 1234,
+            "auc": 0.9323927101704881,
+            "sens99": 0.2833333333333333
+          }
+        ],
+        "auc_mean": 0.9356907701352146,
+        "auc_std": 0.005897718248097826,
+        "auc_min": 0.9307466196355085,
+        "auc_max": 0.9461199294532628,
+        "sens99_mean": 0.37666666666666665,
+        "sens99_std": 0.06548960901462834,
+        "sens99_min": 0.2833333333333333,
+        "sens99_max": 0.4666666666666667
+      },
+      "runtime_seconds": 206.1
+    },
+    "BRCA": {
+      "auc_pooled": 0.9543422523174019,
+      "sens_at_99pct_pooled": 0.33962264150943394,
+      "n_positive": 53,
+      "weights_meta": {
+        "n_folds_total": 25,
+        "n_active_channels_mean": 44609.12,
+        "n_active_channels_std": 589.7517660846808,
+        "n_active_channels_min": 42802,
+        "n_active_channels_max": 45482,
+        "mean_w_active_mean": 0.09164091643857152,
+        "mean_w_active_std": 0.012188058286727548,
+        "max_w_mean": 0.3429163508934755,
+        "max_w_std": 0.0066909574432424705,
+        "median_w_mean": 0.08101392292909228,
+        "n_features_total": 63246
+      },
+      "stability": {
+        "per_seed": [
+          {
+            "seed": 42,
+            "auc": 0.9578265728748931,
+            "sens99": 0.33962264150943394
+          },
+          {
+            "seed": 13,
+            "auc": 0.9484583525080533,
+            "sens99": 0.3584905660377358
+          },
+          {
+            "seed": 7,
+            "auc": 0.9410623890605483,
+            "sens99": 0.32075471698113206
+          },
+          {
+            "seed": 99,
+            "auc": 0.9597330878969168,
+            "sens99": 0.2830188679245283
+          },
+          {
+            "seed": 1234,
+            "auc": 0.9526658339359674,
+            "sens99": 0.2641509433962264
+          }
+        ],
+        "auc_mean": 0.9519492472552757,
+        "auc_std": 0.006728367640560499,
+        "auc_min": 0.9410623890605483,
+        "auc_max": 0.9597330878969168,
+        "sens99_mean": 0.3132075471698113,
+        "sens99_std": 0.03499478677545548,
+        "sens99_min": 0.2641509433962264,
+        "sens99_max": 0.3584905660377358
+      },
+      "runtime_seconds": 209.7
+    }
+  },
+  "binary_final": {
+    "channel_set": "all features (per-cancer weights do not touch binary)",
+    "n_features_used": 63246,
+    "auc_pooled": 0.9698013189748727,
+    "sens_at_99pct_pooled": 0.7768595041322314,
+    "runtime_seconds": 32.2
+  },
+  "baseline": {
+    "BRCA": {
+      "auc_pooled": 0.9532246400631122,
+      "sens_at_99pct_pooled": 0.41509433962264153
+    },
+    "OV": {
+      "auc_pooled": 0.9545671357023611,
+      "sens_at_99pct_pooled": 0.25
+    },
+    "PAAD": {
+      "auc_pooled": 0.9400940623162845,
+      "sens_at_99pct_pooled": 0.45
+    }
+  },
+  "baseline_binary_sens99": 0.7355371900826446,
+  "baseline_binary_auc": 0.9660363970281326,
+  "topk_results": {
+    "OV": {
+      "K": 10000,
+      "auc_pooled": 0.9525,
+      "sens_at_99pct_pooled": 0.3571
+    },
+    "PAAD": {
+      "K": 5000,
+      "auc_pooled": 0.9449,
+      "sens_at_99pct_pooled": 0.4333
+    },
+    "BRCA": {
+      "K": 50000,
+      "auc_pooled": 0.954,
+      "sens_at_99pct_pooled": 0.3396
+    }
+  },
+  "topk_baseline_binary_sens99": 0.7768595041322314,
+  "topk_baseline_binary_auc": 0.9698013189748727,
+  "floors": {
+    "auc_per_cancer": 0.94,
+    "binary_sens99": 0.755,
+    "binary_auc": 0.9755,
+    "targets": {
+      "OV": 0.4,
+      "PAAD": 0.55,
+      "BRCA": 0.5
+    }
+  },
+  "deltas": {
+    "sens_vs_uniform": {
+      "linear": {
+        "OV": -0.17857142857142858,
+        "PAAD": -0.06666666666666665,
+        "BRCA": -0.07547169811320759
+      },
+      "sigmoid_10": {
+        "OV": 0.0,
+        "PAAD": 0.0,
+        "BRCA": 0.0
+      }
+    },
+    "sens_vs_topk": {
+      "linear": {
+        "OV": -0.2856714285714286,
+        "PAAD": -0.04996666666666666,
+        "BRCA": 2.2641509433929397e-05
+      },
+      "sigmoid_10": {
+        "OV": -0.10709999999999997,
+        "PAAD": 0.016699999999999993,
+        "BRCA": 0.07549433962264152
+      }
+    },
+    "auc_vs_uniform": {
+      "linear": {
+        "OV": -0.010732172668733497,
+        "PAAD": -0.0010288065843621075,
+        "BRCA": 0.001117612254289635
+      },
+      "sigmoid_10": {
+        "OV": -0.0015502027188171175,
+        "PAAD": -5.878894767785692e-05,
+        "BRCA": 0.002070869765301464
+      }
+    }
+  },
+  "passes": {
+    "sens_target_met": {
+      "OV": false,
+      "PAAD": false,
+      "BRCA": false
+    },
+    "auc_floor_met": {
+      "OV": true,
+      "PAAD": false,
+      "BRCA": true
+    },
+    "binary_sens_baseline_preserved": true,
+    "binary_auc_baseline_preserved": true,
+    "binary_sens_floor_met": true,
+    "binary_auc_floor_met": false
+  },
+  "bottom_line": "Per-cancer CADD-style continuous weighting (this script) vs uniform-channel OvR baseline vs hard top-K subset (commit b5d8260):\n\n  Scheme: linear\n    OV: Sens@99% 0.2500 -> 0.0714 (-0.1786 vs uniform; -0.2857 vs top-K), AUC 0.9546 -> 0.9438 (-0.0107 vs uniform), target 0.40 -> NOT MET\n    PAAD: Sens@99% 0.4500 -> 0.3833 (-0.0667 vs uniform; -0.0500 vs top-K), AUC 0.9401 -> 0.9391 (-0.0010 vs uniform), target 0.55 -> NOT MET\n    BRCA: Sens@99% 0.4151 -> 0.3396 (-0.0755 vs uniform; +0.0000 vs top-K), AUC 0.9532 -> 0.9543 (+0.0011 vs uniform), target 0.50 -> NOT MET\n\n  Scheme: sigmoid_10\n    OV: Sens@99% 0.2500 -> 0.2500 (+0.0000 vs uniform; -0.1071 vs top-K), AUC 0.9546 -> 0.9530 (-0.0016 vs uniform), target 0.40 -> NOT MET\n    PAAD: Sens@99% 0.4500 -> 0.4500 (+0.0000 vs uniform; +0.0167 vs top-K), AUC 0.9401 -> 0.9400 (-0.0001 vs uniform), target 0.55 -> NOT MET\n    BRCA: Sens@99% 0.4151 -> 0.4151 (+0.0000 vs uniform; +0.0755 vs top-K), AUC 0.9532 -> 0.9553 (+0.0021 vs uniform), target 0.50 -> NOT MET\n\nBinary guard (cancer vs healthy, full 63246 features):\n  Sens@99%=0.7769  uniform-baseline=0.7355 (+0.0413, ABOVE baseline), floor=0.755 (MET)\n  AUC     =0.9698  uniform-baseline=0.9660 (+0.0038, ABOVE baseline), floor=0.9755 (NOT MET)\n\nLinear (literal task spec) beats hard top-K on: ['BRCA']\nLinear regressed >1pp vs top-K on: ['OV', 'PAAD']\nLinear stable across seeds (Sens@99% std < 0.10): ['OV', 'PAAD', 'BRCA']\n\nNo cancer gained >= 0.10 absolute Sens@99% over the uniform baseline while preserving AUC and binary baseline. Per-cancer picture (Sens@99% delta vs uniform, linear scheme): OV -0.1786, PAAD -0.0667, BRCA -0.0755.",
+  "wall_seconds": 1109.5
+}
