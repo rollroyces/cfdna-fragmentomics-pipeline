@@ -75,6 +75,7 @@ jobs:
         run: |
           for script in \
               scripts/auc_reproducibility_gate.py \
+              scripts/comprehensive_sens_spec_table.py \
               scripts/honest_benchmark.py \
               scripts/lr_no_pca_vs_pca200.py \
               scripts/lr_regularization_sweep.py \
