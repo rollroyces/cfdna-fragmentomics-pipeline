@@ -1,0 +1,87 @@
+{
+  "generated_at": "2026-09-17T00:00:00+00:00",
+  "task": "AlphaGenome Atlas variant-prioritized per-cancer detection (OV, PAAD)",
+  "outcome": "SCOPE_MISMATCH_NOT_EXECUTABLE",
+  "summary": "The cfdna-fragmentomics-pipeline has no per-mutation panel to re-rank. The LR classifier is trained on 5-channel fragment-coverage features (DELFI 5Mb/100kb windows + FSD-196), with no variant/SNV calls, no gene-region panel, and no AVI-score input. There is no mutation-level data on which to apply AlphaGenome Variant Impact (AVI) re-ranking. The task as specified cannot be executed on this codebase.",
+  "evidence": {
+    "pipeline_is_tumor_naive": {
+      "file": "USAGE.md:489",
+      "quote": "HEAD/tumor-naive (this project): the fragmentomics-only classifier that doesn't require patient-specific mutation panels. Contrast with the 'mutation-informed' panel-LLR detector in DeepCatch."
+    },
+    "feature_set_has_no_variants": {
+      "loader": "scripts/honest_benchmark.py:load5",
+      "feature_files_per_sample": [
+        "{sample}.delfi_5mb_ratio.npy",
+        "{sample}.delfi_5mb_coverage.npy",
+        "{sample}.delfi_100kb_ratio.npy",
+        "{sample}.delfi_100kb_counts.npy",
+        "{sample}.fsd.json"
+      ],
+      "data_dir_contents": "data/features/ has no .vcf / .maf / variant.tsv / mutation.tsv / avi.* files",
+      "label_files_only": ["labels_multiclass.tsv", "data/features/labels_cross_study.tsv", "data/features/labels.tsv"]
+    },
+    "ov_dropped_from_default_cohort": {
+      "MIN_CLASS_N": 30,
+      "OV_n": 28,
+      "consequence": "OV is excluded from the default multiclass_classification.py cohort; it only appears in per_cancer_ov_paad_sweep.py because that script sets keep=set(labels.values())."
+    },
+    "synthetic_mutation_channel_documented": {
+      "file": "scripts/fusion_ablation.py:1-9",
+      "quote": "The synthetic mutation score is *not* a real mutation model — it's a calibrated stand-in used to ask: 'Given a mutation channel of this quality, does fusion help?'"
+    }
+  },
+  "constraints_evaluated": {
+    "alphagenome_no_ml_training": "Honored by design — no model was trained or modified using AlphaGenome Atlas outputs. The AVI score (or any related feature) was never used as an input to the LR, PCA, or any score transform.",
+    "no_avi_model_input": "True — the AVI score never appeared in any feature matrix, scaler, PCA component, or LR coefficient. The 'AVI as a feature' interpretation was never instantiated.",
+    "alphagenome_package_installed": "pip install alphagenome succeeded in the deepcatch venv (v1.2.x). AtlasClient + genome.Variant API confirmed importable. Atlas query requires an authenticated API key; no calls were made."
+  },
+  "baseline_reference_for_context": {
+    "source": "results/per_cancer_ov_paad.json (committed at HEAD 5d4f3a9)",
+    "baseline": {
+      "OV": {"n_positive": 28, "auc_pooled": 0.9546, "sens_at_99pct_pooled": 0.2500},
+      "PAAD": {"n_positive": 60, "auc_pooled": 0.9401, "sens_at_99pct_pooled": 0.4500},
+      "binary_pooled_auc": 0.9660,
+      "binary_sens99": 0.7355
+    },
+    "best_techniques_from_prior_sweep": {
+      "OV_best_sens99": 0.3571,
+      "OV_best_technique": "B_cancer_specific_pca",
+      "PAAD_best_sens99": 0.4667,
+      "PAAD_best_technique": "E_class_weight_5x",
+      "OV_target_0.40_met": false,
+      "PAAD_target_0.60_met": false
+    }
+  },
+  "attempted_approaches_and_blocker": [
+    {
+      "approach": "Direct AVI re-ranking of a per-cancer mutation panel",
+      "blocker": "No per-cancer mutation panel exists in the repo. The feature set is windowed coverage only."
+    },
+    {
+      "approach": "Window-level 'high-AVI variant density' prior: map each DELFI/FSD window to its genomic interval, query Atlas for AVI scores of variants falling in that interval, weight the window by max-AVI",
+      "blocker": "(a) Requires per-cancer variant lists to define which AVI scores are 'cancer-relevant'. (b) The Atlas API requires an authenticated key; even with a key, generating a per-cancer variant panel from TCGA/COSMIC would itself be inventing data. (c) The AVI-weighted feature would still need to be a model input, violating the 'AVI score cannot be a model input' rule. The Task itself notes the API cannot train models — only the rank is allowed. There is no rank to apply when the feature space is windowed coverage."
+    },
+    {
+      "approach": "Pretend that 'panel' refers to the OvR class list (BRCA/CRC/...) and rank classes by an AVI-derived gene-set overlap",
+      "blocker": "This would not test the hypothesis that 'variants with higher AVI carry more cancer signal per mutation than uniformly-tracked mutations' — it would test something completely different, and would also invent the gene-set overlap. Documented in this file and rejected."
+    }
+  ],
+  "honest_bottom_line": {
+    "did_avi_ranked_panel_beat_uniform_panel": "CANNOT BE MEASURED — there is no per-mutation panel to rank.",
+    "did_avi_ranking_help_anywhere": "CANNOT BE MEASURED — the experiment was not instantiated.",
+    "was_no_ml_training_restriction_honored": "YES — no model was trained on or modified using AlphaGenome Atlas outputs. The AVI score never reached any training pipeline.",
+    "recommendation": "The AVI-ranking hypothesis is testable in the deepcatch panel-LLR pipeline (which does use a per-patient TCGA mutation panel), not in this tumor-naive fragmentomics pipeline. See /Users/hermes/deepcatch/src/foundation/model.py and MODEL.md for the panel-LLR system that could carry an AVI-ranked variant panel."
+  },
+  "ov_sens99_improvement": 0.0,
+  "paad_sens99_improvement": 0.0,
+  "ov_auc_floor_preserved": true,
+  "paad_auc_floor_preserved": true,
+  "ov_auc_floor_value": 0.94,
+  "paad_auc_floor_value": 0.94,
+  "binary_sens99_floor_preserved": "N/A — baseline binary_sens99=0.7355 already falls below the stated 0.755 floor; the floor cannot be 'preserved' because it was never met in this cohort. The default multiclass_classification.py cohort drops OV (n=28 < MIN_CLASS_N=30), so the OV/PAAD sweep's binary number is on a different cohort than the v2.2 published reference.",
+  "reproducibility": {
+    "alphagenome_package": "pip install alphagenome succeeds; atlas.atlas.AtlasClient is importable.",
+    "no_atlas_calls_made": true,
+    "no_artificial_data_added": true
+  }
+}
